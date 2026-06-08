@@ -1,0 +1,302 @@
+{
+  "d0a44ffa43d5ebb2": {
+    "summary": "Nervous system: CNS (brain+spinal cord) and PNS (nerves). Neuron structure: dendrites→cell body→axon→synaptic terminals. Reflex arc: receptor→sensory neuron→spinal cord→motor neuron→effector (fast, involuntary). Brain: forebrain (cerebrum), midbrain, hindbrain.",
+    "chunks": [
+      {
+        "title": "Understanding Animals - Nervous System",
+        "content": "**Animals - Nervous System** is a key topic in Control and Coordination for CBSE Class X Science.\n\n**Nervous system:** Detects stimuli, processes information, produces responses.\n\n**Neuron (nerve cell):** Structural and functional unit.\nDendrites (receive signals) → Cell body (integrates) → Axon (conducts impulse) → Synaptic terminals (release neurotransmitter)"
+      },
+      {
+        "title": "Key Concepts of Types of Neurons and Synapse",
+        "content": "**Important points:**\n• **Sensory (afferent):** Carry impulses from receptors (sense organs) → CNS\n• **Motor (efferent):** Carry impulses from CNS → effectors (muscles, glands)\n• **Interneurons:** Connect sensory and motor neurons within CNS\n• **Synapse:** Junction between two neurons. Electrical impulse → neurotransmitter (chemical) released → next neuron stimulated. Gap = synaptic cleft"
+      },
+      {
+        "title": "Key Concepts of Central and Peripheral Nervous System",
+        "content": "**Important points:**\n• **Brain (protected by skull + 3 meninges + CSF):** Forebrain (cerebrum: thinking, memory, voluntary action; hypothalamus: homeostasis). Midbrain (reflexes of eyes/ears). Hindbrain (cerebellum: balance/coordination; medulla: involuntary actions: breathing, heartbeat, BP)\n• **Spinal cord:** Extends from medulla. 31 pairs of spinal nerves. Centre for reflex arcs\n• **PNS:** Cranial nerves (12 pairs from brain) + Spinal nerves (31 pairs from spinal cord)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Describe the path of a reflex arc when you touch a hot object.\n\n**Solution:**\n**Step 1:** Receptors in skin detect heat (stimulus)\n**Step 2:** Sensory neuron carries impulse to spinal cord (relay/interneuron)\n**Step 3:** Spinal cord processes signal (does not wait for brain)\n**Step 4:** Motor neuron carries impulse to arm muscles (effector)\n**Step 5:** Muscles contract → hand pulls away (response). All happens in milliseconds\n\n**Answer:** Receptor → Sensory neuron → Spinal cord (interneuron) → Motor neuron → Effector (muscle contracts)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Name the three main parts of the brain and their functions.\n\n**Answer:** Forebrain (thinking, memory). Midbrain (visual/auditory reflexes). Hindbrain (balance, involuntary actions).\n\n---\n\n**Q2.** What is the function of the synapse?\n\n**Answer:** Transfers signal from one neuron to next via neurotransmitters (chemicals).\n\n---\n\n**Q3.** Differentiate between voluntary and involuntary actions.\n\n**Answer:** Voluntary: conscious, controlled by cerebrum. Involuntary: automatic, controlled by medulla/spinal cord."
+      }
+    ]
+  },
+  "0ff2ff230e863daf": {
+    "summary": "Plants respond to stimuli through movements: tropisms (growth towards/away from stimulus) and nastic movements. Phototropism (light), geotropism (gravity), hydrotropism (water), thigmotropism (touch). Plant hormones: auxins, gibberellins, cytokinins, abscisic acid.",
+    "chunks": [
+      {
+        "title": "Understanding Coordination in Plants",
+        "content": "**Coordination in Plants** is a key topic in Control and Coordination for CBSE Class X Science.\n\n**Unlike animals, plants lack a nervous system.** They respond to stimuli using **hormones (plant growth regulators)** and **movements**.\n\n**Tropic movements:** Directional growth movements towards (positive) or away from (negative) a stimulus.\n**Nastic movements:** Non-directional, independent of stimulus direction."
+      },
+      {
+        "title": "Key Concepts of Types of Plant Movements",
+        "content": "**Important points:**\n• **Phototropism:** Growth towards light (shoots = positive, roots = negative). Auxin accumulates on shaded side → cells elongate → shoot bends towards light\n• **Geotropism (Gravitropism):** Growth in response to gravity. Roots = positive (grow downward). Shoots = negative (grow upward)\n• **Hydrotropism:** Growth towards water. Roots show positive hydrotropism (more important than geotropism)\n• **Thigmotropism:** Response to touch. Tendrils of climbers coil around support. Differential growth on touched vs untouched side\n• **Chemotropism:** Growth in response to chemicals. Pollen tube grows towards ovule (positive chemotropism)"
+      },
+      {
+        "title": "Key Concepts of Plant Hormones",
+        "content": "**Important points:**\n• **Auxin (IAA):** Produced at shoot tip. Promotes cell elongation, apical dominance. Used as rooting hormone, weedicide (2,4-D)\n• **Gibberellins:** Promote stem elongation, seed germination, fruit development. Used to increase grape size\n• **Cytokinins:** Promote cell division, delay senescence (ageing). Used in tissue culture\n• **Abscisic acid (ABA):** Stress hormone. Promotes stomatal closure, seed dormancy, leaf fall. Inhibits growth"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why do shoots grow towards light and roots grow away from light?\n\n**Solution:**\n**Step 1:** Auxin (IAA) produced at shoot tip diffuses to shaded side\n**Step 2:** Higher auxin on shaded side → more cell elongation there\n**Step 3:** Shaded side elongates faster → shoot bends towards light\n**Step 4:** In roots, higher auxin INHIBITS cell elongation. So root bends away from light (towards darkness)\n\n**Answer:** Auxin distribution: higher on shaded side. Shoots: more elongation → bends to light. Roots: less elongation → bends away."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the function of auxin in plants?\n\n**Answer:** Cell elongation, apical dominance, phototropism, root initiation.\n\n---\n\n**Q2.** Name a plant hormone that promotes cell division.\n\n**Answer:** Cytokinin (promotes cell division, delays senescence).\n\n---\n\n**Q3.** Why do tendrils coil around a support?\n\n**Answer:** Thigmotropism. Cells in contact with support grow slower → tendril coils around support."
+      }
+    ]
+  },
+  "bdb9472ec533e7b0": {
+    "summary": "Hormones are chemical messengers secreted by endocrine glands. Human endocrine system: pituitary (master gland), thyroid, parathyroid, adrenal, pancreas, gonads (ovary/testis). Hormones regulate growth, metabolism, reproduction, and homeostasis.",
+    "chunks": [
+      {
+        "title": "Understanding Hormones in Animals",
+        "content": "**Hormones in Animals** is a key topic in Control and Coordination for CBSE Class X Science.\n\n**Endocrine system:** Glands that secrete hormones directly into blood (ductless).\n\n**Hormone:** Chemical messenger that travels through blood to target organs, producing specific effects (slow but long-lasting, unlike nervous system)."
+      },
+      {
+        "title": "Key Concepts of Major Endocrine Glands and Their Hormones",
+        "content": "**Important points:**\n• **Pituitary (master gland):** Controls other glands. GH (growth), TSH (thyroid), ACTH (adrenal), FSH/LH (gonads), ADH (water balance), Oxytocin (childbirth/milk)\n• **Thyroid:** T₃/T₄ (metabolism, growth). Requires iodine. Hypothyroidism → goitre, cretinism (children), myxoedema (adults). Hyperthyroidism → Graves' disease (exophthalmos)\n• **Parathyroid:** PTH (raises blood Ca²⁺, from bone). Works opposite to calcitonin (thyroid, lowers Ca²⁺)\n• **Adrenal:** Medulla (adrenaline/noradrenaline: fight/flight, increases HR, BP, blood glucose). Cortex (cortisol: stress response, metabolism; aldosterone: salt balance; sex hormones)\n• **Pancreas:** Islets of Langerhans. α-cells → glucagon (raises blood sugar). β-cells → insulin (lowers blood sugar). Diabetes mellitus → insulin deficiency/resistance"
+      },
+      {
+        "title": "Key Concepts of Feedback Mechanism and Other Glands",
+        "content": "**Important points:**\n• **Negative feedback:** High hormone level → suppresses further production (e.g., TSH→T₃/T₄→inhibits TSH). Maintains homeostasis\n• **Positive feedback:** Oxytocin in childbirth (more stretching → more oxytocin → stronger contractions → more stretching...)\n• **Gonads (ovary/testis):** Testosterone (male, sperm production, secondary sex characteristics). Oestrogen/Progesterone (female, menstrual cycle, pregnancy, secondary sex characteristics)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** What happens when the thyroid gland does not produce enough thyroxine?\n\n**Solution:**\n**Step 1:** Low T₃/T₄ levels → low metabolic rate\n**Step 2:** Symptoms: fatigue, weight gain, cold sensitivity, slow heart rate, dry skin\n**Step 3:** In children: cretinism (stunted growth, mental retardation)\n**Step 4:** In adults: myxoedema (puffy face, lethargy)\n**Step 5:** Treatment: synthetic thyroxine supplements\n\n**Answer:** Hypothyroidism. Causes goitre (enlarged thyroid), low metabolism, fatigue."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Which gland is called the master gland? Why?\n\n**Answer:** Pituitary gland. It secretes hormones that control other endocrine glands (TSH, ACTH, FSH/LH).\n\n---\n\n**Q2.** What is the role of insulin? Name the disease caused by its deficiency.\n\n**Answer:** Insulin lowers blood glucose (promotes glucose uptake by cells). Deficiency → diabetes mellitus.\n\n---\n\n**Q3.** Describe the effect of adrenaline on the body.\n\n**Answer:** Fight/flight: increased HR, BP, breathing rate; blood diverted to muscles; pupils dilate; blood glucose rises."
+      }
+    ]
+  },
+  "a00cbc717f782dde": {
+    "summary": "Asexual reproduction: binary fission (Amoeba), multiple fission (Plasmodium), budding (Hydra), fragmentation (Spirogyra), regeneration (Planaria), spore formation (Rhizopus). Produces clones (genetically identical offspring).",
+    "chunks": [
+      {
+        "title": "Understanding Asexual Reproduction",
+        "content": "**Asexual Reproduction** is a key topic in How do Organisms Reproduce? for CBSE Class X Science.\n\n**Asexual reproduction:** Single parent produces offspring genetically identical (clones). No gamete formation, no fertilisation.\n\n**Advantages:** Rapid (population increase), no mate needed, all genes passed on.\n**Disadvantages:** No variation (vulnerable to environmental changes, diseases)."
+      },
+      {
+        "title": "Key Concepts of Types of Asexual Reproduction",
+        "content": "**Important points:**\n• **Binary fission:** Parent divides into two equal halves. Amoeba: divides by constriction (any plane). Leishmania: longitudinal division (flagellum inheritance)\n• **Multiple fission:** Parent divides into many daughter cells simultaneously. Plasmodium (malaria parasite): forms cyst → many merozoites released\n• **Budding:** Outgrowth (bud) forms on parent, detaches to form new individual. Hydra: bud grows from body wall, develops tentacles, detaches. Yeast: small bud, also budding"
+      },
+      {
+        "title": "Key Concepts of Regeneration, Fragmentation, and Spore Formation",
+        "content": "**Important points:**\n• **Regeneration:** Ability to regrow lost body parts. Planaria (flatworm): cut into pieces → each piece regenerates into complete organism. Not all organisms can regenerate (humans can heal, not regenerate limbs)\n• **Fragmentation:** Parent breaks into fragments, each grows into new individual. Spirogyra (algae): filament breaks, each fragment grows new filament\n• **Spore formation:** Rhizopus (bread mould): sporangiophores → sporangium → spores → released → germinate into new hyphae. Spores are microscopic, lightweight, can survive harsh conditions"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** How does Amoeba reproduce? Explain with diagram.\n\n**Solution:**\n**Step 1:** Amoeba reaches maturity (attains maximum size)\n**Step 2:** Nucleus undergoes mitotic division (karyokinesis)\n**Step 3:** Cytoplasm divides (cytokinesis) by constriction\n**Step 4:** Two daughter Amoebae formed — equal size\n**Step 5:** Both genetically identical to parent\n\n**Answer:** Binary fission: parent divides into two equal daughter cells."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the difference between binary fission and budding?\n\n**Answer:** Binary fission: parent divides into two equal halves. Budding: small outgrowth (bud) develops, grows, detaches.\n\n---\n\n**Q2.** Why does Planaria exhibit regeneration? How is it different from Hydra's budding?\n\n**Answer:** Regeneration: specialised cells proliferate to form missing parts. Budding: outgrowth from body wall (Hydra).\n\n---\n\n**Q3.** Name the organism that reproduces by spore formation. Draw diagram.\n\n**Answer:** Rhizopus (bread mould). Sporangium → spores → released → germinate under suitable conditions."
+      }
+    ]
+  },
+  "9f3d7fc2f8d03888": {
+    "summary": "Sexual reproduction involves fusion of male and female gametes, producing variation. Flower structure: sepals, petals, stamens (male: anther+pollen), carpel/pistil (female: stigma+style+ovary+ovules). Pollination → fertilisation → seed+fruit formation.",
+    "chunks": [
+      {
+        "title": "Understanding Sexual Reproduction",
+        "content": "**Sexual Reproduction** is a key topic in How do Organisms Reproduce? for CBSE Class X Science.\n\n**Sexual reproduction:** Fusion of male (sperm/pollen) and female (egg/ovum) gametes from two parents.\n\n**Advantages:** Genetic variation (mixing of genes) → better adaptation, evolution.\n**Disadvantages:** Slower, needs mate, more energy, fewer offspring."
+      },
+      {
+        "title": "Key Concepts of Sexual Reproduction in Flowering Plants",
+        "content": "**Important points:**\n• **Flower parts:** Sepals (protect bud), Petals (attract pollinators), Stamens (male: filament + anther producing pollen). Carpel (female: stigma + style + ovary with ovules)\n• **Pollination:** Transfer of pollen from anther → stigma. Self-pollination (same flower) vs Cross-pollination (different flower). Agents: wind, water, insects, birds, bats\n• **Double fertilisation:** Pollen tube grows through style → ovule. One sperm + egg → zygote (2n). Other sperm + 2 polar nuclei → endosperm (3n). Unique to angiosperms\n• **Seed and fruit:** Ovule → seed (embryo + stored food + seed coat). Ovary → fruit. Seed dispersal by wind, water, animals, explosion"
+      },
+      {
+        "title": "Key Concepts of Sexual Reproduction in Animals",
+        "content": "**Important points:**\n• **Male reproductive system:** Testes (in scrotum, produce sperm + testosterone). Epididymis (sperm storage). Vas deferens (sperm duct). Seminal vesicles + prostate + Cowper's glands (seminal fluid)\n• **Female reproductive system:** Ovaries (produce eggs + oestrogen/progesterone). Fallopian tubes/oviducts (fertilisation site). Uterus (implantation, foetus development). Cervix + Vagina (birth canal)\n• **Fertilisation:** Sperm + egg in fallopian tube → zygote → mitosis → blastocyst → implants in uterus → embryo → foetus → baby (≈9 months)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Describe the process of double fertilisation in flowering plants.\n\n**Solution:**\n**Step 1:** Pollen grain lands on stigma and germinates\n**Step 2:** Pollen tube grows through style to ovule\n**Step 3:** Two sperm cells enter ovule (via pollen tube)\n**Step 4:** One sperm + egg cell → zygote (2n, develops into embryo)\n**Step 5:** Second sperm + 2 polar nuclei → triploid endosperm (3n, food for embryo)\n\n**Answer:** One sperm fertilises egg → zygote. Other sperm fuses with polar nuclei → endosperm. Both events = double fertilisation."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the difference between self-pollination and cross-pollination?\n\n**Answer:** Self: pollen from same flower. Cross: pollen from different flower (genetic variation).\n\n---\n\n**Q2.** Name the site of fertilisation in human females.\n\n**Answer:** Fallopian tube (oviduct).\n\n---\n\n**Q3.** What happens to the ovary after fertilisation in plants?\n\n**Answer:** Ovary → fruit. Ovule → seed. Embryo forms from fertilised egg."
+      }
+    ]
+  },
+  "43338d6a9b9987d0": {
+    "summary": "Human reproductive system: male (testes→penis) produces sperm, female (ovaries→uterus) produces eggs. Menstrual cycle (~28 days). Fertilisation → pregnancy → birth (9 months). Contraception: barrier, hormonal, IUD, surgical. STDs: HIV, gonorrhoea, syphilis.",
+    "chunks": [
+      {
+        "title": "Understanding Reproduction in Human Beings",
+        "content": "**Reproduction in Human Beings** is a key topic in How do Organisms Reproduce? for CBSE Class X Science.\n\n**Human reproduction:** Sexually reproducing, internal fertilisation, viviparous (give birth to young).\n\n**Puberty (10-14 yrs):** Hormonal changes. Secondary sex characteristics develop (voice change, body hair, breast development, menstrual onset)."
+      },
+      {
+        "title": "Key Concepts of Male Reproductive System",
+        "content": "**Important points:**\n• **Testes (2):** In scrotum (outside body, 2-3°C lower temp. needed for sperm). Produce sperm (spermatogenesis) + testosterone (male sex hormone)\n• **Epididymis:** Sperm storage and maturation (~20 days)\n• **Vas deferens:** Carries sperm from epididymis to urethra (during ejaculation)\n• **Accessory glands:** Seminal vesicles (fructose-rich fluid → energy for sperm). Prostate (alkaline fluid → neutralises vaginal acidity). Cowper's gland (lubrication)\n• **Penis:** Deposits sperm in vagina (copulation). Contains erectile tissue"
+      },
+      {
+        "title": "Key Concepts of Female Reproductive System",
+        "content": "**Important points:**\n• **Ovaries (2):** Produce eggs (oogenesis) + oestrogen/progesterone. ~4,00,000 eggs at birth; ~400 mature in lifetime\n• **Fallopian tubes (oviducts):** Fimbriae sweep egg into tube. Site of fertilisation\n• **Uterus (womb):** Pear-shaped, muscular. Lining (endometrium) thickens for implantation. Foetus develops here (~9 months). Placenta (exchange of nutrients/O₂/CO₂/waste)\n• **Cervix:** Lower part of uterus. Vagina: birth canal, receives penis during intercourse"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Explain the menstrual cycle briefly.\n\n**Solution:**\n**Step 1:** Day 1-5: Menstruation (endometrium sheds, bleeding)\n**Step 2:** Day 6-13: Follicular phase (egg matures in ovary, endometrium rebuilds)\n**Step 3:** Day ~14: Ovulation (egg released from ovary)\n**Step 4:** Day 15-28: Luteal phase (progesterone maintains endometrium). If no fertilisation → period starts again\n**Step 5:** Cycle ~28 days (varies 21-35 days)\n\n**Answer:** Month cycle: menstruation → follicular phase → ovulation → luteal phase."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the function of the placenta?\n\n**Answer:** Exchange of nutrients, O₂, waste, CO₂ between mother and foetus. Produces hormones (hCG) to maintain pregnancy.\n\n---\n\n**Q2.** Name two methods of contraception.\n\n**Answer:** Barrier (condom), Hormonal (pills/patches), IUD (copper-T), Surgical (vasectomy/tubectomy).\n\n---\n\n**Q3.** What are STDs? Name two examples.\n\n**Answer:** Sexually Transmitted Diseases. Examples: HIV/AIDS, Gonorrhoea, Syphilis, Chlamydia. Prevention: safe sex, condoms."
+      }
+    ]
+  },
+  "bb5f5ec877b10084": {
+    "summary": "Heredity: transmission of traits from parents to offspring. Mendel's laws: Dominance, Segregation, Independent Assortment. Monohybrid cross (3:1 ratio). Dihybrid cross (9:3:3:1 ratio). Genes (alleles) in pairs on chromosomes.",
+    "chunks": [
+      {
+        "title": "Understanding Heredity",
+        "content": "**Heredity** is a key topic in Heredity and Evolution for CBSE Class X Science.\n\n**Heredity:** The passing of traits from parents to offspring via genes.\n\n**Gregor Mendel (1822-1884):** Austrian monk, 'Father of Genetics'. Worked with pea plants (Pisum sativum) for 7 traits. His laws form the basis of classical genetics."
+      },
+      {
+        "title": "Key Concepts of Mendel's Laws of Inheritance",
+        "content": "**Important points:**\n• **Law of Dominance:** When two different factors (alleles) for a trait are present, one (dominant) masks the other (recessive). Expressed only in homozygous state for recessive\n• **Law of Segregation:** During gamete formation (meiosis), the two alleles for a trait separate, each gamete gets only one allele\n• **Law of Independent Assortment:** Alleles of different traits segregate independently during gamete formation (does not apply to linked genes on same chromosome)\n• **Monohybrid cross (Tt × Tt):** Tall (dominant) × Dwarf (recessive) → F1 = all Tall (Tt). F2 = 3 Tall : 1 Dwarf (genotypic 1:2:1). Shows law of segregation"
+      },
+      {
+        "title": "Key Concepts of Genotype, Phenotype, and Dihybrid Cross",
+        "content": "**Important points:**\n• **Genotype:** Genetic makeup (TT, Tt, tt). **Phenotype:** Observable trait (Tall, Dwarf)\n• **Homozygous:** Same alleles (TT or tt). **Heterozygous:** Different alleles (Tt)\n• **Dihybrid cross (RRyy × rrYY):** Round-yellow × wrinkled-green. F1 = all RrYy (Round-yellow). F2 = 9:3:3:1 ratio (9 Round-yellow, 3 Round-green, 3 Wrinkled-yellow, 1 Wrinkled-green). Shows independent assortment"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** In pea plants, tall (T) is dominant over dwarf (t). If a heterozygous tall plant is crossed with a dwarf, what are the phenotypic and genotypic ratios?\n\n**Solution:**\n**Step 1:** Cross: Tt (tall) × tt (dwarf)\n**Step 2:** Gametes: T, t from tall parent; t, t from dwarf\n**Step 3:** Offspring: Tt, tt (50:50)\n**Step 4:** Phenotype: 1 Tall : 1 Dwarf\n**Step 5:** Genotype: 1 Tt : 1 tt\n\n**Answer:** Phenotypic ratio: 1:1 (Tall:Dwarf). Genotypic ratio: 1:1 (Tt:tt)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the genotypic ratio of a monohybrid cross (Tt × Tt)?\n\n**Answer:** 1 TT : 2 Tt : 1 tt (Phenotypic: 3 Tall : 1 Dwarf).\n\n---\n\n**Q2.** State Mendel's Law of Segregation.\n\n**Answer:** Alleles for a trait separate during gamete formation; each gamete receives one allele.\n\n---\n\n**Q3.** In dihybrid cross RrYy × RrYy, what is the probability of RrYy offspring?\n\n**Answer:** Rr (1/2) × Yy (1/2) = 1/4 or 25%."
+      }
+    ]
+  },
+  "01607e3492a68a90": {
+    "summary": "Variations arise during reproduction: DNA replication errors (mutations) in asexual, recombination in sexual. Variations help populations adapt to changing environments. Accumulation over generations leads to evolution.",
+    "chunks": [
+      {
+        "title": "Understanding Accumulation of Variation during Reproduction",
+        "content": "**Accumulation of Variation during Reproduction** is a key topic in Heredity and Evolution for CBSE Class X Science.\n\n**Variation:** Differences in traits among individuals of the same species.\n\n**Sources of variation:**\n• DNA copying errors (mutations) during replication\n• Recombination (crossing over during meiosis in sexual reproduction)\n• Independent assortment of chromosomes"
+      },
+      {
+        "title": "Key Concepts of Role of Variation in Evolution",
+        "content": "**Important points:**\n• **Asexual reproduction:** Only mutations (DNA copying errors) create variation. Very little variation (offspring nearly identical clones)\n• **Sexual reproduction:** Lots of variation. Crossing over (prophase I) shuffles genes. Independent assortment creates new combinations. Random fertilisation adds more variety\n• **Survival advantage:** Variations allow some individuals to survive environmental changes (natural selection). Without variation, entire population could be wiped out\n• **Accumulation:** Beneficial variations survive better (reproduce more) → passed to next generation → accumulate over generations → evolution"
+      },
+      {
+        "title": "Key Concepts of Examples of Variation",
+        "content": "**Important points:**\n• **Continuous variation:** Height, weight, skin colour (range of values, polygenic)\n• **Discontinuous variation:** Blood type (A/B/AB/O), tongue rolling (yes/no), attached/free earlobes (distinct categories)\n• **Recessive traits can skip generations:** A recessive allele can be carried (heterozygous) without expression, appearing in later generations"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why is variation more in sexually reproducing organisms than in asexual?\n\n**Solution:**\n**Step 1:** Asexual: only mutation (rare) causes variation\n**Step 2:** Sexual: crossing over (recombination), independent assortment of chromosomes, random fertilisation\n**Step 3:** Three sources of variation in sexual vs one source in asexual\n\n**Answer:** Sexual reproduction has 3 sources of variation vs 1 in asexual."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What are the two types of variations?\n\n**Answer:** Continuous (height, weight — polygenic, range) and Discontinuous (blood type, earlobe — distinct categories).\n\n---\n\n**Q2.** How do mutations cause variation?\n\n**Answer:** DNA copying errors change nucleotide sequence → altered protein → new trait may appear.\n\n---\n\n**Q3.** Why is variation important for a species?\n\n**Answer:** Allows adaptation to environmental changes; without variation, disease/climate change could wipe out the entire species."
+      }
+    ]
+  },
+  "53bc61d4bfb7f5d0": {
+    "summary": "Evolution: gradual change in species over generations. Natural selection (Darwin): individuals with advantageous traits survive and reproduce more. Adaptations increase fitness. Examples: peppered moth, Darwin's finches, antibiotic resistance in bacteria.",
+    "chunks": [
+      {
+        "title": "Understanding Evolution",
+        "content": "**Evolution** is a key topic in Heredity and Evolution for CBSE Class X Science.\n\n**Evolution:** The gradual change in inherited characteristics of species over generations.\n\n**Charles Darwin (1809-1882):** Proposed theory of evolution by Natural Selection in 'On the Origin of Species' (1859).\n\n**Key observations:** Overproduction, limited resources, variation, differential survival, inheritance."
+      },
+      {
+        "title": "Key Concepts of Natural Selection",
+        "content": "**Important points:**\n• **Overproduction:** More offspring produced than can survive\n• **Struggle for existence:** Limited food, space, mates → competition\n• **Variation:** Individuals differ in traits. Some traits provide advantage\n• **Survival of the fittest:** Individuals with advantageous traits survive longer, reproduce more\n• **Inheritance:** Advantageous traits passed to offspring → become more common in population over generations"
+      },
+      {
+        "title": "Key Concepts of Evidence of Evolution",
+        "content": "**Important points:**\n• **Fossils:** Remains of ancient organisms. Deeper layers = older. Transitional fossils (Archaeopteryx: reptile+bird features) show intermediate forms\n• **Homologous organs:** Same basic structure, different functions (forelimbs of humans, bats, whales, horses). Indicate common ancestry (divergent evolution)\n• **Analogous organs:** Different structure, same function (wings of birds and insects). Indicate convergent evolution (different ancestors, similar environment)\n• **Embryological evidence:** Vertebrate embryos similar in early stages (gill slits, tail) → common ancestry\n• **Molecular evidence:** DNA/protein similarities between species. Humans and chimpanzees share ~98.5% DNA"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** How does the peppered moth example illustrate natural selection?\n\n**Solution:**\n**Step 1:** Pre-industrial England: light moths camouflaged on lichen-covered trees (survived better)\n**Step 2:** Industrial Revolution: soot darkened trees (black moths better camouflaged)\n**Step 3:** Light moths became rare (more visible to predators), dark moths increased\n**Step 4:** After clean air laws: light moths increased again\n\n**Answer:** Change in environment (soot) → different colour better camouflaged → natural selection favoured that colour."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the difference between homologous and analogous organs?\n\n**Answer:** Homologous: same structure, different function (common ancestry). Analogous: different structure, same function (convergent evolution).\n\n---\n\n**Q2.** What are fossils? How are they formed?\n\n**Answer:** Fossils = preserved remains of ancient organisms. Formed when organisms get buried in sediment, minerals replace organic matter.\n\n---\n\n**Q3.** Why are Darwin's finches considered evidence of evolution?\n\n**Answer:** Different beak shapes on Galapagos islands adapted to different food sources. Common ancestor → divergent evolution."
+      }
+    ]
+  },
+  "339a0357334890ff": {
+    "summary": "Speciation: formation of new species from existing ones. Causes: geographical isolation (barriers → separate gene pools → different mutations/selection) + genetic drift + natural selection. Gene flow prevents speciation. Allopatric vs sympatric speciation.",
+    "chunks": [
+      {
+        "title": "Understanding Speciation",
+        "content": "**Speciation** is a key topic in Heredity and Evolution for CBSE Class X Science.\n\n**Species:** Group of organisms capable of interbreeding to produce fertile offspring.\n\n**Speciation:** Process by which new species evolve from existing ones.\n\n**Key factors:**\n• Geographical isolation (physical barrier)\n• Genetic drift (random changes in gene frequency)\n• Natural selection (differential survival based on traits)\n• Accumulation of variations over generations"
+      },
+      {
+        "title": "Key Concepts of Mechanisms of Speciation",
+        "content": "**Important points:**\n• **Geographical isolation:** Mountains, rivers, oceans, deserts separate populations. No gene flow between groups. They accumulate different mutations and face different selection pressures\n• **Genetic drift (Sewall Wright effect):** Random changes in gene frequencies, especially in small populations. Some alleles may be lost completely. Founder effect: small group colonises new area (limited gene pool)\n• **Natural selection:** Different environments favour different traits in each isolated population. Over generations, the two populations become increasingly different\n• **Reproductive isolation:** Eventually, even if the populations meet again, they cannot interbreed → separate species. Pre-zygotic (mating differences) and post-zygotic (hybrid infertility) barriers"
+      },
+      {
+        "title": "Key Concepts of Examples and Related Concepts",
+        "content": "**Important points:**\n• **Darwin's finches:** Single ancestor from mainland → isolated on different Galapagos islands. Different beak shapes/temperatures/behaviours evolved. Now 14 species\n• **Galápagos tortoises:** Different shell shapes on different islands (saddle vs dome) adapted to different food sources\n• **Gene flow:** Transfer of genes between populations. Prevents speciation (keeps gene pool mixed)\n• **Mutation:** Ultimate source of new alleles. Most are neutral/harmful. Occasionally beneficial"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Explain how geographical isolation can lead to speciation.\n\n**Solution:**\n**Step 1:** Population separated by river/mountain (geographical barrier)\n**Step 2:** No gene flow between the two groups\n**Step 3:** Different environments → different selection pressures\n**Step 4:** Different mutations accumulate in each group\n**Step 5:** Genetic drift (especially if small populations) changes gene frequencies\n**Step 6:** After many generations → reproductively isolated → different species\n\n**Answer:** Geographical isolation → no gene flow → different mutations + natural selection + drift → reproductive isolation → new species."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the difference between geographical and reproductive isolation?\n\n**Answer:** Geographical: physical barrier separates. Reproductive: cannot interbreed (even if together).\n\n---\n\n**Q2.** What is genetic drift?\n\n**Answer:** Random change in allele frequency in small populations due to chance events.\n\n---\n\n**Q3.** Why do Darwin's finches show evidence of speciation?\n\n**Answer:** Common ancestor isolated on different Galapagos islands → different food sources → different beak shapes → reproductive isolation → separate species."
+      }
+    ]
+  },
+  "234ee21528695535": {
+    "summary": "Evolutionary relationships are shown through classification systems. Species with recent common ancestors share more characteristics and group closer in classification. Hierarchical: Kingdom → Phylum → Class → Order → Family → Genus → Species.",
+    "chunks": [
+      {
+        "title": "Understanding Evolution and Classification",
+        "content": "**Evolution and Classification** is a key topic in Heredity and Evolution for CBSE Class X Science.\n\n**Classification:** Grouping organisms based on similarities.\n\n**Relationship:** Classification reflects evolutionary relationships. Organisms with recent common ancestry share more characteristics and are grouped closer together.\n\n**Hierarchy:** Kingdom → Phylum → Class → Order → Family → Genus → Species"
+      },
+      {
+        "title": "Key Concepts of Tracing Evolutionary Relationships",
+        "content": "**Important points:**\n• **Morphological similarities:** Similar body structures suggest common ancestry. Homologous organs (forelimbs of mammals) = diverged from common ancestor. Analogous organs (bird/insect wings) = convergent evolution, different ancestry\n• **Fossil record:** Older fossils have more primitive features. Transitional fossils show intermediate forms between groups. Age determined by relative (strata) and absolute (radioactive dating) methods\n• **Molecular phylogeny:** DNA/RNA/protein sequence comparison. More similarities = closer relationship. Cytochrome c, rRNA, globin genes used. Humans-chimpanzees: ~98.5% DNA identical"
+      },
+      {
+        "title": "Key Concepts of Convergent and Divergent Evolution",
+        "content": "**Important points:**\n• **Divergent evolution:** Common ancestor → different adaptations (homologous structures). Darwin's finches, mammalian forelimbs\n• **Convergent evolution:** Different ancestors → similar adaptations (analogous structures). Wings of bats (mammal) and birds (reptile descendant). Eye of octopus (mollusc) and human (vertebrate)\n• **Adaptive radiation:** Rapid divergence from common ancestor into many species occupying different ecological niches. Darwin's finches (14 species from 1 ancestor), Hawaiian honeycreepers"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** How does molecular evidence confirm evolutionary relationships?\n\n**Solution:**\n**Step 1:** Compare DNA sequences of different organisms\n**Step 2:** Count number of differences (mutations) between sequences\n**Step 3:** Fewer differences = more recent common ancestor\n**Step 4:** Example: human-chimp 1.5% difference; human-baboon 6% difference\n**Step 5:** Consistent with fossil and morphological evidence\n\n**Answer:** DNA similarity = closeness of relationship. More similar DNA = more recent common ancestor."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why are homologous structures evidence for evolution?\n\n**Answer:** Same basic structure, different functions → common ancestor modified for different uses (divergent evolution).\n\n---\n\n**Q2.** How does classification reflect evolution?\n\n**Answer:** Similar organisms grouped closer = recent common ancestor. Hierarchical classification shows branching pattern of evolution.\n\n---\n\n**Q3.** What is adaptive radiation? Give an example.\n\n**Answer:** Rapid divergence of one species into many with different ecological roles. Darwin's finches (14 species from 1 ancestor on Galapagos)."
+      }
+    ]
+  },
+  "10670c5e5e8aa6e0": {
+    "summary": "Evolution is not necessarily progress; it is adaptation to changing environments. Simpler organisms still exist (bacteria, protists). Humans evolved from apelike ancestors but are not the 'goal' of evolution. Complex organisms may not survive if environment changes.",
+    "chunks": [
+      {
+        "title": "Understanding Evolution should not be equated with Progress",
+        "content": "**Evolution should not be equated with Progress** is a key topic in Heredity and Evolution for CBSE Class X Science.\n\n**Common misconception:** Evolution = 'progress' towards more complex or 'better' organisms.\n\n**Reality:** Evolution is adaptation to changing environments. There is no predetermined direction or goal.\n\n**Evidence:** Simple organisms (bacteria, amoebae) still exist and thrive after billions of years of evolution."
+      },
+      {
+        "title": "Key Concepts of Why Evolution is Not Progress",
+        "content": "**Important points:**\n• **Bacteria:** Have existed for ~3.5 billion years. Incredibly successful (adapt to antibiotics, extreme environments). By population/biomass, bacteria dominate Earth\n• **'Living fossils':** Organisms unchanged for millions of years. Limulus (horseshoe crab), coelacanth (fish), gingko biloba tree. They are well-adapted to their niches — no 'need' to change\n• **Complex ≠ better:** Dinosaurs were highly complex but went extinct. Cockroaches survived. Complexity does not guarantee survival\n• **Environmental dependence:** What is 'advanced' in one environment may be disadvantageous in another. Antibiotic resistance is beneficial in treated patients but neutral elsewhere"
+      },
+      {
+        "title": "Key Concepts of Humans and Evolution",
+        "content": "**Important points:**\n• **Humans and apes:** Humans did NOT evolve from modern apes. Both evolved from a common ancestor ~6-8 million years ago\n• **Human evolution timeline:** Australopithecus (~4 mya) → Homo habilis (~2.5 mya, tools) → Homo erectus (~1.8 mya, fire, larger brain) → Homo neanderthalensis → Homo sapiens (~200,000 yrs ago)\n• **Humans are not the pinnacle:** Our large brain is useful but costly (20% of energy). Other species have different 'excellences': echolocation (bats), speed (cheetah), strength, longevity\n• **Future evolution:** Humans continue to evolve (lactose tolerance, disease resistance). Environment will determine direction"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** If evolution is about progress, why are bacteria still around?\n\n**Solution:**\n**Step 1:** Bacteria are extremely successful (survive extreme conditions, reproduce fast, evolve rapidly)\n**Step 2:** Evolution adapts organisms to their SPECIFIC environment\n**Step 3:** Bacteria's niche does not require large brains/complex bodies\n**Step 4:** They occupy more biomass and habitats than any other group on Earth\n\n**Answer:** Evolution = adaptation, not progress. Bacteria are perfectly adapted to their niches."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why is evolution not considered a linear progression?\n\n**Answer:** No predetermined goal. Different environments favour different traits. Simpler forms coexist with complex forms.\n\n---\n\n**Q2.** How are humans related to apes?\n\n**Answer:** Common ancestor ~6-8 mya. Humans and chimpanzees share ~98.5% DNA. Not descended from apes — shared ancestor.\n\n---\n\n**Q3.** What determines whether a species is 'successful' in evolutionary terms?\n\n**Answer:** Survival and reproduction in its environment. Success = adaptedness to niche, not complexity."
+      }
+    ]
+  }
+}

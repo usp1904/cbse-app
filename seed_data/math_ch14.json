@@ -1,0 +1,102 @@
+{
+  "57d9cc53b64d42b1": {
+    "summary": "Mean of grouped data: Direct (x̄ = Σfx/Σf), Assumed Mean (x̄ = a + Σfd/Σf), Step-Deviation (x̄ = a + h×Σfu/Σf). Use step-deviation when class width is constant for easiest calculation.",
+    "chunks": [
+      {
+        "title": "Understanding Mean of Grouped Data",
+        "content": "**Mean of Grouped Data** is a key concept in Statistics of CBSE Class X Mathematics.\n\n**Methods for grouped mean:**\n\n1. **Direct:** x̄ = Σfᵢxᵢ/Σfᵢ (xᵢ = class mark)\n2. **Assumed Mean:** x̄ = a + Σfᵢdᵢ/Σfᵢ (dᵢ = xᵢ-a)\n3. **Step-Deviation:** x̄ = a + h×Σfᵢuᵢ/Σfᵢ (uᵢ = (xᵢ-a)/h)\n\nAll give the SAME answer.\n\n**Key points to remember:**\n• Class mark = (LCL+UCL)/2\n• Step-deviation fastest for equal-width classes\n• All three methods yield identical results\n• Arrange in table: class, x, f, fx or u, fu"
+      },
+      {
+        "title": "Properties and Applications of Mean of Grouped Data",
+        "content": "**1. Properties:**\n• Direct: Σfx/Σf\n• Assumed mean: choose a near middle\n• Step-deviation: h = class width\n• Step-deviation simplifies calculations\n\n**2. Important Formulas:**\nDirect: x̄ = Σfx/Σf\nAssumed: x̄ = a + Σfd/Σf\nStep-Deviation: x̄ = a + h×Σfu/Σf\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nClasses: 0-10(2), 10-20(5), 20-30(8), 30-40(4)\nDirect: Σfx=10+75+200+140=425, Σf=19, x̄=425/19=22.37"
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** Find mean by step-deviation: 0-10(5), 10-20(8), 20-30(12), 30-40(6), 40-50(4).\n\n**Solution:**\n\n**Step 1:** x: 5,15,25,35,45. h=10, a=25\n**Step 2:** u: -2,-1,0,1,2\n**Step 3:** Σfu = -10-8+0+6+8 = -4\n**Step 4:** Σf = 35\n**Step 5:** x̄ = 25+10(-4/35) = 25-1.14 = 23.86\n\nTherefore, x̄ ≈ 23.86.\n\n**Verification:**\nDirect: Σfx=835, Σf=35, x̄=23.86 ✓"
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Wrong class mark:** Class mark = (LCL+UCL)/2\n\n**Tips and Tricks:**\n\n✓ **Use step-deviation:** Fastest for equal-width classes"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nFind mean direct: 0-20(4), 20-40(6), 40-60(10), 60-80(5).\n\n**Answer:** x: 10,30,50,70. Σfx=40+180+500+350=1070. Σf=25. x̄=42.8.\n\n---\n\n**Problem 2 (Intermediate):**\nFind mean by step-deviation: 1-3(8), 3-5(12), 5-7(15), 7-9(5).\n\n**Answer:** a=5, h=2. u: -2,-1,0,1,2. Σfu=-16-12+0+5=-23. Σf=40. x̄=5+2(-23/40)=3.85.\n\n---\n\n**Problem 3 (Advanced):**\nAttendance: 0-20(8), 20-40(15), 40-60(20), 60-80(12), 80-100(5). Find mean.\n\n**Answer:** x: 10,30,50,70,90. Σfx=80+450+1000+840+450=2820. Σf=60. x̄=47."
+      }
+    ]
+  },
+  "a8e85e46ba25fb68": {
+    "summary": "Mode of grouped data: Modal class has highest frequency. Mode = l + (f₁-f₀)/(2f₁-f₀-f₂)×h. l = lower limit of modal class, f₁ = frequency of modal class, f₀ and f₂ = preceding and following frequencies.",
+    "chunks": [
+      {
+        "title": "Understanding Mode of Grouped Data",
+        "content": "**Mode of Grouped Data** is a key concept in Statistics of CBSE Class X Mathematics.\n\n**Modal class** = class with highest frequency.\n\n**Formula:**\nMode = l + (f₁-f₀)/(2f₁-f₀-f₂) × h\n\nWhere:\nl = lower limit of modal class\nh = class width\nf₁ = freq of modal class\nf₀ = freq of class BEFORE modal\nf₂ = freq of class AFTER modal\n\n**Key points to remember:**\n• Modal class = highest f\n• f₀ is preceding, f₂ is following\n• Mode ≠ class mark necessarily\n• Identifies most frequent value"
+      },
+      {
+        "title": "Properties and Applications of Mode of Grouped Data",
+        "content": "**1. Properties:**\n• Mode is most frequent value\n• Interpolates within modal class\n• Mode ≠ mean or median\n• Used for categorical preferences\n\n**2. Important Formulas:**\nMode = l + (f₁-f₀)/(2f₁-f₀-f₂) × h\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\n0-10(3), 10-20(8), 20-30(12), 30-40(6), 40-50(2)\nModal: 20-30. l=20, f₁=12, f₀=8, f₂=6, h=10.\nMode=20+(12-8)/(24-8-6)×10=20+4=24."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** Find mode: 0-20(5), 20-40(12), 40-60(18), 60-80(10), 80-100(3).\n\n**Solution:**\n\n**Step 1:** Modal: 40-60. l=40, f₁=18, f₀=12, f₂=10, h=20\n**Step 2:** Mode = 40+(18-12)/(36-12-10)×20\n**Step 3:** = 40+6/14×20 = 40+8.57 = 48.57\n\nTherefore, Mode ≈ 48.57."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Wrong f₀/f₂:** f₀ is BEFORE, f₂ is AFTER modal class\n\n**Tips and Tricks:**\n\n✓ **Identify modal class first:** Class with highest frequency"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nFind mode: 0-5(4), 5-10(7), 10-15(10), 15-20(5).\n\n**Answer:** Modal: 10-15. l=10, f₁=10, f₀=7, f₂=5, h=5. Mode=10+3/(20-7-5)×5=11.875.\n\n---\n\n**Problem 2 (Intermediate):**\nMode: 10-20(6), 20-30(14), 30-40(20), 40-50(8).\n\n**Answer:** Modal: 30-40. l=30, f₁=20, f₀=14, f₂=8, h=10. Mode=30+6/(40-14-8)×10=33.33.\n\n---\n\n**Problem 3 (Advanced):**\nFind modal marks: 0-20(2), 20-40(10), 40-60(25), 60-80(15).\n\n**Answer:** Modal: 40-60. l=40, f₁=25, f₀=10, f₂=15, h=20. Mode=40+15/(50-10-15)×20=52."
+      }
+    ]
+  },
+  "a631a4a22abd33fb": {
+    "summary": "Median of grouped data: Build cumulative frequency, find n/2, identify median class (first cf ≥ n/2). Median = l + (n/2-cf)/f × h. l = lower limit of median class, cf = cumulative freq before median class.",
+    "chunks": [
+      {
+        "title": "Understanding Median of Grouped Data",
+        "content": "**Median of Grouped Data** is a key concept in Statistics of CBSE Class X Mathematics.\n\n**Steps:**\n1. Build cumulative frequency (cf) column\n2. Find n/2\n3. Median class = first class where cf ≥ n/2\n4. Apply formula:\n\n**Median = l + (n/2 - cf)/f × h**\n\nl = lower limit of median class\ncf = cumulative freq BEFORE median class\nf = freq of median class\nh = class width\n\n**Key points to remember:**\n• Median = 50th percentile\n• Find median class using n/2\n• cf BEFORE median class (not including)\n• Also findable via ogive"
+      },
+      {
+        "title": "Properties and Applications of Median of Grouped Data",
+        "content": "**1. Properties:**\n• Less than ogive: upward sloping\n• More than ogive: downward sloping\n• Median from ogive: horizontal at n/2 to curve, then vertical\n• Median less affected by outliers\n\n**2. Important Formulas:**\nMedian = l + (n/2-cf)/f × h\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nClasses: 10-20(5), 20-30(8), 30-40(12), 40-50(10), 50-60(5)\ncf:5,13,25,35,40. n/2=20. Median class:30-40.\nl=30, cf=13, f=12, h=10. Med=30+(20-13)/12×10=35.83."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** Find median: 0-10(3), 10-20(7), 20-30(10), 30-40(6), 40-50(4).\n\n**Solution:**\n\n**Step 1:** cf: 3,10,20,26,30. n=30, n/2=15\n**Step 2:** Median class: 20-30 (cf=10→20)\n**Step 3:** l=20, cf=10, f=10, h=10\n**Step 4:** Med = 20+(15-10)/10×10 = 25\n\nTherefore, Median = 25."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **cf vs f:** cf = cumulative freq BEFORE median class, not including it\n\n**Tips and Tricks:**\n\n✓ **Build cf table first:** Before finding median class"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nFind median: 5-15(4), 15-25(8), 25-35(12), 35-45(6).\n\n**Answer:** cf:4,12,24,30. n/2=15. Med:25-35. l=25, cf=12, f=12, h=10. Med=25+3/12×10=27.5.\n\n---\n\n**Problem 2 (Intermediate):**\nMedian: 0-10(2),10-20(6),20-30(10),30-40(8),40-50(4).\n\n**Answer:** cf:2,8,18,26,30. n/2=15. Med:20-30. l=20,cf=8,f=10,h=10. Med=20+7/10×10=27.\n\n---\n\n**Problem 3 (Advanced):**\nFind median from less-than ogive data: cf points (10,2),(20,8),(30,18),(40,26),(50,30).\n\n**Answer:** At y=15 on ogive, x≈27."
+      }
+    ]
+  },
+  "67512a99b49cf2e1": {
+    "summary": "Empirical relationship: 3 Median = Mode + 2 Mean. Ogive (cumulative frequency curve) gives median graphically. Less-than and more-than ogives intersect at the median.",
+    "chunks": [
+      {
+        "title": "Understanding Graphical Representation of Cumulative Frequency Distribution",
+        "content": "**Graphical Representation of Cumulative Frequency Distribution** is a key concept in Statistics of CBSE Class X Mathematics.\n\n**Ogive (Cumulative Frequency Curve):**\n• **Less than ogive:** Plot upper limits vs cf (cumulative freq from start)\n• **More than ogive:** Plot lower limits vs cf (cumulative freq from end)\n• Median is the x-coordinate where y = n/2 meets the ogive\n• Two ogives intersect at the median\n\n**Empirical Relationship:**\n3 Median = Mode + 2 Mean\n(Approximate, for moderately skewed distributions)\n\n**Key points to remember:**\n• Less than: slopes upward\n• More than: slopes downward\n• Intersection gives median\n• Empirical formula is approximate"
+      },
+      {
+        "title": "Properties and Applications of Graphical Representation of Cumulative Frequency Distribution",
+        "content": "**1. Properties:**\n• From ogive: draw horizontal at n/2 to curve, then vertical to x-axis\n• Empirical: 3 Med = Mode+2Mean\n• Use when one measure unknown\n• Helps cross-check all three measures\n\n**2. Important Formulas:**\n3 Median = Mode + 2 Mean\nMean = (3Med-Mode)/2\nMode = 3Med-2Mean\nMedian = (Mode+2Mean)/3\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nIf Median=28, Mode=24: Mean = (84-24)/2 = 30."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** If Mean=25 and Median=24, find Mode using empirical relationship.\n\n**Solution:**\n\n**Step 1:** 3 Med = Mode + 2 Mean\n**Step 2:** 72 = Mode + 50\n**Step 3:** Mode = 22\n\nTherefore, Mode = 22."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Exact vs approximate:** Empirical formula is approximate\n\n**Tips and Tricks:**\n\n✓ **3 Med = Mode+2Mean:** Memorize this"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nMean=30, Median=28. Find Mode.\n\n**Answer:** Mode=3×28-2×30=84-60=24.\n\n---\n\n**Problem 2 (Intermediate):**\nMedian=35, Mode=29. Find Mean.\n\n**Answer:** Mean=(105-29)/2=38.\n\n---\n\n**Problem 3 (Advanced):**\nFrom ogive, median=34. If mode=30, estimate mean.\n\n**Answer:** 3×34=30+2M → M=36."
+      }
+    ]
+  }
+}

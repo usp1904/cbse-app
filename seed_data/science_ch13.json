@@ -1,0 +1,77 @@
+{
+  "f196e53c1c962dc9": {
+    "summary": "An ecosystem includes all biotic (plants, animals, microbes) and abiotic (sunlight, temperature, soil, water) components interacting in a habitat. Biotic components are producers, consumers, and decomposers.",
+    "chunks": [
+      {
+        "title": "Understanding Ecosystems",
+        "content": "**Ecosystem and its Components** is a fundamental concept in Our Environment for CBSE Class X Science.\n\n**Ecosystem:** All interacting organisms (biotic) and non-living (abiotic) factors in a defined area.\n\n**Abiotic Components:**\n• Sunlight — primary energy source\n• Temperature — affects metabolism\n• Water — essential for life\n• Soil — provides nutrients and anchorage\n• Air — CO₂, O₂ for photosynthesis/respiration\n\n**Biotic Components:**\n• Producers (Autotrophs): Green plants, algae — make food via photosynthesis\n• Consumers (Heterotrophs): Animals that eat plants/other animals\n• Decomposers (Saprotrophs): Bacteria, fungi — break down dead matter"
+      },
+      {
+        "title": "Producers and Consumers",
+        "content": "**Producers (Autotrophs):**\n• Convert solar energy into chemical energy (photosynthesis)\n• 6CO₂ + 12H₂O → C₆H₁₂O₆ + 6O₂ + 6H₂O\n• Form the first trophic level\n• E.g., Green plants, phytoplankton, algae\n\n**Consumers (Heterotrophs):**\n• **Primary consumers (Herbivores):** Eat producers (cow, deer, rabbit)\n• **Secondary consumers:** Eat herbivores (snake, frog, cat)\n• **Tertiary consumers:** Eat secondary consumers (eagle, lion, shark)\n• **Omnivores:** Eat both plants and animals (human, bear, crow)\n\n**Decomposers:**\n• Break down dead organisms into simpler substances\n• Return nutrients to soil → used again by producers\n• E.g., Bacteria, fungi (mushrooms, mould)"
+      },
+      {
+        "title": "Trophic Levels and Energy Flow",
+        "content": "**Trophic Levels:** The position an organism occupies in a food chain.\n\n**10% Law (Lindemann's Law):** Only 10% of energy is transferred from one trophic level to the next. The rest is:\n• Used in respiration\n• Lost as heat\n• Used for growth, reproduction, excretion\n\n**Energy Flow is Unidirectional:**\nSun → Producer → Primary Consumer → Secondary Consumer → Tertiary Consumer\n\n**Ecological Pyramids:**\n• **Pyramid of Numbers:** Number of organisms at each level\n• **Pyramid of Biomass:** Biomass at each level\n• **Pyramid of Energy:** Always upright — energy decreases at each level"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** In a grassland ecosystem, sunflowers (1000 kcal) are eaten by rabbits, who are eaten by snakes, who are eaten by eagles. Calculate energy available at each trophic level.\n\n**Solution:**\n**Step 1:** Producers (sunflowers) = 1000 kcal\n**Step 2:** Primary consumers (rabbits) = 10% of 1000 = 100 kcal\n**Step 3:** Secondary consumers (snakes) = 10% of 100 = 10 kcal\n**Step 4:** Tertiary consumers (eagles) = 10% of 10 = 1 kcal\n\n**Answer:** 1000 kcal → 100 kcal → 10 kcal → 1 kcal"
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Identify the biotic and abiotic components in a pond ecosystem.\n\n**Answer:** Biotic — fish, algae, frogs, bacteria. Abiotic — water, sunlight, temperature, dissolved O₂, pH.\n\n---\n\n**Q2.** Why are decomposers essential for an ecosystem?\n\n**Answer:** They decompose dead matter, recycle nutrients back to soil, which producers use. Without decomposers, nutrients would be locked in dead remains.\n\n---\n\n**Q3.** What happens to the energy that is not transferred to the next trophic level?\n\n**Answer:** Used in respiration, growth, reproduction; lost as heat to the environment."
+      }
+    ]
+  },
+  "02013f649f24bf49": {
+    "summary": "Food chain: linear sequence of who eats whom (grass→deer→lion). Food web: interconnected food chains. Biological magnification: non-biodegradable chemicals (DDT) accumulate at higher trophic levels.",
+    "chunks": [
+      {
+        "title": "Understanding Food Chains",
+        "content": "**Food Chains and Webs** is a fundamental concept in Our Environment for CBSE Class X Science.\n\n**Food Chain:** A linear sequence showing who eats whom, depicting energy transfer from one organism to another.\n\n**Example:**\nGrass → Grasshopper → Frog → Snake → Eagle\n\n**Types:**\n1. **Grazing Food Chain:** Starts with producers (plants)\n   • Terrestrial: Grass → Deer → Lion\n   • Aquatic: Phytoplankton → Zooplankton → Small fish → Large fish\n2. **Detritus Food Chain:** Starts with dead organic matter\n   • Dead leaves → Earthworm → Bird"
+      },
+      {
+        "title": "Food Webs",
+        "content": "**Food Web:** An interconnecting network of multiple food chains in an ecosystem.\n\n**Why food webs are important:**\n• More stable than single food chains\n• If one species declines, organisms can eat alternative food\n• Shows complex feeding relationships\n\n**Example of a forest food web:**\n• Oak tree → Caterpillar → Bird → Hawk\n• Oak tree → Deer → Wolf\n• Oak tree → Squirrel → Fox → Wolf\n• Berries → Mouse → Owl\n\nAll these chains interconnect — a single species (e.g., oak tree) supports multiple consumers."
+      },
+      {
+        "title": "Biological Magnification and Ozone Depletion",
+        "content": "**Biological Magnification (Biomagnification):**\nIncrease in concentration of a non-biodegradable substance (pesticide, heavy metal) at each successive trophic level.\n\n**Example — DDT:**\n• Water: 0.003 ppb → Phytoplankton: 0.04 ppm (×10⁴) → Zooplankton: 0.5 ppm → Small fish: 2 ppm → Large fish: 25 ppm → Fish-eating birds: 5-100 ppm\n• Result: Bird eggshells thin → population decline\n\n**Ozone Depletion:**\n• O₂ + UV → O₃ (ozone in stratosphere)\n• O₃ absorbs harmful UV-B radiation\n• CFCs (chlorofluorocarbons) from refrigerators, ACs destroy O₃\n• CFCs → Cl + O₃ → ClO + O₂ (catalytic destruction)\n• 1987 Montreal Protocol banned CFCs globally"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Construct a food chain from: grass, frog, eagle, grasshopper, snake. Which organism has the highest concentration of non-biodegradable pesticides?\n\n**Solution:**\n**Step 1:** Arrange by feeding: Grass → Grasshopper → Frog → Snake → Eagle\n**Step 2:** Through biomagnification, DDT concentration increases at each trophic level\n**Step 3:** Eagle is at the highest trophic level\n\n**Answer:** Grass → Grasshopper → Frog → Snake → Eagle. The eagle will have the highest concentration of pesticides."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why are food webs more stable than food chains?\n\n**Answer:** Multiple feeding options exist — if one species declines, organisms can switch to alternative food sources.\n\n---\n\n**Q2.** If pesticide enters a pond ecosystem, which organism will have the maximum concentration?\n\n**Answer:** The top predator (e.g., large fish or fish-eating bird) due to biological magnification.\n\n---\n\n**Q3.** What is the role of CFCs in ozone depletion?\n\n**Answer:** CFCs release chlorine atoms in the stratosphere, which catalytically destroy ozone molecules (Cl + O₃ → ClO + O₂)."
+      }
+    ]
+  },
+  "ccbc4e54a9393cbf": {
+    "summary": "Human activities like waste generation, deforestation, and pollution harm the environment. Non-biodegradable waste persists. Proper waste management (reduce, reuse, recycle, compost, landfill) is essential for sustainability.",
+    "chunks": [
+      {
+        "title": "Impact of Human Activities on Environment",
+        "content": "**How do our Activities affect the Environment?** is a fundamental concept in Our Environment for CBSE Class X Science.\n\nHuman activities significantly alter ecosystems:\n\n**1. Waste Generation:**\n• **Biodegradable waste:** Can be decomposed by microorganisms (fruit peels, paper, wood, cotton)\n• **Non-biodegradable waste:** Cannot be decomposed (plastics, glass, metal, DDT, synthetic fibres)\n\n**2. Deforestation:**\n• Reduces CO₂ absorption → increased greenhouse effect\n• Soil erosion, loss of biodiversity, climate change\n\n**3. Pollution:**\n• Air: Burning fossil fuels, industrial emissions\n• Water: Industrial effluents, sewage, agricultural runoff\n• Soil: Pesticides, chemical fertilisers, plastic waste"
+      },
+      {
+        "title": "Waste Management",
+        "content": "**Waste Management Strategies:**\n\n**3Rs — Reduce, Reuse, Recycle:**\n• **Reduce:** Minimise waste generation (carry cloth bags, avoid single-use plastics)\n• **Reuse:** Use items repeatedly (refillable bottles, repaired electronics)\n• **Recycle:** Convert waste into new products (paper, glass, metal, plastic)\n\n**Composting:**\n• Biodegradable waste → compost (natural fertiliser)\n• Aerobic decomposition by microorganisms\n• Reduces landfill burden\n\n**Landfills:**\n• Dumping waste in low-lying areas\n• Non-biodegradable waste ends up here\n• Problems: Leachate pollutes groundwater, methane gas, space shortage\n\n**Vermicomposting:** Using earthworms to decompose organic waste"
+      },
+      {
+        "title": "Global Environmental Issues",
+        "content": "**Greenhouse Effect and Global Warming:**\n• CO₂, CH₄, H₂O vapour trap heat in atmosphere\n• Enhanced by burning fossil fuels, deforestation\n• Consequences: Melting glaciers, rising sea levels, extreme weather\n\n**Ozone Layer Depletion:**\n• Ozone (O₃) in stratosphere absorbs UV-B radiation\n• CFCs, halons, methyl bromide destroy ozone\n• Effects: Skin cancer, cataracts, reduced crop yield\n\n**Sustainable Practices:**\n• Use renewable energy (solar, wind, hydro)\n• Plant trees (afforestation)\n• Segregate waste at source (wet/dry)\n• Say NO to single-use plastics\n• Carpooling, public transport"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Classify as biodegradable or non-biodegradable: plastic bag, vegetable peels, glass bottle, paper, DDT, cotton cloth.\n\n**Solution:**\n**Step 1:** Biodegradable — broken down by microorganisms: vegetable peels, paper, cotton cloth\n**Step 2:** Non-biodegradable — cannot be broken down: plastic bag, glass bottle, DDT\n\n**Answer:** Biodegradable: vegetable peels, paper, cotton cloth. Non-biodegradable: plastic bag, glass bottle, DDT."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the difference between biodegradable and non-biodegradable waste? Give two examples of each.\n\n**Answer:** Biodegradable (decomposed by microbes): fruit peels, wood. Non-biodegradable (cannot decompose): plastic, glass.\n\n---\n\n**Q2.** Why should we segregate waste into wet and dry categories?\n\n**Answer:** Wet waste can be composted (biodegradable). Dry waste can be recycled. Mixing makes both processes difficult.\n\n---\n\n**Q3.** Suggest three ways to reduce plastic pollution.\n\n**Answer:** 1. Use cloth/jute bags. 2. Carry reusable water bottles. 3. Refuse single-use plastic straws and cutlery."
+      }
+    ]
+  }
+}

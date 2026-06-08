@@ -1,0 +1,77 @@
+{
+  "62db340c53af20c8": {
+    "summary": "The distance formula, derived from Pythagoras theorem, gives the distance between points (x₁,y₁) and (x₂,y₂) as √[(x₂-x₁)²+(y₂-y₁)²]. It is used to classify triangles, find perimeters, and determine collinearity of points.",
+    "chunks": [
+      {
+        "title": "Understanding the Distance Formula",
+        "content": "The **distance formula** calculates the distance between any two points in the Cartesian plane.\n\n**Formula:** The distance between A(x₁, y₁) and B(x₂, y₂) is:\n**d = √[(x₂ - x₁)² + (y₂ - y₁)²]**\n\n**Derivation:** This comes from the **Pythagoras theorem**. Draw a right triangle with horizontal leg |x₂-x₁| and vertical leg |y₂-y₁|. AB is the hypotenuse.\n\nAB² = (x₂-x₁)² + (y₂-y₁)²\nAB = √[(x₂-x₁)² + (y₂-y₁)²]\n\n**Example:**\nDistance between A(2, 3) and B(5, 7):\nd = √[(5-2)² + (7-3)²] = √[9+16] = √25 = 5 units\n\n**Distance from origin:**\nDistance of P(x, y) from O(0,0): OP = √(x² + y²)"
+      },
+      {
+        "title": "Applications of the Distance Formula",
+        "content": "**1. Checking Collinearity:**\nThree points A, B, C are collinear if AB + BC = AC.\n\n**2. Classifying Triangles:**\n- Equilateral: all three sides equal\n- Isosceles: two sides equal\n- Scalene: all sides different\n- Right-angled: Pythagoras holds (a² + b² = c²)\n\n**3. Classifying Quadrilaterals:**\n- Square: all sides equal AND diagonals equal\n- Rectangle: opposite sides equal AND diagonals equal\n- Rhombus: all sides equal\n- Parallelogram: opposite sides equal\n\n**4. Circle Problems:**\nPoints on a circle are equidistant from centre.\nEquation: (x-h)²+(y-k)²=r² where centre=(h,k), radius=r\n\n**Example:** Check if A(0,0), B(3,4), C(6,8) are collinear.\nAB=5, BC=5, AC=10. Since 5+5=10, points are collinear."
+      },
+      {
+        "title": "Worked Example: Distance Formula",
+        "content": "**Problem:** Show that A(1,2), B(4,6), C(7,10) are collinear.\n\n**Solution:**\n\n**Step 1:** Find AB = √[(4-1)²+(6-2)²] = √(9+16) = √25 = 5\n**Step 2:** Find BC = √[(7-4)²+(10-6)²] = √(9+16) = √25 = 5\n**Step 3:** Find AC = √[(7-1)²+(10-2)²] = √(36+64) = √100 = 10\n**Step 4:** Check: AB + BC = 5 + 5 = 10 = AC\n\nTherefore, A, B, C are collinear.\n\n---\n\n**Problem 2:** Show that A(0,-1), B(2,1), C(0,3) are vertices of a right triangle.\n\n**Solution:**\nAB = √(4+4) = √8\nBC = √(4+4) = √8\nAC = √(0+16) = 4\nAB²+BC² = 8+8 = 16 = 4² = AC²\nSo angle B = 90°. Right triangle."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\nConfusing (x₂-x₁)² with x₂²-x₁²: Use the difference, not separate squares.\nForgetting coordinates of origin: O(0,0), not O(0,1).\nSign errors: (x₂-x₁)² eliminates sign, but take the correct difference.\nForgetting the square root: Distance is √(sum), not just the sum.\n\n**Tips and Tricks:**\n\nDraw a rough diagram — helps visualise and catch errors.\nMemorise as d² = (Δx)² + (Δy)², then take square root at the end.\nFor collinearity, check if largest distance equals sum of other two.\nUse the formula to verify geometric properties."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1:** Find distance between (3,4) and (6,8).\n**Answer:** √[(6-3)²+(8-4)²] = √(9+16) = 5 units.\n\n---\n\n**Problem 2:** Check if A(0,-1), B(2,1), C(0,3) form a right triangle.\n**Answer:** AB=√8, BC=√8, AC=4. AB²+BC²=8+8=16=AC². Right angle at B.\n\n---\n\n**Problem 3:** Find the point on x-axis equidistant from (2,-5) and (-2,9).\n**Answer:** Let (x,0). (x-2)²+25 = (x+2)²+81 → -4x+4+25 = 4x+4+81 → -4x+29=4x+85 → -8x=56 → x=-7. Point (-7,0)."
+      }
+    ]
+  },
+  "610032c6198dfd2f": {
+    "summary": "The section formula gives coordinates of a point dividing a line segment joining (x₁,y₁) and (x₂,y₂) internally in ratio m:n: P = ((mx₂+nx₁)/(m+n), (my₂+ny₁)/(m+n)). The midpoint is a special case where m=n=1.",
+    "chunks": [
+      {
+        "title": "Understanding the Section Formula",
+        "content": "The **section formula** finds the coordinates of a point dividing a line segment joining two given points in a given ratio.\n\n**Internal Division Formula:**\nIf P divides AB (with A(x₁,y₁) and B(x₂,y₂)) internally in ratio m:n (AP:PB = m:n):\n\nP(x,y) = ((mx₂ + nx₁)/(m + n), (my₂ + ny₁)/(m + n))\n\n**Key Point:**\n- m corresponds to the second point (x₂,y₂)\n- n corresponds to the first point (x₁,y₁)\n\n**Example:**\nDivide A(2,3) and B(6,7) in ratio 3:1 internally.\nx = (3×6 + 1×2)/(3+1) = 20/4 = 5\ny = (3×7 + 1×3)/(3+1) = 24/4 = 6\nP(5,6). Check: AP:PB = √18:√2 = 3:1 ✓"
+      },
+      {
+        "title": "Midpoint Formula and Applications",
+        "content": "**Midpoint Formula (ratio 1:1):**\nP = ((x₁+x₂)/2, (y₁+y₂)/2)\n\n**Points of Trisection (divide into 3 equal parts):**\nP₁ (ratio 1:2) = ((2x₁+x₂)/3, (2y₁+y₂)/3)\nP₂ (ratio 2:1) = ((x₁+2x₂)/3, (y₁+2y₂)/3)\n\n**Centroid of a Triangle:**\nG = ((x₁+x₂+x₃)/3, (y₁+y₂+y₃)/3)\nThe centroid divides each median in the ratio 2:1.\n\n**Example — Centroid:**\nTriangle A(2,3), B(-1,4), C(5,-2):\nG = ((2-1+5)/3, (3+4-2)/3) = (6/3, 5/3) = (2, 5/3)\n\n**Applications:**\n- Finding midpoint of a segment\n- Finding centroid of triangles\n- Solving geometry problems using coordinates"
+      },
+      {
+        "title": "Worked Example: Section Formula",
+        "content": "**Problem:** Find the coordinates of the point dividing A(-1,7) and B(4,-3) in ratio 2:3.\n\n**Solution:**\n\n**Step 1:** A(x₁,y₁)=(-1,7), B(x₂,y₂)=(4,-3), m:n=2:3\n\n**Step 2:** x = (mx₂+nx₁)/(m+n) = (2×4+3×(-1))/(2+3) = (8-3)/5 = 1\n\n**Step 3:** y = (my₂+ny₁)/(m+n) = (2×(-3)+3×7)/(2+3) = (-6+21)/5 = 3\n\nSo P = (1, 3).\n\n**Verification:**\nAP = √[(1+1)²+(3-7)²] = √(4+16) = √20\nPB = √[(4-1)²+(-3-3)²] = √(9+36) = √45\nAP:PB = √20:√45 = 2:3 ✓"
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\nReversing m and n: m goes with B(x₂), n goes with A(x₁).\nUsing wrong sign: The formula works with signed coordinates.\nConfusing internal and external division: Standard formula is for INTERNAL division.\n\n**Tips and Tricks:**\n\nWrite: (x₁,y₁)=first point, (x₂,y₂)=second point, m:n=ratio.\nMemorise: x = (mx₂+nx₁)/(m+n), similarly for y.\nFor midpoint, just average: ((x₁+x₂)/2, (y₁+y₂)/2).\nVerify by computing AP and PB and checking the ratio."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1:** Find midpoint of (3,5) and (-1,7).\n**Answer:** ((3-1)/2, (5+7)/2) = (1, 6).\n\n---\n\n**Problem 2:** If A(2,-2) and B(-7,4), find point dividing AB in ratio 1:2.\n**Answer:** x=(1(-7)+2(2))/3 = (-7+4)/3 = -1. y=(1(4)+2(-2))/3 = 0/3 = 0. P(-1,0).\n\n---\n\n**Problem 3:** Find the ratio in which (-1,6) divides A(-3,10) and B(6,-8).\n**Answer:** Let ratio be k:1. x: (6k-3)/(k+1)=-1 → 6k-3=-k-1 → 7k=2 → k=2/7. y: (-8k+10)/(k+1)=6 → -8k+10=6k+6 → -14k=-4 → k=2/7 ✓. Ratio = 2:7."
+      }
+    ]
+  },
+  "6b980e3a03774f4e": {
+    "summary": "The area of a triangle with vertices (x₁,y₁), (x₂,y₂), (x₃,y₃) is ½|x₁(y₂-y₃)+x₂(y₃-y₁)+x₃(y₁-y₂)|. If this expression equals zero, the points are collinear. This formula is also extended to find areas of quadrilaterals by splitting into triangles.",
+    "chunks": [
+      {
+        "title": "Area of a Triangle in Coordinate Geometry",
+        "content": "The **area of a triangle** can be calculated using coordinates of its vertices without finding side lengths.\n\n**Area Formula:**\nFor triangle with vertices A(x₁,y₁), B(x₂,y₂), C(x₃,y₃):\n\n**Area = ½|x₁(y₂ - y₃) + x₂(y₃ - y₁) + x₃(y₁ - y₂)|**\n\n**Derivation:**\nThe formula is derived by considering the triangle area as a trapezium area difference.\n\n**Important:**\n- The absolute value ensures positive area\n- If the expression inside is zero, points are COLLINEAR\n- The sign changes with vertex order (clockwise/anticlockwise)\n\n**Example:**\nTriangle A(1,2), B(4,5), C(3,1):\nArea = ½|1(5-1)+4(1-2)+3(2-5)| = ½|4-4-9| = ½|-9| = 4.5 sq. units"
+      },
+      {
+        "title": "Applications of the Area Formula",
+        "content": "**1. Checking Collinearity:**\nIf area = 0, points are collinear.\n\n**2. Area of Quadrilateral:**\nSplit into two triangles and add their areas.\nArea(ABCD) = Area(ABC) + Area(ACD)\n\n**3. Finding Missing Vertex:**\nGiven area and two vertices, possible coordinates of third vertex can be found.\n\n**4. Determinant Form:**\nArea = ½|det([[x₁,y₁,1],[x₂,y₂,1],[x₃,y₃,1]])|\n\n**Example — Collinearity:**\nCheck if (1,2), (3,4), (5,6) are collinear.\nArea = ½|1(4-6)+3(6-2)+5(2-4)| = ½|-2+12-10| = ½|0| = 0\nYes, they are collinear."
+      },
+      {
+        "title": "Worked Example: Area of Triangle",
+        "content": "**Problem:** Find the area of triangle with vertices A(-3,4), B(6,2), C(-7,-5).\n\n**Solution:**\n\n**Step 1:** Apply formula:\nArea = ½|x₁(y₂-y₃) + x₂(y₃-y₁) + x₃(y₁-y₂)|\n\n**Step 2:** Compute each term:\nx₁(y₂-y₃) = -3(2-(-5)) = -3(7) = -21\nx₂(y₃-y₁) = 6(-5-4) = 6(-9) = -54\nx₃(y₁-y₂) = -7(4-2) = -7(2) = -14\n\n**Step 3:** Sum = -21-54-14 = -89\n\n**Step 4:** Area = ½×|-89| = 44.5 sq. units\n\nThe triangle has area **44.5** square units."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\nForgetting absolute value: Area must be positive.\nMissing ½ factor: The formula gives twice the area without ½.\nWrong pattern: It is x₁(y₂-y₃), NOT x₁(y₃-y₂).\nAssuming three points always form a triangle: If area=0, they're collinear.\n\n**Tips and Tricks:**\n\nWrite carefully: x₁(y₂-y₃) + x₂(y₃-y₁) + x₃(y₁-y₂).\nAlways include ½ and absolute value.\nTo check collinearity, compute area. Zero means collinear.\nFor quadrilateral area, split into two triangles and add."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1:** Find area of triangle with vertices (0,0), (4,0), (0,3).\n**Answer:** ½|0(0-3)+4(3-0)+0(0-0)| = ½|12| = 6 sq. units (matches ½×4×3).\n\n---\n\n**Problem 2:** If area of triangle (2,3), (5,7), (x,1) is 10 sq. units, find x.\n**Answer:** ½|2(7-1)+5(1-3)+x(3-7)| = ½|12-10-4x| = ½|2-4x| = 10. |2-4x|=20. x=-4.5 or x=5.5.\n\n---\n\n**Problem 3:** Prove points (a,b+c), (b,c+a), (c,a+b) are collinear.\n**Answer:** Area = ½|a(c+a-a-b)+b(a+b-b-c)+c(b+c-c-a)| = ½|a(c-b)+b(a-c)+c(b-a)| = ½|ac-ab+ab-bc+bc-ac| = 0. Collinear."
+      }
+    ]
+  }
+}

@@ -1,0 +1,286 @@
+{
+  "f8990c8d79e9b4ac": {
+    "summary": "Light reflects obeying laws: angle of incidence = angle of reflection, incident/reflected/normal in same plane. Regular (smooth surface) vs diffuse (rough surface) reflection.",
+    "chunks": [
+      {
+        "title": "Understanding Reflection of Light",
+        "content": "**Reflection of Light** is a key topic in Light – Reflection and Refraction for CBSE Class X Science.\n\n**Light:** Form of energy that enables vision. Travels in straight lines (rectilinear propagation). Speed: 3×10⁸ m/s in vacuum.\n\n**Reflection:** Bouncing back of light when it strikes a surface.\n\n**Laws of Reflection:**\n1. Incident ray, reflected ray, and normal all lie in the SAME plane\n2. Angle of incidence (∠i) = Angle of reflection (∠r)"
+      },
+      {
+        "title": "Key Concepts of Types of Reflection",
+        "content": "**Important points:**\n• **Regular/Specular reflection:** Smooth surface (mirror, calm water). Parallel incident rays → parallel reflected rays. Clear image formed\n• **Diffuse/Irregular reflection:** Rough surface (paper, wall, cloth). Parallel incident rays → reflected in different directions. No image. Enables us to see non-luminous objects from any angle"
+      },
+      {
+        "title": "Key Concepts of Image Formation by Plane Mirror",
+        "content": "**Important points:**\n• **Characteristics:** Virtual, erect, same size as object, laterally inverted (left↔right). Distance behind mirror = distance in front\n• **Field of view:** Larger than that of a window of same size (can see more area)\n• **Uses:** Periscope, kaleidoscope, looking glass, sign boards (message reversed on ambulance)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A person stands 2 m in front of a plane mirror. Where is the image? What is the distance between person and image?\n\n**Solution:**\n**Step 1:** Image formed behind mirror at same distance = 2 m\n**Step 2:** Image is virtual, erect, same size\n**Step 3:** Distance between person and image = 2+2 = 4 m\n\n**Answer:** Image 2 m behind mirror. Distance = 4 m."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** State laws of reflection.\n\n**Answer:** ∠i = ∠r. Incident, reflected, normal in same plane.\n\n---\n\n**Q2.** Why can't we see our image in a wall?\n\n**Answer:** Wall is rough → diffuse reflection. Light scatters in all directions, no image formed.\n\n---\n\n**Q3.** Why is the word AMBULANCE written inverted on vehicles?\n\n**Answer:** Mirror reflection reverses. Driver ahead reads AMBULANCE correctly in rearview mirror."
+      }
+    ]
+  },
+  "24567c8c0fcac90b": {
+    "summary": "Spherical mirrors (concave/convex). Terms: pole, centre of curvature, focus, focal length (f=R/2). Image formation rules: ray diagrams for object at various positions. Uses: concave (shaving mirror, solar cooker), convex (rearview mirror). Mirror equation: 1/f = 1/u + 1/v. Magnification: m = -v/u.",
+    "chunks": [
+      {
+        "title": "Understanding Spherical Mirrors",
+        "content": "**Spherical Mirrors** is a key topic in Light – Reflection and Refraction for CBSE Class X Science.\n\n**Spherical mirror:** Part of a hollow sphere.\n\n**Types:**\n• **Concave (converging):** Reflecting surface curves INWARD. Focus in front\n• **Convex (diverging):** Reflecting surface curves OUTWARD. Focus behind\n\n**Terms:** Pole (P), Centre of curvature (C), Radius of curvature (R), Focus/Focal point (F), Focal length (f) = R/2"
+      },
+      {
+        "title": "Key Concepts of Image Formation: Ray Diagrams",
+        "content": "**Important points:**\n• **Rules for concave mirror:** (1) Ray ∥ to axis → passes through F after reflection. (2) Ray through F → ∥ to axis. (3) Ray through C → reflects back along same path. (4) Ray to pole P → reflects with ∠i=∠r\n• **Concave — Object at:** ∞ → real, inverted, diminished at F. Beyond C → real, inverted, diminished between C and F. At C → real, inverted, same size at C. Between C and F → real, inverted, enlarged beyond C. At F → real, inverted, highly enlarged at ∞. Between P and F → virtual, erect, enlarged behind mirror\n• **Convex mirror:** Always produces virtual, erect, diminished image. Used for rearview mirrors (wider field of view)"
+      },
+      {
+        "title": "Key Concepts of Mirror Formula and Magnification",
+        "content": "**Important points:**\n• **Mirror formula:** 1/f = 1/u + 1/v. Sign convention: u = -ve (object in front). f = -ve (concave), +ve (convex). v = -ve (real image), +ve (virtual image)\n• **Magnification (m):** m = hᵢ/hₒ = -v/u. |m|>1 → enlarged; |m|<1 → diminished; |m|=1 → same size. Positive m = virtual/erect; negative m = real/inverted"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** An object 5 cm high is placed 15 cm from a concave mirror of focal length 10 cm. Find position, nature, and size of image.\n\n**Solution:**\n**Step 1:** Given: u = -15 cm, f = -10 cm, hₒ = 5 cm\n**Step 2:** 1/v = 1/f - 1/u = -1/10 + 1/15 = (-3+2)/30 = -1/30\n**Step 3:** v = -30 cm (real image, 30 cm in front of mirror)\n**Step 4:** m = -v/u = -(-30)/(-15) = -2 (inverted, enlarged)\n**Step 5:** hᵢ = m×hₒ = -2×5 = -10 cm (10 cm, inverted)\n\n**Answer:** Image: real, inverted, 10 cm tall, 30 cm in front of mirror."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the focal length of a concave mirror with R=40 cm?\n\n**Answer:** f = R/2 = 20 cm.\n\n---\n\n**Q2.** Why are convex mirrors used as rearview mirrors?\n\n**Answer:** Wider field of view, always erect image, shows traffic behind.\n\n---\n\n**Q3.** An object placed 20 cm from a concave mirror gives real image at 20 cm. Find f.\n\n**Answer:** 1/f = 1/20+1/20 = 2/20 = 1/10. f = 10 cm."
+      }
+    ]
+  },
+  "03d99857ba348019": {
+    "summary": "Refraction: bending of light when passing from one medium to another. Light slows down in denser medium. Laws: Snell's law (n₁ sin i = n₂ sin r). Refractive index n = c/v. Examples: apparent depth, stick in water appearing bent.",
+    "chunks": [
+      {
+        "title": "Understanding Refraction of Light",
+        "content": "**Refraction of Light** is a key topic in Light – Reflection and Refraction for CBSE Class X Science.\n\n**Refraction:** The bending of light when it passes obliquely from one transparent medium to another.\n\n**Cause:** Light changes speed when entering a different medium.\n\n**Effects:**\n• Rarer→Denser: bends TOWARDS the normal (slows down)\n• Denser→Rarer: bends AWAY from the normal (speeds up)"
+      },
+      {
+        "title": "Key Concepts of Laws of Refraction (Snell's Law)",
+        "content": "**Important points:**\n• **Law 1:** Incident ray, refracted ray, and normal at interface all lie in same plane\n• **Law 2 (Snell's Law):** n₁ sin i = n₂ sin r, where n = refractive index, i = angle of incidence, r = angle of refraction\n• **Refractive index:** n = speed of light in vacuum / speed of light in medium = c/v. Always ≥1. Higher n = optically denser medium\n• **Relative refractive index:** n₂₁ = n₂/n₁ (from medium 1 to 2)"
+      },
+      {
+        "title": "Key Concepts of Effects of Refraction in Daily Life",
+        "content": "**Important points:**\n• **Apparent depth:** Object in water appears closer to surface (less deep) due to refraction. Real depth / Apparent depth = n (refractive index of water ≈ 4/3)\n• **Stick in water appears bent:** Light from underwater part refracts at water-air interface → appears at different angle\n• **Twinkling of stars:** Atmospheric refraction of starlight (continuous change in air density → light path keeps changing)\n• **Sun visible before sunrise/after sunset:** Atmospheric refraction bends sunlight → we see sun ~2 min before actual sunrise"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Light enters from air to water (n=4/3). If angle of incidence is 45°, find angle of refraction. (sin 45°=0.707)\n\n**Solution:**\n**Step 1:** n₁ sin i = n₂ sin r\n**Step 2:** 1 × 0.707 = (4/3) × sin r\n**Step 3:** sin r = 0.707 × 3/4 = 0.530\n**Step 4:** r = sin⁻¹(0.530) ≈ 32°\n\n**Answer:** r ≈ 32° (light bends towards normal, water is denser)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the speed of light in glass if n=1.5 and c=3×10⁸ m/s?\n\n**Answer:** v = c/n = 3×10⁸/1.5 = 2×10⁸ m/s.\n\n---\n\n**Q2.** Why does a pencil appear bent when partly immersed in water?\n\n**Answer:** Light from underwater part refracts at water-air interface → appears at different position.\n\n---\n\n**Q3.** If n of diamond is 2.42, what is the speed of light in diamond?\n\n**Answer:** v = 3×10⁸/2.42 ≈ 1.24×10⁸ m/s."
+      }
+    ]
+  },
+  "96fe99dec7d3d34d": {
+    "summary": "Light bends when entering/exiting a rectangular glass slab. Emergent ray is parallel to incident ray (laterally displaced). Displacement depends on thickness, refractive index, angle of incidence.",
+    "chunks": [
+      {
+        "title": "Understanding Refraction through a Rectangular Glass Slab",
+        "content": "**Refraction through a Rectangular Glass Slab** is a key topic in Light – Reflection and Refraction for CBSE Class X Science.\n\n**Experiment:** Pass a ray of light through a rectangular glass slab.\n\n**Observations:**\n1. Incident ray bends towards normal at air→glass interface\n2. Ray travels straight inside glass\n3. Emergent ray bends away from normal at glass→air interface\n4. Emergent ray is PARALLEL to incident ray (same direction)\n5. Lateral displacement occurs (lateral shift)"
+      },
+      {
+        "title": "Key Concepts of Lateral Displacement",
+        "content": "**Important points:**\n• **Lateral shift:** The perpendicular distance between the path of incident ray and emergent ray\n• **Factors:** Depends on thickness of slab (more thickness = more shift), refractive index (higher n = more shift), angle of incidence (higher i = more shift)\n• **Why no deviation of direction?** Light enters and exits through parallel surfaces. Air→Glass: bends towards normal. Glass→Air: bends away from normal by same amount. Net angular deviation = 0"
+      },
+      {
+        "title": "Key Concepts of Verifying Laws of Refraction",
+        "content": "**Important points:**\n• **Procedure:** Place glass slab on paper. Draw outline. Draw incident ray (angle i). Pin pricks to trace path. Draw emergent ray. Measure i, r, e. Observe i = e (parallel). Measure lateral shift (d)\n• **Results confirm:** Snell's law (n₁ sin i = n₂ sin r). Light bends towards normal in denser medium. Reversibility of light (path is reversible)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A ray incident at 40° on a glass slab (n=1.5, thickness 5 cm) emerges parallel. What is the angle of emergence? Explain.\n\n**Solution:**\n**Step 1:** At first surface: 1×sin40° = 1.5×sinr → sinr = 0.429 → r ≈ 25.4°\n**Step 2:** Ray travels through glass (straight)\n**Step 3:** At second surface: 1.5×sin25.4° = 1×sine → sine = 0.643 → e = 40°\n**Step 4:** e = i (40°). Emergent ray ∥ incident ray\n\n**Answer:** Angle of emergence = 40° (same as incidence). Emergent ray is parallel to incident ray."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why is the emergent ray parallel to the incident ray in a glass slab?\n\n**Answer:** Both surfaces are parallel. The bending at entry and exit are equal and opposite (net deviation zero).\n\n---\n\n**Q2.** What is lateral displacement?\n\n**Answer:** Perpendicular distance between incident and emergent ray paths. Increases with slab thickness and refractive index.\n\n---\n\n**Q3.** If angle of incidence is 0° (normal incidence), what happens?\n\n**Answer:** No bending (i=r=0). Ray goes straight through without deviation or lateral shift."
+      }
+    ]
+  },
+  "eb14e744b7e4bae5": {
+    "summary": "Refractive index (n) = c/v. Absolute (vacuum→medium) vs Relative (medium1→medium2). Higher n = optically denser. Snell's law: n₁ sin i = n₂ sin r. Applications: optical fibres, lenses, apparent depth.",
+    "chunks": [
+      {
+        "title": "Understanding Refractive Index",
+        "content": "**Refractive Index** is a key topic in Light – Reflection and Refraction for CBSE Class X Science.\n\n**Refractive index (n):** Measure of how much light slows down in a medium.\n\nn = Speed of light in vacuum (or air) / Speed of light in medium = c/v\n\n**Examples:**\nAir n≈1.0003, Water n=4/3≈1.33, Glass n=1.5, Diamond n=2.42"
+      },
+      {
+        "title": "Key Concepts of Types of Refractive Index",
+        "content": "**Important points:**\n• **Absolute refractive index:** n = c/v. Refers to vacuum as reference. For air, n ≈ 1 (very close to vacuum)\n• **Relative refractive index:** n₂₁ = n₂/n₁ = v₁/v₂. From medium 1 to medium 2. Used in Snell's law calculations\n• **Optical density vs physical density:** Higher n does not necessarily mean higher physical density (e.g., oil vs water)"
+      },
+      {
+        "title": "Key Concepts of Applications of Refractive Index",
+        "content": "**Important points:**\n• **Total Internal Reflection (TIR):** When light goes from denser→rarer medium at angle > critical angle (C). sin C = n_rarer / n_denser. All light reflected back\n• **Optical fibres:** Light guided by repeated TIR inside glass fibre. Used in telecommunications, endoscopy\n• **Diamond sparkle:** High n=2.42 → very small critical angle (≈24°) → light undergoes multiple internal reflections → intense sparkle\n• **Lens maker:** n determines lens power. Different lens materials (crown glass n=1.52, flint glass n=1.62) give different dispersion"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Critical angle of diamond is 24°. What is its refractive index? (sin 24° = 0.407)\n\n**Solution:**\n**Step 1:** sin C = n_air / n_diamond\n**Step 2:** sin 24° = 1 / n_diamond\n**Step 3:** 0.407 = 1 / n_diamond\n**Step 4:** n_diamond = 1/0.407 ≈ 2.46\n\n**Answer:** n ≈ 2.46. (Actual value 2.42; small difference from sin approximation)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the refractive index of water? What does it mean?\n\n**Answer:** n=4/3≈1.33. Light travels 1.33 times slower in water than in vacuum.\n\n---\n\n**Q2.** What is the critical angle for water-air interface? (n_water=1.33)\n\n**Answer:** sin C = 1/1.33 = 0.75 → C = sin⁻¹(0.75) ≈ 48.75°.\n\n---\n\n**Q3.** Why do diamonds sparkle?\n\n**Answer:** High n (2.42) → small critical angle (~24°) → light undergoes many internal reflections before emerging."
+      }
+    ]
+  },
+  "77609e640fad4330": {
+    "summary": "Lenses (convex/converging, concave/diverging). Terms: optical centre, principal focus, focal length. Ray diagrams. Lens formula: 1/f = 1/v - 1/u. Power: P = 1/f (dioptre D). Magnification: m = v/u.",
+    "chunks": [
+      {
+        "title": "Understanding Refraction by Spherical Lenses",
+        "content": "**Refraction by Spherical Lenses** is a key topic in Light – Reflection and Refraction for CBSE Class X Science.\n\n**Lens:** Transparent material (usually glass) with two spherical surfaces.\n\n• **Convex (converging):** Thicker at centre. Focuses parallel light to a point. f positive\n• **Concave (diverging):** Thinner at centre. Spreads parallel light. f negative\n\n**Terms:** Optical centre (O), Principal focus (F), Focal length (f)"
+      },
+      {
+        "title": "Key Concepts of Image Formation by Lenses",
+        "content": "**Important points:**\n• **Convex lens — Object:** Beyond 2F → real, inverted, diminished between F and 2F. At 2F → real, inverted, same size at 2F. Between F and 2F → real, inverted, enlarged beyond 2F. At F → real, inverted, highly enlarged at ∞. Between O and F → virtual, erect, enlarged (magnifier)\n• **Concave lens:** Always produces virtual, erect, diminished image for any object position (between O and F)"
+      },
+      {
+        "title": "Key Concepts of Lens Formula and Power",
+        "content": "**Important points:**\n• **Lens formula:** 1/f = 1/v - 1/u. Sign convention: u = -ve (object in front). f = +ve (convex), -ve (concave). v = +ve (real image behind lens), -ve (virtual image in front)\n• **Magnification (m):** m = hᵢ/hₒ = v/u. |m|>1 → enlarged; <1 → diminished. Positive m = virtual/erect; negative m = real/inverted\n• **Power (P):** P = 1/f (in metres). Unit: Dioptre (D). Convex lens: P positive. Concave lens: P negative"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** An object 4 cm high is placed 20 cm from a convex lens of focal length 15 cm. Find position, nature, size of image.\n\n**Solution:**\n**Step 1:** Given: u = -20 cm, f = +15 cm, hₒ = 4 cm\n**Step 2:** 1/v = 1/f + 1/u = 1/15 + 1/(-20) = (4-3)/60 = 1/60\n**Step 3:** v = 60 cm (real image, behind lens)\n**Step 4:** m = v/u = 60/(-20) = -3 (inverted, enlarged)\n**Step 5:** hᵢ = m×4 = -12 cm (12 cm, inverted)\n\n**Answer:** Image: real, inverted, 12 cm tall, 60 cm behind lens."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the power of a convex lens of focal length 25 cm?\n\n**Answer:** P = 1/0.25 = +4 D.\n\n---\n\n**Q2.** What type of lens always produces a virtual, erect, diminished image?\n\n**Answer:** Concave lens (for any object position).\n\n---\n\n**Q3.** A concave lens of focal length 20 cm. Where is the image of an object 30 cm away?\n\n**Answer:** 1/v = 1/f + 1/u = -1/20 + 1/(-30) = -5/60 = -1/12. v = -12 cm (virtual, in front)."
+      }
+    ]
+  },
+  "1187a8c10f70052f": {
+    "summary": "Human eye: cornea (bends light), iris/pupil (controls light), lens (focuses), retina (image formation → signals to brain via optic nerve). Accommodation: ciliary muscles adjust lens shape for near/far objects (power of accommodation).",
+    "chunks": [
+      {
+        "title": "Understanding The Human Eye",
+        "content": "**The Human Eye** is a key topic in The Human Eye and the Colourful World for CBSE Class X Science.\n\nThe human eye is a complex optical instrument:\n\n**Structure:** Cornea (transparent front) → Aqueous humour → Iris (coloured, controls pupil size) → Pupil (light aperture) → Lens (biconvex, elastic) → Vitreous humour → Retina (photoreceptor cells) → Optic nerve → Brain\n\n**Image formation:** Lens forms real, inverted image on retina. Brain interprets as erect."
+      },
+      {
+        "title": "Key Concepts of Working of the Eye",
+        "content": "**Important points:**\n• **Cornea:** Does ~2/3 of light bending (fixed refraction). Lens provides fine adjustment (variable focus)\n• **Iris and Pupil:** Iris muscles control pupil diameter. Bright light → pupil constricts (protects retina). Dim light → pupil dilates (more light enters)\n• **Accommodation:** Ciliary muscles change lens shape (thickness). Thicker lens = more converging = near objects. Thinner lens = less converging = far objects. Power of accommodation = range of adjustment\n• **Near point:** ~25 cm for normal adult eye. **Far point:** Infinity. Range of vision = near point to infinity"
+      },
+      {
+        "title": "Key Concepts of Persistance of Vision and Other Properties",
+        "content": "**Important points:**\n• **Persistence of vision:** Image remains on retina for ~1/16th second after object removed. Movies displayed at 24 frames/sec → appears continuous\n• **Blind spot:** Where optic nerve leaves retina — no photoreceptors. Eye fills in gap using context\n• **Colour vision:** Retina has cones (colour, bright light) and rods (black/white, dim light). ~120 million rods, ~6 million cones 🌈"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** How does the eye focus on objects at different distances?\n\n**Solution:**\n**Step 1:** For far objects: ciliary muscles relaxed → lens thin (small curvature) → less converging → image on retina\n**Step 2:** For near objects: ciliary muscles contract → lens thick (more curvature) → more converging → image on retina\n**Step 3:** Process called 'accommodation'. Lens elasticity decreases with age (presbyopia)\n\n**Answer:** Ciliary muscles change lens thickness → changes focal length → maintains sharp image on retina."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the function of the iris?\n\n**Answer:** Controls pupil size (dilates/constricts) to regulate amount of light entering eye.\n\n---\n\n**Q2.** What is the near point and far point of a normal eye?\n\n**Answer:** Near point = 25 cm. Far point = infinity.\n\n---\n\n**Q3.** Why do we see a movie as continuous motion?\n\n**Answer:** Persistence of vision (~1/16 s). Successive frames merge seamlessly (24 fps)."
+      }
+    ]
+  },
+  "20f1b159774bed6b": {
+    "summary": "Myopia (nearsightedness): image before retina → concave lens. Hypermetropia (farsightedness): image behind retina → convex lens. Presbyopia: age-related loss of accommodation → bifocals. Astigmatism: irregular cornea → cylindrical lens. Cataract: lens cloudy → surgery.",
+    "chunks": [
+      {
+        "title": "Understanding Defects of Vision and their Correction",
+        "content": "**Defects of Vision and their Correction** is a key topic in The Human Eye and the Colourful World for CBSE Class X Science.\n\n**Common vision defects and their correction:**\n\n1. **Myopia (Nearsightedness):** Cannot see distant objects clearly\n2. **Hypermetropia (Farsightedness):** Cannot see nearby objects clearly\n3. **Presbyopia:** Age-related, cannot see nearby objects"
+      },
+      {
+        "title": "Key Concepts of Myopia and Hypermetropia",
+        "content": "**Important points:**\n• **Myopia:** Eyeball too long OR lens too curved. Image formed BEFORE retina. Can see near, not far. Corrected by **concave lens** (diverges light before it enters eye). Power: -ve sign\n• **Hypermetropia:** Eyeball too short OR lens too flat. Image formed BEHIND retina. Can see far, not near. Corrected by **convex lens** (converges light more). Power: +ve sign"
+      },
+      {
+        "title": "Key Concepts of Presbyopia, Astigmatism, and Cataract",
+        "content": "**Important points:**\n• **Presbyopia:** Age-related (>40 yrs). Lens loses elasticity → can't accommodate for near objects. Corrected by **bifocal lenses** (upper part for distance: concave/convex; lower part for reading: convex in both cases)\n• **Astigmatism:** Irregular curvature of cornea/lens → blurred vision at ALL distances. Corrected by **cylindrical lenses** (different power in different meridians)\n• **Cataract:** Lens becomes cloudy (opaque). Not a 'defect' but a medical condition. Corrected by **surgery** (remove cloudy lens, implant artificial intraocular lens)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A person cannot see objects beyond 1 m clearly. What defect does they have? Find lens power.\n\n**Solution:**\n**Step 1:** Cannot see far objects → myopia (nearsightedness)\n**Step 2:** Far point = 1 m (normal = ∞)\n**Step 3:** Need concave lens that makes object at ∞ appear at 1 m\n**Step 4:** 1/f = 1/v - 1/u = 1/(-1) - 1/∞ = -1\n**Step 5:** P = -1 D (concave lens)\n\n**Answer:** Myopia. Corrected by concave lens of power -1 D."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What type of lens corrects hypermetropia? Why?\n\n**Answer:** Convex lens. Converges light more so that image falls ON the retina.\n\n---\n\n**Q2.** What is presbyopia? How is it corrected?\n\n**Answer:** Age-related loss of accommodation. Corrected by bifocal lenses.\n\n---\n\n**Q3.** A person needs +2 D lens. What defect do they have?\n\n**Answer:** Hypermetropia (+2 D = convex lens, f=50 cm). Cannot see near objects clearly."
+      }
+    ]
+  },
+  "af7724cf41683a3d": {
+    "summary": "Light passing through a triangular prism bends twice (refraction at both surfaces), causing overall deviation. Dispersion: white light splits into 7 colours (VIBGYOR). Violet bends most, red least. Prism formula: δ = i₁ + i₂ - A.",
+    "chunks": [
+      {
+        "title": "Understanding Refraction of Light through a Prism",
+        "content": "**Refraction of Light through a Prism** is a key topic in The Human Eye and the Colourful World for CBSE Class X Science.\n\n**Prism:** Transparent medium bounded by two plane surfaces inclined at an angle (refracting angle A).\n\n**Path of light:**\n1. Air→Glass: bends TOWARDS normal (slows down)\n2. Travels through prism\n3. Glass→Air: bends AWAY from normal (speeds up)\n**Net result:** Light deviates towards the BASE of the prism"
+      },
+      {
+        "title": "Key Concepts of Angle of Deviation and Dispersion",
+        "content": "**Important points:**\n• **Angle of deviation (δ):** The angle between incident ray and emergent ray. Depends on A (prism angle), n (refractive index), and angle of incidence\n• **Minimum deviation (δₘ):** When incident angle = emergent angle. Prism formula: n = sin[(A+δₘ)/2] / sin(A/2)\n• **Dispersion:** White light splits into constituent colours (VIBGYOR) because different colours have different speeds in glass → different bending. Violet (most deviation, shortest λ). Red (least deviation, longest λ)"
+      }
+    ]
+  },
+  "0c2e1cdaa71a6264": {
+    "summary": "Dispersion: white light splits into 7 colours (VIBGYOR) through a prism. Rainbow: natural dispersion by water droplets (refraction + internal reflection + refraction). Newton showed white light is composed of colours; two prisms recombine colours to white.",
+    "chunks": [
+      {
+        "title": "Understanding Dispersion of White Light by a Glass Prism",
+        "content": "**Dispersion of White Light by a Glass Prism** is a key topic in The Human Eye and the Colourful World for CBSE Class X Science.\n\n**Isaac Newton (1666):** Showed that white light is composed of seven colours.\n\n**Dispersion:** Splitting of white light into its constituent colours.\n\n**Order:** Violet → Indigo → Blue → Green → Yellow → Orange → Red (VIBGYOR)\n\n**Reason:** Different colours have different wavelengths → different speeds in glass → different refractive indices → bend by different amounts."
+      },
+      {
+        "title": "Key Concepts of Rainbow Formation and Recombination",
+        "content": "**Important points:**\n• **Rainbow:** Natural spectrum formed by dispersion in water droplets. Three steps: Refraction at entry, Total Internal Reflection inside droplet, Refraction at exit. Sun behind observer → rainbow in opposite direction\n• **Recombination:** Two prisms placed opposite. First prism splits, second prism recombines colours back to white light. Proves white light = mixture of coloured lights\n• **Why VIBGYOR?** Violet has shortest wavelength (400 nm) → bends most. Red has longest wavelength (700 nm) → bends least"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Newton placed a second prism inverted after the first. What did he observe and why?\n\n**Solution:**\n**Step 1:** First prism: white light → spectrum (VIBGYOR) — dispersion\n**Step 2:** Second prism (inverted): spectrum → white light — recombination\n**Step 3:** Conclusion: White light is composed of 7 colours\n**Step 4:** Prisms do not 'add colour' — they separate existing colours\n\n**Answer:** Spectrum recombined to white light. Proves white light = mix of all colours."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Name the seven colours of the spectrum in order.\n\n**Answer:** Violet, Indigo, Blue, Green, Yellow, Orange, Red (VIBGYOR).\n\n---\n\n**Q2.** Why does violet bend more than red through a prism?\n\n**Answer:** Violet has shorter wavelength → slower in glass → higher refractive index → more bending.\n\n---\n\n**Q3.** How is a rainbow formed?\n\n**Answer:** Sunlight → water droplets → refraction (enters) → TIR (inside) → refraction (exits) → dispersion → rainbow."
+      }
+    ]
+  },
+  "8493f1f7a882c4a6": {
+    "summary": "Atmospheric refraction: light bends due to varying air density/temperature. Effects: twinkling of stars (turbulence), sun visible before sunrise/after sunset (~2 min early), apparent flattening of sun at horizon, mirages (hot air near ground).",
+    "chunks": [
+      {
+        "title": "Understanding Atmospheric Refraction",
+        "content": "**Atmospheric Refraction** is a key topic in The Human Eye and the Colourful World for CBSE Class X Science.\n\n**Atmospheric refraction:** The refraction of light by Earth's atmosphere due to varying air density (and hence varying refractive index) at different heights.\n\n**Key effects:**\n• Stars twinkle\n• Sun visible before actual sunrise and after sunset\n• Sun appears flattened at sunrise/sunset\n• Mirages"
+      },
+      {
+        "title": "Key Concepts of Phenomena Explained by Atmospheric Refraction",
+        "content": "**Important points:**\n• **Twinkling of stars:** Light from star enters atmosphere → bends due to changing air density. Turbulence (moving air pockets) causes light path to fluctuate → apparent position and brightness vary. Planets (extended discs) don't twinkle much (average of many light rays)\n• **Advance sunrise/delayed sunset:** Sun appears ~2 min before actual sunrise and remains visible ~2 min after actual sunset. Light from below-horizon sun bends around Earth's curvature due to atmospheric refraction\n• **Apparent flattening:** At sunrise/sunset, lower edge of sun is refracted more than upper edge → sun appears elliptical (flattened)"
+      },
+      {
+        "title": "Key Concepts of Mirages",
+        "content": "**Important points:**\n• **Mirage (in deserts):** Hot air near ground has lower density (lower n) than cooler air above. Light from sky bends UPWARDS (away from normal as it goes from denser→rarer). Apparent reflection of sky on ground → looks like water\n• **Not an illusion:** The bend light path is real. The 'water' is an image of the sky. Similar phenomenon on hot roads (looks wet)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why do stars twinkle but planets do not?\n\n**Solution:**\n**Step 1:** Stars are point sources (very far, appear as points of light)\n**Step 2:** Atmospheric turbulence bends light from different parts of the same star differently → fluctuations in brightness\n**Step 3:** Planets are extended discs (not points). Light from different points on disc average out the fluctuations\n**Step 4:** Result: planets appear steady, stars twinkle\n\n**Answer:** Stars = point sources → turbulence effects visible. Planets = extended discs → effects averaged out."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why is the sun visible before actual sunrise?\n\n**Answer:** Atmospheric refraction bends sunlight from below horizon → appears above horizon ~2 min early.\n\n---\n\n**Q2.** What causes a mirage in the desert?\n\n**Answer:** Hot air near ground (less dense) → light bends upward → looks like water reflection of sky.\n\n---\n\n**Q3.** Why does the sun appear flattened at sunrise?\n\n**Answer:** Lower edge refracts more than upper edge → elliptical appearance."
+      }
+    ]
+  },
+  "95fb5c3ff2484dbb": {
+    "summary": "Scattering of light by particles smaller than wavelength. Rayleigh scattering (intensity ∝ 1/λ⁴): blue sky (shorter λ violet/blue scattered more), red sunrise/sunset (longer path, blue scattered away, red reaches eye). Tyndall effect: colloid particles scatter light.",
+    "chunks": [
+      {
+        "title": "Understanding Scattering of Light",
+        "content": "**Scattering of Light** is a key topic in The Human Eye and the Colourful World for CBSE Class X Science.\n\n**Scattering:** Absorption and re-emission of light by particles.\n\n**Rayleigh scattering:** Scattering intensity ∝ 1/λ⁴ (shorter wavelengths scatter much more).\n\nThis explains:\n1. Blue colour of sky\n2. Red/ orange colour of sunrise/sunset\n3. White colour of clouds\n4. Tyndall effect"
+      },
+      {
+        "title": "Key Concepts of Colour of Sky and Sun",
+        "content": "**Important points:**\n• **Blue sky:** Shorter wavelengths (violet, blue) scatter more by air molecules. Our eyes are more sensitive to blue than violet → sky appears blue. In space (no atmosphere), sky appears black (no scattering)\n• **Red sunrise/sunset:** Sun near horizon → light travels longer through atmosphere. Most blue/violet scattered away (multiple scattering). Only red/orange (longer λ, less scattered) reaches our eyes → red/orange sun\n• **White clouds:** Water droplets in clouds are larger than wavelength. They scatter ALL colours equally (Mie scattering) → clouds appear white"
+      },
+      {
+        "title": "Key Concepts of Tyndall Effect",
+        "content": "**Important points:**\n• **Tyndall effect:** Scattering of light by colloidal particles (larger than molecules, smaller than visible). Particles must be ~1-100 nm\n• **Examples:** Blue colour of sky (dust+water in atmosphere). Headlight beam in fog. Blue eyes vs brown: more scattering in blue (less pigment). Milk, starch solution, smoke show Tyndall effect\n• **Not Tyndall:** True solutions (salt water, sugar water) do NOT show Tyndall effect (particles too small)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why does the sky appear dark to astronauts on the moon?\n\n**Solution:**\n**Step 1:** Moon has NO atmosphere (no air molecules to scatter light)\n**Step 2:** Without scattering, the sky remains black (even when sun is shining)\n**Step 3:** This proves blue colour of sky is from atmospheric scattering\n\n**Answer:** No atmosphere → no scattering → sky appears black even in sunlight."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why is the sky blue?\n\n**Answer:** Shorter wavelengths (blue/violet) scatter more by air molecules (Rayleigh scattering ∝ 1/λ⁴).\n\n---\n\n**Q2.** Why is the sun red at sunset?\n\n**Answer:** Longer path through atmosphere → blue scattered away, only red reaches eye.\n\n---\n\n**Q3.** What is the Tyndall effect? Give two examples.\n\n**Answer:** Scattering by colloidal particles. Examples: beam of light in fog/milk, blue colour of eyes with less pigment."
+      }
+    ]
+  }
+}

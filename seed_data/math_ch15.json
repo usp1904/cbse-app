@@ -1,0 +1,27 @@
+{
+  "239b84f606fa7fdb": {
+    "summary": "Probability P(E) = favourable outcomes / total outcomes. Values: 0 ≤ P(E) ≤ 1. P(E)+P(not E)=1. Complementary events simplify 'at least one' problems: P(at least one)=1-P(none).",
+    "chunks": [
+      {
+        "title": "Understanding Probability - A Theoretical Approach",
+        "content": "**Probability - A Theoretical Approach** is a key concept in Probability of CBSE Class X Mathematics.\n\n**Probability** measures how likely an event is to occur.\n\nP(E) = Number of favourable outcomes / Total number of possible outcomes\n\n**Properties:**\n• 0 ≤ P(E) ≤ 1\n• P(impossible) = 0, P(certain) = 1\n• P(E) + P(not E) = 1\n• ΣP(all outcomes) = 1\n\n**Sample spaces:** 1 coin→2, 2 coins→4, 1 die→6, 2 dice→36, cards→52\n\n**Key points to remember:**\n• Probabilities always 0 to 1\n• P(E)+P(not E)=1\n• 'At least one' = 1-P(none)\n• All outcomes equally likely in theoretical probability"
+      },
+      {
+        "title": "Properties and Applications of Probability - A Theoretical Approach",
+        "content": "**1. Properties:**\n• P(at least 1 head in 3 coins) = 1-P(no heads)=1-1/8=7/8\n• P(king) = 4/52 = 1/13\n• P(sum 7 with 2 dice) = 6/36 = 1/6\n• P(face card) = 12/52 = 3/13\n\n**2. Important Formulas:**\nP(E) = fav/total\n0 ≤ P(E) ≤ 1\nP(E) + P(not E) = 1\nP(at least one) = 1-P(none)\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nBag: 3 red, 5 blue, 2 green. P(red)=3/10=0.3, P(not blue)=1-5/10=0.5."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** From a well-shuffled deck of 52 cards, find P(a king) and P(red face card).\n\n**Solution:**\n\n**Step 1:** P(king) = 4/52 = 1/13\n**Step 2:** Red face cards: Hearts J,Q,K and Diamonds J,Q,K = 6\n**Step 3:** P(red face) = 6/52 = 3/26\n\nTherefore, P(king)=1/13, P(red face)=3/26."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **P > 1:** Probability is always between 0 and 1\n\n**Tips and Tricks:**\n\n✓ **Fav/total:** Always: favourable / total possible"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nToss 2 coins. Find P(2 heads).\n\n**Answer:** Total=4. Fav=1. P=1/4.\n\n---\n\n**Problem 2 (Intermediate):**\nA die rolled. Find P(even).\n\n**Answer:** Even: 2,4,6. P=3/6=1/2.\n\n---\n\n**Problem 3 (Advanced):**\nBag: 4 white, 6 black, 5 red. Find P(not black).\n\n**Answer:** Total=15. Not black=9. P=9/15=3/5."
+      }
+    ]
+  }
+}

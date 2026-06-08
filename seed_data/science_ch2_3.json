@@ -1,0 +1,252 @@
+{
+  "17e1372a1e855937": {
+    "summary": "Acids (HCl, H₂SO₄, HNO₃) taste sour, turn blue litmus red, have pH<7. Bases (NaOH, KOH, Ca(OH)₂) taste bitter, feel soapy, turn red litmus blue, have pH>7.",
+    "chunks": [
+      {
+        "title": "Understanding Understanding the Chemical Properties of Acids and Bases",
+        "content": "**Understanding the Chemical Properties of Acids and Bases** is a key topic in Acids, Bases and Salts for CBSE Class X Science.\n\n**Acids:** Substances that give H⁺ ions in aqueous solution.\n• Types: Mineral acids (HCl, H₂SO₄, HNO₃) and Organic acids (citric, acetic, lactic)\n• Properties: Sour taste, corrosive, turn blue litmus red\n\n**Bases:** Substances that give OH⁻ ions in aqueous solution.\n• Types: Strong bases (NaOH, KOH) and Weak bases (NH₄OH, Ca(OH)₂)\n• Properties: Bitter taste, soapy feel, turn red litmus blue"
+      },
+      {
+        "title": "Key Concepts of Chemical Properties of Acids",
+        "content": "**Important points:**\n• Acids react with metals to give H₂ gas: Zn + 2HCl → ZnCl₂ + H₂↑\n• Acids react with metal carbonates: CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂↑\n• Acids react with metal bicarbonates: NaHCO₃ + HCl → NaCl + H₂O + CO₂↑\n• Acids react with bases (neutralisation): HCl + NaOH → NaCl + H₂O\n• Acids react with metal oxides: CuO + 2HCl → CuCl₂ + H₂O"
+      },
+      {
+        "title": "Key Concepts of Chemical Properties of Bases",
+        "content": "**Important points:**\n• Bases react with metals (some): 2NaOH + Zn → Na₂ZnO₂ + H₂↑\n• Bases react with acids (neutralisation): KOH + HNO₃ → KNO₃ + H₂O\n• Bases react with non-metal oxides: 2NaOH + CO₂ → Na₂CO₃ + H₂O\n• Bases react with ammonium salts: NaOH + NH₄Cl → NaCl + H₂O + NH₃↑\n• Bases feel soapy due to reaction with skin oils"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A metal carbonate reacts with dilute HCl to produce a gas. Identify the gas and write test for it.\n\n**Solution:**\n**Step 1:** Carbonate + acid produces CO₂ gas\n**Step 2:** Test: Pass gas through limewater (Ca(OH)₂)\n**Step 3:** Limewater turns milky: Ca(OH)₂ + CO₂ → CaCO₃↓ + H₂O\n\n**Answer:** CO₂ gas. Turns limewater milky (CaCO₃ white precipitate)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What happens when zinc reacts with dilute HCl?\n\n**Answer:** Zn + 2HCl → ZnCl₂ + H₂↑ (H₂ gas, pop sound test)\n\n---\n\n**Q2.** What is the reaction between NaOH and HCl called?\n\n**Answer:** Neutralisation: NaOH + HCl → NaCl + H₂O (salt + water)\n\n---\n\n**Q3.** Write reaction of CaCO₃ with H₂SO₄.\n\n**Answer:** CaCO₃ + H₂SO₄ → CaSO₄ + H₂O + CO₂↑"
+      }
+    ]
+  },
+  "6af291ba84294882": {
+    "summary": "Indicators change colour in acids and bases. Natural: litmus (red/blue), turmeric (yellow/red), china rose. Universal indicator gives pH (0-14). Strong acids have pH 0-3, weak 4-6, neutral 7, weak bases 8-10, strong 11-14.",
+    "chunks": [
+      {
+        "title": "Understanding Properties of Acids and Bases",
+        "content": "**Properties of Acids and Bases** is a key topic in Acids, Bases and Salts for CBSE Class X Science.\n\n**Indicators:** Substances that change colour in acidic/basic media.\n\n**Natural indicators:**\n• Litmus (lichen extract): Blue→Red in acid, Red→Blue in base\n• Turmeric (curcumin): Yellow→Red-brown in base\n• China rose (hibiscus): Pink→Green in base\n\n**Synthetic indicators:**\n• Phenolphthalein: Colourless in acid, Pink in base\n• Methyl orange: Red in acid, Yellow in base\n• Universal indicator: Range of colours for different pH"
+      },
+      {
+        "title": "Key Concepts of pH Scale (0-14)",
+        "content": "**Important points:**\n• pH = -log[H⁺]; measures H⁺ ion concentration\n• pH < 7: Acidic (lower pH = stronger acid)\n• pH = 7: Neutral (pure water)\n• pH > 7: Basic/alkaline (higher pH = stronger base)\n• Universal indicator paper gives approximate pH by colour match"
+      },
+      {
+        "title": "Key Concepts of Strength of Acids and Bases",
+        "content": "**Important points:**\n• Strong acid: Fully ionises in water (HCl → H⁺ + Cl⁻)\n• Weak acid: Partially ionises (CH₃COOH ↔ CH₃COO⁻ + H⁺)\n• Strong base: Fully ionises (NaOH → Na⁺ + OH⁻)\n• Weak base: Partially ionises (NH₄OH ↔ NH₄⁺ + OH⁻)\n• Concentrated vs dilute: Amount of acid/base in given volume\n• Strong ≠ concentrated; weak ≠ dilute"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A solution turns blue litmus red. What can you conclude about its pH?\n\n**Solution:**\n**Step 1:** Blue litmus→red indicates acidic solution\n**Step 2:** Acidic means pH < 7\n**Step 3:** Could be any acid (weak or strong)\n\n**Answer:** The solution is acidic (pH < 7)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What colour does turmeric turn in soap solution?\n\n**Answer:** Yellow to red-brown (soap is basic)\n\n---\n\n**Q2.** Classify as strong/weak acid: HCl, CH₃COOH, H₂SO₄, H₂CO₃.\n\n**Answer:** Strong: HCl, H₂SO₄; Weak: CH₃COOH, H₂CO₃\n\n---\n\n**Q3.** What is pH of pure water? Why?\n\n**Answer:** pH=7. Neutral because [H⁺]=[OH⁻]=10⁻⁷ M."
+      }
+    ]
+  },
+  "5f1a9c62776291a9": {
+    "summary": "Acids react with bases (neutralisation) to form salt and water. Metal oxide + acid → salt + water. Non-metal oxide + base → salt + water. The type of salt depends on the acid-base combination.",
+    "chunks": [
+      {
+        "title": "Understanding Reactions of Acids and Bases with Each Other",
+        "content": "**Reactions of Acids and Bases with Each Other** is a key topic in Acids, Bases and Salts for CBSE Class X Science.\n\n**Neutralisation Reaction:**\nAcid + Base → Salt + Water\n\n**General equation:**\nHCl + NaOH → NaCl + H₂O\nH⁺ + OH⁻ → H₂O (net ionic equation)\n\n**Neutralisation is exothermic** (releases heat)."
+      },
+      {
+        "title": "Key Concepts of Types of Salts from Neutralisation",
+        "content": "**Important points:**\n• Normal salt: Complete neutralisation (HCl + NaOH → NaCl + H₂O)\n• Acidic salt: Partial neutralisation of polybasic acid (H₂SO₄ + NaOH → NaHSO₄ + H₂O)\n• Basic salt: Partial neutralisation of polyacidic base (Mg(OH)₂ + HCl → MgOHCl + H₂O)\n• Double salt: Contains two different cations/anions (KAl(SO₄)₂·12H₂O)"
+      },
+      {
+        "title": "Key Concepts of Reactions of Metal and Non-metal Oxides",
+        "content": "**Important points:**\n• Metal oxides (Na₂O, CaO, MgO, CuO) are basic: react with acids to form salt+water\n• Na₂O + 2HCl → 2NaCl + H₂O\n• CuO + 2HCl → CuCl₂ + H₂O (black CuO → blue-green CuCl₂ solution)\n• Non-metal oxides (CO₂, SO₂, SO₃) are acidic: react with bases to form salt+water\n• CO₂ + Ca(OH)₂ → CaCO₃↓ + H₂O (limewater test for CO₂)\n• SO₂ + 2NaOH → Na₂SO₃ + H₂O"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** What mass of NaOH is needed to completely neutralise 50g of HCl? (Atomic masses: H=1, O=16, Na=23, Cl=35.5)\n\n**Solution:**\n**Step 1:** Write equation: HCl + NaOH → NaCl + H₂O\n**Step 2:** Molar masses: HCl=36.5 g/mol, NaOH=40 g/mol\n**Step 3:** 50g HCl = 50/36.5 ≈ 1.37 mol\n**Step 4:** 1:1 ratio → 1.37 mol NaOH needed\n**Step 5:** Mass = 1.37 × 40 = 54.8 g\n\n**Answer:** 54.8 g NaOH needed."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Write net ionic equation for neutralisation of any strong acid with strong base.\n\n**Answer:** H⁺ + OH⁻ → H₂O\n\n---\n\n**Q2.** What type of salt is NaHSO₄?\n\n**Answer:** Acidic salt (partial neutralisation of H₂SO₄)\n\n---\n\n**Q3.** Why is Ca(OH)₂ used to neutralise acid spills?\n\n**Answer:** Ca(OH)₂ is a mild base; neutralises acid without violent reaction, forms Ca-salt + water."
+      }
+    ]
+  },
+  "36d472bc3da92933": {
+    "summary": "pH is crucial in everyday life: tooth decay (acidic pH), soil pH for plant growth, pH of digestive system, self-defence by organisms (stings), and water quality testing.",
+    "chunks": [
+      {
+        "title": "Understanding Importance of pH in Everyday Life",
+        "content": "**Importance of pH in Everyday Life** is a key topic in Acids, Bases and Salts for CBSE Class X Science.\n\n**pH plays a vital role in many biological and environmental processes.**\n\n**pH in the body:**\n• Stomach: pH≈1.5-3.5 (HCl for digestion)\n• Blood: pH≈7.35-7.45 (slightly alkaline, tightly regulated)\n• Saliva: pH≈6.5-7.5\n• Skin: pH≈4.5-6 (acidic, protects from bacteria)"
+      },
+      {
+        "title": "Key Concepts of pH in Health and Medicine",
+        "content": "**Important points:**\n• Tooth decay: Bacteria produce acids (pH<5.5) that demineralise enamel\n• Antacids (Mg(OH)₂, Al(OH)₃) neutralise excess stomach acid (relieve acidity/indigestion)\n• Bee stings: Acidic (formic acid), treat with baking soda (base)\n• Ant/ nettle stings: Acidic, treat with calamine (ZnCO₃) or baking soda\n• Digestion: Enzymes work at specific pH (pepsin at pH~2, trypsin at pH~8)"
+      },
+      {
+        "title": "Key Concepts of pH in Agriculture and Environment",
+        "content": "**Important points:**\n• Soil pH 6.5-7.5 ideal for most crops\n• Acidic soil: Add lime (CaO) or slaked lime Ca(OH)₂ to neutralise\n• Basic soil: Add organic matter (compost) or gypsum (CaSO₄)\n• Acid rain (pH<5.6): Damages crops, buildings (marble), and aquatic life\n• pH of water bodies: Fish need pH 6.5-8.5; pH changes can kill aquatic life"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A farmer finds soil pH is 4.5. Which substance should he add to neutralise it? Explain.\n\n**Solution:**\n**Step 1:** Soil too acidic (pH 4.5 < 7)\n**Step 2:** Add slaked lime Ca(OH)₂ (mild base)\n**Step 3:** Neutralises acidity without damaging crops\n**Step 4:** Amount depends on soil type and crop\n\n**Answer:** Add slaked lime Ca(OH)₂ to neutralise soil acidity."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why do we use antacids after eating spicy food?\n\n**Answer:** Excess HCl in stomach. Antacids (Mg(OH)₂) neutralise excess acid.\n\n---\n\n**Q2.** Why is baking soda applied to bee stings?\n\n**Answer:** Bee sting injects formic acid. Baking soda (NaHCO₃, a mild base) neutralises it.\n\n---\n\n**Q3.** What is the pH range of normal rain? Why is acid rain harmful?\n\n**Answer:** Normal rain pH~5.6 (CO₂ forms carbonic acid). Acid rain (pH<5.6) damages marble, plants, aquatic life."
+      }
+    ]
+  },
+  "7e781f20f290bcf5": {
+    "summary": "Common salts: NaCl (table salt), Na₂CO₃ (washing soda), NaHCO₃ (baking soda), CaOCl₂ (bleaching powder), CaSO₄·½H₂O (plaster of Paris). Salts can be acidic, basic, or neutral depending on parent acid and base.",
+    "chunks": [
+      {
+        "title": "Understanding More about Salts",
+        "content": "**More about Salts** is a key topic in Acids, Bases and Salts for CBSE Class X Science.\n\n**Common salt (NaCl)** is obtained from seawater/rock salt. It is the raw material for many industrial chemicals.\n\n**pH of salts:**\n• Salt of strong acid + strong base: Neutral (pH=7), e.g., NaCl\n• Salt of strong acid + weak base: Acidic (pH<7), e.g., NH₄Cl\n• Salt of weak acid + strong base: Basic (pH>7), e.g., CH₃COONa"
+      },
+      {
+        "title": "Key Concepts of Preparation and Uses of Important Salts",
+        "content": "**Important points:**\n• **Baking soda (NaHCO₃):** NaCl + NH₃ + CO₂ + H₂O → NH₄Cl + NaHCO₃↓. Used in baking (releases CO₂), antacid, fire extinguishers\n• **Washing soda (Na₂CO₃·10H₂O):** 2NaHCO₃ → Na₂CO₃ + H₂O + CO₂. Used for cleaning, glass/soap manufacturing, water softening\n• **Bleaching powder (CaOCl₂):** Ca(OH)₂ + Cl₂ → CaOCl₂ + H₂O. Used for bleaching cotton/linen, water disinfection\n• **Plaster of Paris (CaSO₄·½H₂O):** CaSO₄·2H₂O → CaSO₄·½H₂O + 1½H₂O (at 373K). Used for plastering fractures, moulds, decorative work"
+      },
+      {
+        "title": "Key Concepts of Water of Crystallisation and Hydrated Salts",
+        "content": "**Important points:**\n• Water of crystallisation: Fixed number of H₂O molecules in crystal structure\n• CuSO₄·5H₂O (blue) → on heating → CuSO₄ (white) + 5H₂O\n• Blue vitriol (CuSO₄·5H₂O), Green vitriol (FeSO₄·7H₂O)\n• Washing soda: Na₂CO₃·10H₂O (has 10 water molecules)\n• POP: CaSO₄·½H₂O → mixes with water to form CaSO₄·2H₂O (gypsum, hardens)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why is plaster of Paris stored in airtight containers?\n\n**Solution:**\n**Step 1:** POP (CaSO₄·½H₂O) reacts with moisture\n**Step 2:** Forms gypsum (CaSO₄·2H₂O)\n**Step 3:** Once hardened, it cannot be used again for plastering\n\n**Answer:** It absorbs moisture and sets into hard gypsum, becoming unusable."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the chemical formula of washing soda? How is it prepared?\n\n**Answer:** Na₂CO₃·10H₂O. 2NaHCO₃ → Na₂CO₃ + H₂O + CO₂ (heating baking soda).\n\n---\n\n**Q2.** Differentiate between baking soda and baking powder.\n\n**Answer:** Baking soda=NaHCO₃. Baking powder=NaHCO₃+tartaric acid (neutralises bitter taste).\n\n---\n\n**Q3.** Why does CuSO₄ change from blue to white on heating?\n\n**Answer:** Loses water of crystallisation. CuSO₄·5H₂O → CuSO₄ + 5H₂O. Blue colour due to hydrated Cu²⁺."
+      }
+    ]
+  },
+  "4971f7dccc17b9e2": {
+    "summary": "Metals: lustrous, malleable, ductile, good conductors, sonorous, high MP/BP (except Hg). Non-metals: dull, brittle, poor conductors, low MP/BP (except diamond, graphite). Metalloids have intermediate properties.",
+    "chunks": [
+      {
+        "title": "Understanding Physical Properties of Metals and Non-metals",
+        "content": "**Physical Properties of Metals and Non-metals** is a key topic in Metals and Non-metals for CBSE Class X Science.\n\n**Metals:** 118 known elements, most are metals.\n• Examples: Fe, Cu, Al, Au, Ag, Na, Mg, Ca\n• State: Solids at room temperature (except Hg=liquid)\n\n**Non-metals:** 17-20 elements.\n• Examples: C, N, O, H, Cl, S, P\n• State: Solids (C, S, P), Gases (O₂, N₂, H₂), Liquid (Br₂)"
+      },
+      {
+        "title": "Key Concepts of Comparison of Physical Properties",
+        "content": "**Important points:**\n• **Lustre:** Metals shiny (polished surface reflects light); Non-metals dull (except diamond, iodine)\n• **Malleability:** Metals can be hammered into thin sheets (Au most malleable); Non-metals brittle (break when hammered)\n• **Ductility:** Metals can be drawn into wires (Au most ductile); Non-metals not ductile\n• **Conductivity:** Metals good conductors of heat/electricity (Ag, Cu best); Non-metals poor conductors (except graphite)\n• **Sonority:** Metals produce ringing sound when struck; Non-metals not sonorous\n• **Melting/Boiling points:** Metals generally high MP/BP; Non-metals generally low MP/BP (except carbon)"
+      },
+      {
+        "title": "Key Concepts of Exceptions and Special Cases",
+        "content": "**Important points:**\n• **Graphite:** Non-metal but good conductor of electricity (delocalised electrons)\n• **Diamond:** Non-metal but hardest natural substance, high MP\n• **Mercury:** Metal but liquid at room temperature (MP=-39°C)\n• **Sodium/Potassium:** Metals but soft (cut with knife), low density\n• **Iodine:** Non-metal but lustrous (shiny)\n• **Gallium/Caesium:** Metals with very low melting points (Ga MP=30°C, melts in hand)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Compare electrical conductivity of copper, graphite, and sulphur.\n\n**Solution:**\n**Step 1:** Copper (metal): Excellent conductor (free electrons in metallic bond)\n**Step 2:** Graphite (non-metal): Good conductor (delocalised electrons between layers)\n**Step 3:** Sulphur (non-metal): Poor conductor (no free electrons)\n\n**Answer:** Cu → best. Graphite → conductor (exception). Sulphur → insulator."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why is gold used for jewellery?\n\n**Answer:** Malleable, ductile, lustrous, non-corrosive (noble metal).\n\n---\n\n**Q2.** Why is tungsten used in filaments?\n\n**Answer:** High melting point (3422°C), does not melt when heated.\n\n---\n\n**Q3.** Why are cooking utensils made of aluminium?\n\n**Answer:** Good conductor of heat, lightweight, resistant to corrosion (oxide layer)."
+      }
+    ]
+  },
+  "2e190a80e005c951": {
+    "summary": "Metals react with O₂ (form basic oxides), H₂O (alkali metals vigorously), acids (release H₂ gas), and other metal salts (displacement). Reactivity varies across the reactivity series.",
+    "chunks": [
+      {
+        "title": "Understanding Chemical Properties of Metals",
+        "content": "**Chemical Properties of Metals** is a key topic in Metals and Non-metals for CBSE Class X Science.\n\nMetals vary greatly in chemical reactivity. The **Reactivity Series** arranges metals from most reactive to least:\n\nK > Na > Ca > Mg > Al > Zn > Fe > Pb > [H] > Cu > Ag > Au\n\nHighly reactive metals (K, Na, Ca) are stored in kerosene oil to prevent reaction with air/moisture."
+      },
+      {
+        "title": "Key Concepts of Reactions of Metals",
+        "content": "**Important points:**\n• **With Oxygen:** Metal + O₂ → Metal oxide (basic). 4Na + O₂ → 2Na₂O; 2Mg + O₂ → 2MgO (white); 3Fe + 2O₂ → Fe₃O₄. Amphoteric oxides (Al₂O₃, ZnO) react with both acids and bases\n• **With Water:** 2Na + 2H₂O → 2NaOH + H₂↑ (vigorous); Ca + 2H₂O → Ca(OH)₂ + H₂↑ (less vigorous); Mg + H₂O (hot) → MgO + H₂; Fe + H₂O (steam) → Fe₃O₄ + H₂\n• **With Acids:** Metal + Acid → Salt + H₂↑. Mg + 2HCl → MgCl₂ + H₂↑. Cu does not react with dilute acids (below H in series)\n• **Displacement:** More reactive metal displaces less reactive from its salt: Fe + CuSO₄ → FeSO₄ + Cu; Zn + CuSO₄ → ZnSO₄ + Cu"
+      },
+      {
+        "title": "Key Concepts of Reactivity Series and Applications",
+        "content": "**Important points:**\n• **Aqua regia:** 3:1 mixture of conc. HCl and HNO₃. Dissolves noble metals (Au, Pt)\n• **Corrosion prevention:** Zn coating (galvanisation) protects Fe — Zn reacts first\n• **Thermite reaction:** 2Al + Fe₂O₃ → 2Fe + Al₂O₃ + heat (used for welding railway tracks)\n• **Extraction:** Highly reactive metals extracted by electrolysis (Na, K, Ca, Mg, Al); Less reactive by reduction (Fe, Cu, Zn)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** An iron nail is placed in copper sulphate solution. What changes occur?\n\n**Solution:**\n**Step 1:** Fe is more reactive than Cu (above in series)\n**Step 2:** Fe displaces Cu: Fe + CuSO₄ → FeSO₄ + Cu\n**Step 3:** Blue CuSO₄ solution turns pale green (FeSO₄)\n**Step 4:** Brown/reddish Cu coating on iron nail\n\n**Answer:** Blue solution → pale green. Brown Cu coating on nail."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why does Na react violently with water but Cu does not?\n\n**Answer:** Na highly reactive (top of series). Cu below H in series, does not displace H from water.\n\n---\n\n**Q2.** Write reaction of Al with NaOH.\n\n**Answer:** 2Al + 2NaOH + 2H₂O → 2NaAlO₂ + 3H₂↑ (sodium aluminate)\n\n---\n\n**Q3.** Why is Zn used in galvanisation of iron?\n\n**Answer:** Zn more reactive than Fe. Zn reacts first (sacrificial protection), preventing Fe from rusting."
+      }
+    ]
+  },
+  "da552ac4b1aa2d7e": {
+    "summary": "Metals form ionic compounds (electrovalent bonds) by electron transfer. Non-metals form covalent compounds. Ionic compounds have high MP, conduct electricity when molten/dissolved, are soluble in water.",
+    "chunks": [
+      {
+        "title": "Understanding How do Metals and Non-metals React?",
+        "content": "**How do Metals and Non-metals React?** is a key topic in Metals and Non-metals for CBSE Class X Science.\n\n**Ionic Bond (Electrovalent Bond):**\nFormed by complete transfer of electron(s) from metal to non-metal.\n\nMetal (low IE) → loses e⁻ → Cation (+ve)\nNon-metal (high EA) → gains e⁻ → Anion (-ve)\n\nElectrostatic attraction between opposite charges forms the ionic bond."
+      },
+      {
+        "title": "Key Concepts of Formation of Ionic Compounds",
+        "content": "**Important points:**\n• **NaCl:** Na (2,8,1) loses 1e⁻ → Na⁺ (2,8). Cl (2,8,7) gains 1e⁻ → Cl⁻ (2,8,8). Ionic bond between Na⁺ and Cl⁻\n• **MgO:** Mg (2,8,2) loses 2e⁻ → Mg²⁺ (2,8). O (2,6) gains 2e⁻ → O²⁻ (2,8). Mg²⁺ O²⁻\n• **CaCl₂:** Ca (2,8,8,2) → Ca²⁺ + 2e⁻. 2Cl + 2e⁻ → 2Cl⁻. Ca²⁺ (2Cl⁻)\n• **MgS:** Mg (2,8,2)→Mg²⁺. S (2,8,6)→S²⁻. Mg²⁺S²⁻"
+      },
+      {
+        "title": "Key Concepts of Properties of Ionic Compounds",
+        "content": "**Important points:**\n• **Physical state:** Solid at room temperature (strong electrostatic forces)\n• **High MP/BP:** Large energy needed to break ionic bonds (NaCl MP=801°C)\n• **Solubility:** Soluble in polar solvents (water), insoluble in organic solvents\n• **Electrical conductivity:** Conduct electricity in molten state or aqueous solution (ions free to move); Do NOT conduct in solid state (ions fixed in lattice)\n• **Brittle:** Ionic crystals break when force applied (layers shift, like charges repel)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why does NaCl solution conduct electricity but solid NaCl does not?\n\n**Solution:**\n**Step 1:** Solid NaCl: Ions in fixed lattice positions — cannot move\n**Step 2:** Dissolved in water: Ions separate and become mobile (free to move)\n**Step 3:** Electric current = flow of charged particles; mobile ions carry charge\n\n**Answer:** Solid NaCl has fixed ions. Aqueous NaCl has mobile ions that conduct."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What type of bond is formed between Mg and Cl?\n\n**Answer:** Ionic bond: Mg→Mg²⁺, Cl→Cl⁻, Mg²⁺(Cl⁻)₂ (MgCl₂)\n\n---\n\n**Q2.** Why do ionic compounds have high melting points?\n\n**Answer:** Strong electrostatic forces between ions require high energy to break.\n\n---\n\n**Q3.** Compare electrical conductivity of NaCl (aq), NaCl (l), and NaCl (s).\n\n**Answer:** Aqueous (mobile ions) ✓. Molten (mobile ions) ✓. Solid (fixed ions) ✗."
+      }
+    ]
+  },
+  "1be3118c2f98238b": {
+    "summary": "Metals occur as oxides, sulphides, carbonates, or chlorides in the Earth's crust. Extraction involves enrichment (concentration), reduction, and refining. Electrolysis for highly reactive metals, carbon reduction for moderately reactive.",
+    "chunks": [
+      {
+        "title": "Understanding Occurrence of Metals",
+        "content": "**Occurrence of Metals** is a key topic in Metals and Non-metals for CBSE Class X Science.\n\n**Minerals:** Naturally occurring substances containing metals.\n**Ores:** Minerals from which metals can be profitably extracted.\n\n**Gangue:** Impurities (sand, clay, rock) in the ore.\n\n**Sources:** Earth's crust, seawater (NaCl, MgCl₂).\n\nMost metals are found as compounds (not free) due to reactivity."
+      },
+      {
+        "title": "Key Concepts of Extraction of Metals Based on Reactivity",
+        "content": "**Important points:**\n• **Highly reactive (K, Na, Ca, Mg, Al):** Electrolytic reduction. Molten ore → electrolysis → pure metal. 2Al₂O₃ → 4Al + 3O₂ (Hall-Heroult process)\n• **Moderately reactive (Zn, Fe, Pb, Cu):** Carbon reduction. ZnO + C → Zn + CO; Fe₂O₃ + 3CO → 2Fe + 3CO₂ (in blast furnace)\n• **Low reactivity (Ag, Au, Pt):** Found in native (free) state. Sometimes chemical separation (cyanide process for Au)"
+      },
+      {
+        "title": "Key Concepts of Steps in Metallurgy",
+        "content": "**Important points:**\n• **1. Crushing and grinding:** Jaw crushers, ball mills\n• **2. Concentration (Enrichment):** Remove gangue. Froth flotation (sulphide ores); Magnetic separation (magnetic ores); Gravity separation (dense ores)\n• **3. Reduction:** Convert metal compound to free metal (electrolysis or carbon reduction)\n• **4. Refining:** Purify crude metal. Electrolytic refining (anode = impure metal, cathode = pure metal, electrolyte = metal salt solution)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why is aluminium extracted by electrolysis and not by carbon reduction?\n\n**Solution:**\n**Step 1:** Al is highly reactive (above C in series)\n**Step 2:** C cannot reduce Al₂O₃ to Al (less reactive than Al)\n**Step 3:** Electrolysis provides the strong reducing power needed\n**Step 4:** Al₂O₃ mixed with cryolite (Na₃AlF₆) to lower melting point\n\n**Answer:** Al is more reactive than C; only electrolysis can reduce it."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the difference between a mineral and an ore?\n\n**Answer:** Mineral=natural metal compound. Ore=mineral from which metal can be profitably extracted.\n\n---\n\n**Q2.** Name the method used to concentrate sulphide ores.\n\n**Answer:** Froth flotation (uses oil+water; sulphide particles attach to air bubbles).\n\n---\n\n**Q3.** What is electrolytic refining? Draw the setup for Cu refining.\n\n**Answer:** Impure Cu anode → Cu²⁺ + 2e⁻. Cu²⁺ + 2e⁻ → Pure Cu (cathode). Impurities settle as anode mud."
+      }
+    ]
+  },
+  "439eca94f755c026": {
+    "summary": "Corrosion is the gradual destruction of metals by environmental reactions. Rusting (Fe) requires O₂+H₂O. Prevention: barrier methods (paint, oil), galvanisation, alloying, cathodic protection, and using corrosion-resistant metals.",
+    "chunks": [
+      {
+        "title": "Understanding Corrosion",
+        "content": "**Corrosion** is a key topic in Metals and Non-metals for CBSE Class X Science.\n\n**Corrosion:** The slow destruction of metals by chemical/electrochemical reaction with the environment.\n\n• **Rusting:** Corrosion of iron/steel. Fe + O₂ + H₂O → Fe₂O₃·xH₂O (hydrated iron(III) oxide, reddish-brown rust)\n• **Tarnishing:** Ag + H₂S → Ag₂S (black); Cu + CO₂+H₂O → CuCO₃·Cu(OH)₂ (green patina)"
+      },
+      {
+        "title": "Key Concepts of Conditions for Rusting",
+        "content": "**Important points:**\n• **Requires both O₂ and H₂O:** Test: Nail in dry air (no rust), in boiled water (no O₂, no rust), in normal conditions (rust)\n• **Salt accelerates rusting:** NaCl increases conductivity, speeds up electrochemical reaction. Coastal areas have more rusting\n• **Acid rain:** Acids accelerate corrosion by reacting with metal oxides\n• **Temperature:** Higher temperature generally increases corrosion rate"
+      },
+      {
+        "title": "Key Concepts of Prevention of Corrosion",
+        "content": "**Important points:**\n• **Barrier methods:** Paint, grease, oil, plastic coating — prevent air/moisture contact\n• **Galvanisation:** Coating with Zn (Zn reacts before Fe, sacrificial protection)\n• **Alloying:** Stainless steel (Fe+Cr+Ni) resists corrosion; Bronze (Cu+Sn); Brass (Cu+Zn)\n• **Cathodic protection:** Connect to more reactive metal (Mg anode) that corrodes instead\n• **Electroplating:** Coating with Cr, Ni, Ag for protection and decoration"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Explain why iron gates are painted regularly.\n\n**Solution:**\n**Step 1:** Painting creates a barrier between iron and air/moisture\n**Step 2:** Prevents O₂ and H₂O from reaching iron surface\n**Step 3:** If paint chips, rusting starts at that point\n**Step 4:** Regular painting maintains the protective barrier\n\n**Answer:** Paint prevents O₂ and H₂O from reaching iron, stopping rust."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why does iron rust faster in coastal areas?\n\n**Answer:** Salt in air/water increases conductivity, speeds up electrochemical rusting.\n\n---\n\n**Q2.** Why is stainless steel preferred for kitchen utensils?\n\n**Answer:** Fe+Cr+Ni alloy. Cr forms protective Cr₂O₃ layer, resists corrosion, doesn't rust.\n\n---\n\n**Q3.** Explain galvanisation with a diagram concept.\n\n**Answer:** Zn coating on Fe. Zn more reactive → Zn corrodes first (sacrificial anode), protecting Fe underneath."
+      }
+    ]
+  }
+}

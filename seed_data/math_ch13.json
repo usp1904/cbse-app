@@ -1,0 +1,102 @@
+{
+  "eb4caf121403ca74": {
+    "summary": "When combining solids (cone on cylinder, hemisphere on cylinder), total surface area = sum of visible curved/plane surfaces (excluding internal common surfaces). Only external surfaces count.",
+    "chunks": [
+      {
+        "title": "Understanding Surface Area of a Combination of Solids",
+        "content": "**Surface Area of a Combination of Solids** is a key concept in Surface Areas and Volumes of CBSE Class X Mathematics.\n\nMany objects are combinations: tent (cone+cylinder), toy (hemisphere+cone), capsule (cylinder+2 hemispheres).\n\n**Key Rule:** Only visible surfaces count. Common faces where solids join are NOT included in TSA.\n\n**Approach:**\n1. Identify all component solids\n2. List their visible surface areas\n3. Sum them (excluding any shared surfaces)\n\n**Key points to remember:**\n• Common surfaces excluded from TSA\n• Identify each component's contribution\n• Sketch and label dimensions\n• Use correct formulas for each solid"
+      },
+      {
+        "title": "Properties and Applications of Surface Area of a Combination of Solids",
+        "content": "**1. Properties:**\n• Tent = CSA(cone) + CSA(cylinder)\n• Toy = CSA(hemisphere) + CSA(cone)\n• Capsule = CSA(cylinder) + 2×CSA(hemisphere)\n• Any base area included only if visible\n\n**2. Important Formulas:**\nTSA = Σ(visible surfaces)\nCommon surface: excluded once\nCone(CSA) = πrl\nCylinder(CSA) = 2πrh\nHS(CSA) = 2πr²\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nToy: hemisphere(r=3.5)+cone(r=3.5,h=12.5). l=√(156.25+12.25)=√168.5≈13. TSA=2πr²+πrl=77+143=220 cm²."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** A tent: cylinder (r=7m, h=10m) with conical top (r=7m, h=6m). Find canvas required (exclude base).\n\n**Solution:**\n\n**Step 1:** l_cone = √(36+49) = √85 ≈ 9.22 m\n**Step 2:** CSA_cyl = 2×22/7×7×10 = 440 m²\n**Step 3:** CSA_cone = 22/7×7×9.22 = 202.84 m²\n**Step 4:** Total canvas = 440+202.84 = 642.84 m²\n\nTherefore, Canvas ≈ 642.84 m²."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Counting shared surface:** Where solids join, that face is INTERNAL — exclude\n\n**Tips and Tricks:**\n\n✓ **List visible surfaces:** Name each external surface and its formula"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nToy: hemisphere(r=3.5)+cone(r=3.5,h=9.5). Find TSA.\n\n**Answer:** l=√(90.25+12.25)=10.12. TSA=2πr²+πrl=77+111.32=188.32 cm².\n\n---\n\n**Problem 2 (Intermediate):**\nCapsule: cylinder(r=2.1,h=7)+2 hemispheres. Find TSA.\n\n**Answer:** TSA=2πrh+4πr²=2×22/7×2.1×7+4×22/7×4.41=92.4+55.44=147.84 cm².\n\n---\n\n**Problem 3 (Advanced):**\nPaint tent (cyl r=7, h=8 + cone r=7, h=4.5) at ₹20/m².\n\n**Answer:** l=√(20.25+49)=8.32. CSA=352+183.04=535.04. Cost=₹10700.80."
+      }
+    ]
+  },
+  "506049d56b0e5aa4": {
+    "summary": "For combined solids, the total volume is simply the sum of individual volumes: V_total = V₁ + V₂ + V₃ + ... No surfaces are excluded when adding volumes, unlike surface area.",
+    "chunks": [
+      {
+        "title": "Understanding Volume of a Combination of Solids",
+        "content": "**Volume of a Combination of Solids** is a key concept in Surface Areas and Volumes of CBSE Class X Mathematics.\n\nUnlike surface area, volume calculation for combined solids is straightforward: **add the volumes** of each component.\n\n**Common combinations:**\n• Ice-cream cone: V = V_cone + V_hemisphere\n• Tent: V = V_cylinder + V_cone\n• Rocket: V = V_cone + V_cylinder + V_cone\n• Grain silo: V = V_cylinder + V_hemisphere\n\n**Key points to remember:**\n• Volume adds directly — no subtraction\n• Use correct formula for each solid\n• Ensure units are consistent\n• 1 m³ = 1000 L for capacity problems"
+      },
+      {
+        "title": "Properties and Applications of Volume of a Combination of Solids",
+        "content": "**1. Properties:**\n• Cone V = ⅓πr²h\n• Cylinder V = πr²h\n• Sphere V = 4/3πr³\n• Hemisphere V = ⅔πr³\n• Cuboid V = lbh\n\n**2. Important Formulas:**\nV_total = V₁ + V₂ + V₃ + ...\nAll volume formulas as above\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nIce-cream cone: cone(r=3,h=12)+hemisphere(r=3). V=⅓π×9×12+⅔π×27=36π+18π=54π≈169.65 cm³."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** A toy: hemisphere(r=3.5) surmounted by cone(r=3.5, h=9.5). Find total volume.\n\n**Solution:**\n\n**Step 1:** V_hemi = ⅔π(3.5)³ = ⅔π×42.875 = 28.583π cm³\n**Step 2:** V_cone = ⅓π(3.5)²×9.5 = ⅓π×12.25×9.5 = 38.792π cm³\n**Step 3:** Total = 67.375π ≈ 211.68 cm³\n\nTherefore, Total V ≈ 211.68 cm³."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Volume adds — no exclusion:** Unlike TSA, ALL component volumes are added\n\n**Tips and Tricks:**\n\n✓ **Sum the parts:** V_total = V₁+V₂+...+Vₙ"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nIce cream: hemisphere(r=2.1)+cone(r=2.1, h=7). Find V.\n\n**Answer:** V_hemi=⅔π×9.261=6.174π. V_cone=⅓π×4.41×7=10.29π. Total=16.464π≈51.7 cm³.\n\n---\n\n**Problem 2 (Intermediate):**\nTent: cylinder(r=5, h=5)+cone(r=5, h=6). Find V.\n\n**Answer:** V_cyl=125π. V_cone=50π. Total=175π≈549.78 m³.\n\n---\n\n**Problem 3 (Advanced):**\nToy: cylinder(r=3, h=7)+hemisphere(r=3)+cone(r=3, h=5). Find total V.\n\n**Answer:** V_cyl=63π, V_hemi=18π, V_cone=15π. Total=96π≈301.59 cm³."
+      }
+    ]
+  },
+  "4cd11f556cb0ca1a": {
+    "summary": "When a solid is melted and recast into another shape, volume remains constant. V_original = V_new. Only volume is conserved — surface area generally changes. Used for sphere→cylinder, cone→sphere, etc.",
+    "chunks": [
+      {
+        "title": "Understanding Conversion of Solid from One Shape to Another",
+        "content": "**Conversion of Solid from One Shape to Another** is a key concept in Surface Areas and Volumes of CBSE Class X Mathematics.\n\n**Volume Conservation Principle:**\nWhen a solid is melted and recast, the volume remains unchanged.\n\nV_original = V_new\n\n**Common conversions:**\n• Sphere → Cylinder\n• Cone → Sphere\n• Cylinder → Cone(s)\n• Multiple smaller spheres → One larger sphere\n\nSurface area CHANGES — only volume is conserved.\n\n**Key points to remember:**\n• Volume stays same during conversion\n• Surface area generally changes\n• Assume no material loss\n• Use V equality to find unknown dimensions"
+      },
+      {
+        "title": "Properties and Applications of Conversion of Solid from One Shape to Another",
+        "content": "**1. Properties:**\n• Sphere melted → cylinder: 4/3πR³ = πr²h\n• Cuboid melted → cube: lbh = a³\n• Cone melted → sphere: ⅓πr²h = 4/3πR³\n• Number of smaller spheres = (R/r)³\n\n**2. Important Formulas:**\nV_original = V_new\nV_sphere = 4/3πr³\nV_cylinder = πr²h\nV_cone = ⅓πr²h\nV_cuboid = lbh\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nSphere r=3 cm melted to cylinder r=2 cm. Find h.\n4/3π×27 = π×4×h → 36 = 4h → h = 9 cm."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** A metallic sphere of radius 4.2 cm is melted and recast into a cylinder radius 6 cm. Find height.\n\n**Solution:**\n\n**Step 1:** V_sphere = 4/3π(4.2)³ = 4/3π×74.088 = 98.784π cm³\n**Step 2:** V_cyl = π×36×h = 36πh\n**Step 3:** 98.784π = 36πh\n**Step 4:** h = 98.784/36 = 2.744 cm\n\nTherefore, h ≈ 2.74 cm."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Conservation = Volume only:** Surface area CHANGES during recasting\n\n**Tips and Tricks:**\n\n✓ **Set volumes equal:** V_original = V_new, solve for unknown"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nCube of edge 7 cm melted to form sphere. Find radius.\n\n**Answer:** 7³=343. 4/3πr³=343 → r=∛(343×3/(4π))≈4.34 cm.\n\n---\n\n**Problem 2 (Intermediate):**\nCone r=6, h=8 melted to sphere. Find sphere radius.\n\n**Answer:** V=⅓π×36×8=96π. 4/3πr³=96π → r³=72 → r≈4.16 cm.\n\n---\n\n**Problem 3 (Advanced):**\nThree spheres r=3,4,5 cm melted to one. Find radius.\n\n**Answer:** Total V=4/3π(27+64+125)=4/3π×216. r³=216 → r=6 cm."
+      }
+    ]
+  },
+  "cf6c81f20d45f72e": {
+    "summary": "Frustum of a cone: formed by cutting a cone parallel to its base. CSA = π(r₁+r₂)l, TSA = π(r₁+r₂)l+π(r₁²+r₂²), V = ⅓πh(r₁²+r₂²+r₁r₂), where l = √(h²+(r₁-r₂)²).",
+    "chunks": [
+      {
+        "title": "Understanding Frustum of a Cone",
+        "content": "**Frustum of a Cone** is a key concept in Surface Areas and Volumes of CBSE Class X Mathematics.\n\nA **frustum** is formed when a cone is cut by a plane parallel to its base.\n\n**Parameters:**\nh = vertical height\nl = √(h²+(r₁-r₂)²)\nr₁ = lower base radius\nr₂ = upper base radius\n\n**Formulas:**\nCSA = π(r₁+r₂)l\nTSA = π(r₁+r₂)l+π(r₁²+r₂²)\nV = ⅓πh(r₁²+r₂²+r₁r₂)\n\n**Key points to remember:**\n• Frustum = cone with tip cut off\n• l² = h²+(r₁-r₂)²\n• If r₁=r₂, frustum = cylinder\n• Volume formula: average of 3 products"
+      },
+      {
+        "title": "Properties and Applications of Frustum of a Cone",
+        "content": "**1. Properties:**\n• CSA = π(r₁+r₂)l\n• V = ⅓πh(r₁²+r₂²+r₁r₂)\n• Original cone height = h×r₁/(r₁-r₂)\n• Can also subtract small cone V from large\n\n**2. Important Formulas:**\nl = √(h²+(r₁-r₂)²)\nCSA = π(r₁+r₂)l\nTSA = π(r₁+r₂)l+π(r₁²+r₂²)\nV = ⅓πh(r₁²+r₂²+r₁r₂)\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nBucket r₁=15, r₂=10, h=12. V=⅓π×12(225+100+150)=4π×475=1900π≈5971.43 cm³."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** A frustum r₁=14 cm, r₂=7 cm, h=9 cm. Find CSA.\n\n**Solution:**\n\n**Step 1:** l = √(81+49) = √130 ≈ 11.4 cm\n**Step 2:** CSA = π(14+7)×11.4 = π×21×11.4 = 22/7×239.4 = 752.4 cm²\n\nTherefore, CSA ≈ 752.4 cm²."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **l not same as h:** Slant height = √(h²+(r₁-r₂)²)\n\n**Tips and Tricks:**\n\n✓ **Check units:** All radii in same units"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nFind l of frustum r₁=12, r₂=8, h=3.\n\n**Answer:** l=√(9+16)=5 cm.\n\n---\n\n**Problem 2 (Intermediate):**\nFind CSA of frustum r₁=21, r₂=14, h=24.\n\n**Answer:** l=√(576+49)=25. CSA=22/7×35×25=2750 cm².\n\n---\n\n**Problem 3 (Advanced):**\nFind V of bucket r₁=20, r₂=15, h=18 (in litres).\n\n**Answer:** V=⅓π×18(400+225+300)=6π×925=5550π≈17442.86 cm³≈17.44 L."
+      }
+    ]
+  }
+}

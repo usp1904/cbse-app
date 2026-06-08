@@ -1,0 +1,327 @@
+{
+  "f8bea835f63ad19f": {
+    "summary": "Electric current (I = Q/t) is flow of charge (electrons). Unit: Ampere (A). Circuit: cell/battery, wires, switch, load (bulb, resistor). Open circuit (no current) vs closed circuit (current flows). Direction: conventional (positive to negative) vs electron flow (negative to positive).",
+    "chunks": [
+      {
+        "title": "Understanding Electric Current and Circuit",
+        "content": "**Electric Current and Circuit** is a key topic in Electricity for CBSE Class X Science.\n\n**Electric current (I):** Rate of flow of electric charge.\n\nI = Q / t\n\nWhere Q = charge (Coulombs), t = time (seconds)\n\n1 Ampere = 1 Coulomb / 1 second\n\n**Charge of electron:** 1.6 × 10⁻¹⁹ C\n**Direction:** Conventional current flows from positive to negative terminal (opposite to electron flow)."
+      },
+      {
+        "title": "Key Concepts of Electric Circuit Components",
+        "content": "**Important points:**\n• **Cell/Battery:** Provides potential difference (voltage). Converts chemical energy → electrical energy. 1 cell = ~1.5 V\n• **Switch:** Controls current flow (open = no current, closed = current flows)\n• **Load (bulb, resistor, motor):** Device that consumes electrical energy\n• **Wires:** Connect components (Cu or Al, good conductors, insulated)"
+      },
+      {
+        "title": "Key Concepts of Types of Circuits",
+        "content": "**Important points:**\n• **Open circuit:** Gap in path → current cannot flow. Bulb doesn't light. Switch OFF\n• **Closed circuit:** Complete path → current flows. Bulb lights. Switch ON\n• **Short circuit:** Very low resistance path (wire directly across terminals). Very high current → overheating, sparks, fire risk"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A current of 2 A flows through a bulb for 5 minutes. Calculate charge that flows.\n\n**Solution:**\n**Step 1:** Given: I = 2 A, t = 5 min = 5×60 = 300 s\n**Step 2:** I = Q/t → Q = I×t\n**Step 3:** Q = 2 × 300 = 600 C\n\n**Answer:** Charge = 600 C."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the SI unit of current?\n\n**Answer:** Ampere (A). 1 A = 1 C/s.\n\n---\n\n**Q2.** Why does a bulb not glow when the switch is open?\n\n**Answer:** Open circuit = gap → no current flow → no energy to bulb.\n\n---\n\n**Q3.** Calculate number of electrons flowing per second through a wire carrying 1 A. (e=1.6×10⁻¹⁹ C)\n\n**Answer:** n = Q/e = 1/(1.6×10⁻¹⁹) = 6.25×10¹⁸ electrons/s."
+      }
+    ]
+  },
+  "db56b7b2e86d3c9d": {
+    "summary": "Potential difference (V = W/Q) is work done per unit charge. Unit: Volt (V). 1 V = 1 J/C. Cell provides potential difference. Voltmeter measures V (connected in parallel). Ammeter measures I (connected in series).",
+    "chunks": [
+      {
+        "title": "Understanding Electric Potential and Potential Difference",
+        "content": "**Electric Potential and Potential Difference** is a key topic in Electricity for CBSE Class X Science.\n\n**Electric potential (V):** Work done to bring a unit positive charge from infinity to a point in electric field.\n\n**Potential difference (ΔV):** Work done to move a unit charge from one point to another.\n\nV = W / Q\n\nWhere W = work done (Joules), Q = charge (Coulombs)\n\n1 Volt = 1 Joule / 1 Coulomb"
+      },
+      {
+        "title": "Key Concepts of Measuring Instruments",
+        "content": "**Important points:**\n• **Voltmeter:** Measures potential difference between TWO points. Connected in PARALLEL across the component. High resistance (draws negligible current). Symbol: V in a circle\n• **Ammeter:** Measures current flowing through a component. Connected in SERIES with the component. Very low resistance (negligible voltage drop). Symbol: A in a circle\n• **Galvanometer:** Detects small currents. Can be converted to ammeter or voltmeter"
+      },
+      {
+        "title": "Key Concepts of Cell and Battery",
+        "content": "**Important points:**\n• **Cell:** Two electrodes in electrolyte. Chemical reaction creates potential difference (~1.5 V for dry cell). Electrons accumulate at negative terminal\n• **Battery:** Two or more cells connected. Series: voltages add (1.5+1.5=3 V). Parallel: same voltage, more current capacity\n• **EMF vs Terminal Voltage:** EMF = potential difference when no current flows. Terminal V = voltage when current flows (less due to internal resistance)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** If 10 J of work is done to move 2 C of charge between two points, what is the potential difference?\n\n**Solution:**\n**Step 1:** Given: W = 10 J, Q = 2 C\n**Step 2:** V = W/Q = 10/2 = 5 V\n\n**Answer:** Potential difference = 5 V."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the unit of potential difference?\n\n**Answer:** Volt (V). 1 V = 1 J/C.\n\n---\n\n**Q2.** How is a voltmeter connected in a circuit?\n\n**Answer:** In PARALLEL across the component being measured.\n\n---\n\n**Q3.** Why does a cell have a potential difference?\n\n**Answer:** Chemical reaction separates charges → creates potential difference between terminals."
+      }
+    ]
+  },
+  "ce8bffdcb0417f97": {
+    "summary": "Ohm's Law: V ∝ I (at constant temperature). V = IR, where R = resistance (Ohm, Ω). I-V graph is a straight line through origin for ohmic conductors. Non-ohmic: diodes, thermistors, bulbs (non-linear I-V).",
+    "chunks": [
+      {
+        "title": "Understanding Ohm's Law",
+        "content": "**Ohm's Law** is a key topic in Electricity for CBSE Class X Science.\n\n**Ohm's Law (Georg Simon Ohm, 1826):**\n\nThe potential difference across a conductor is directly proportional to the current flowing through it, provided temperature remains constant.\n\nV ∝ I → V/I = constant = R\n\n**V = I × R**\n\nWhere R = resistance (unit: Ohm, Ω)"
+      },
+      {
+        "title": "Key Concepts of Ohmic and Non-ohmic Conductors",
+        "content": "**Important points:**\n• **Ohmic conductors:** Obey Ohm's law. I-V graph is a straight line through origin. Examples: metals (copper, aluminium, iron), electrolytes at constant temperature\n• **Non-ohmic conductors:** Do NOT obey Ohm's law. I-V graph is non-linear. Examples: semiconductor diodes, transistors, filament bulb (resistance changes with temperature)\n• **Filament bulb:** As current increases, filament heats → resistance increases → slope of I-V curve decreases (not linear)"
+      },
+      {
+        "title": "Key Concepts of Resistance and Conductance",
+        "content": "**Important points:**\n• **Resistance (R):** Opposition to flow of current. Depends on material, length, cross-section, temperature. R = V/I. Unit: Ohm (Ω)\n• **Conductance (G):** Ease of current flow. G = 1/R. Unit: Siemens (S) or mho (℧)\n• **Effect of temperature:** For metals, R increases with temperature. For semiconductors, R decreases with temperature (negative temperature coefficient)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A 12 V battery is connected to a resistor, and 3 A current flows. What is the resistance?\n\n**Solution:**\n**Step 1:** Given: V = 12 V, I = 3 A\n**Step 2:** R = V/I = 12/3 = 4 Ω\n\n**Answer:** R = 4 Ω."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** State Ohm's law.\n\n**Answer:** V ∝ I at constant temperature. V/I = R (constant).\n\n---\n\n**Q2.** Why does the resistance of a bulb increase when it glows?\n\n**Answer:** Heating → atoms vibrate more → more collisions for electrons → higher resistance.\n\n---\n\n**Q3.** A wire has 2 A current at 6 V potential difference. What is resistance?\n\n**Answer:** R = 6/2 = 3 Ω."
+      }
+    ]
+  },
+  "69d4798f42772378": {
+    "summary": "Resistance depends on: material (ρ), length (L), cross-section area (A), temperature. R = ρL/A. Resistivity ρ is material property (Ω·m). Good conductors have low ρ (Cu 1.7×10⁻⁸), insulators have high ρ (rubber 10¹³). Series: R_eq = R₁+R₂+... Parallel: 1/R_eq = 1/R₁+1/R₂+...",
+    "chunks": [
+      {
+        "title": "Understanding Factors on which the Resistance of a Conductor depends",
+        "content": "**Factors on which the Resistance of a Conductor depends** is a key topic in Electricity for CBSE Class X Science.\n\n**Resistance depends on four factors:**\n1. **Material (resistivity ρ):** Different materials offer different resistance\n2. **Length (L):** Longer wire → more resistance (R ∝ L)\n3. **Cross-sectional area (A):** Thicker wire → less resistance (R ∝ 1/A)\n4. **Temperature:** R increases with temperature for metals"
+      },
+      {
+        "title": "Key Concepts of Resistivity",
+        "content": "**Important points:**\n• **Formula:** R = ρ × L / A, where ρ = resistivity (Ω·m)\n• **Resistivity:** Material property independent of size/shape. Conductors: low ρ (Cu=1.72×10⁻⁸, Al=2.65×10⁻⁸, Fe=9.8×10⁻⁸ Ω·m). Insulators: high ρ (rubber≈10¹³, glass≈10¹⁰ Ω·m). Alloys: higher than pure metals (nichrome=10⁻⁶ Ω·m, used in heating elements)\n• **Temperature coefficient:** α. R_T = R₀(1 + αΔT). For metals α > 0 (R increases). For semiconductors α < 0 (R decreases with temperature)"
+      },
+      {
+        "title": "Key Concepts of Applications",
+        "content": "**Important points:**\n• **Heating elements (nichrome):** High resistivity, high melting point, does not oxidise at high T\n• **Fuse wire:** Low melting point (tin-lead alloy). High current melts it → breaks circuit (safety)\n• **Transmission cables (Cu, Al):** Low resistivity → less power loss. Thick wires for long distance"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A wire of length 2 m and area 0.5 mm² has resistance 6.8 Ω. Find its resistivity.\n\n**Solution:**\n**Step 1:** Given: L=2 m, A=0.5 mm²=0.5×10⁻⁶ m², R=6.8 Ω\n**Step 2:** ρ = R×A/L = 6.8×0.5×10⁻⁶/2 = 1.7×10⁻⁶ Ω·m\n\n**Answer:** ρ = 1.7×10⁻⁶ Ω·m (nichrome)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** How does resistance change if wire length is doubled?\n\n**Answer:** R ∝ L. If length doubled, resistance doubled.\n\n---\n\n**Q2.** Why are heating elements made of nichrome?\n\n**Answer:** High resistivity, high MP, does not oxidise at high temperatures.\n\n---\n\n**Q3.** Wire of length L, area A has resistance R. If stretched to twice length (same volume), find new R.\n\n**Answer:** New A = A/2 (volume constant). R' = ρ×2L/(A/2) = 4ρL/A = 4R."
+      }
+    ]
+  },
+  "f68751f396cdfa9c": {
+    "summary": "Series: R_eq = R₁+R₂+R₃, same current, voltage divides. Parallel: 1/R_eq = 1/R₁+1/R₂, same voltage, current divides. Advantages: parallel gives independent operation, lower equivalent resistance. Household wiring is parallel.",
+    "chunks": [
+      {
+        "title": "Understanding Resistors in Series and Parallel",
+        "content": "**Resistors in Series and Parallel** is a key topic in Electricity for CBSE Class X Science.\n\n**Series combination:** Resistors connected end-to-end. Same current flows through each.\n\n**Parallel combination:** Resistors connected across same two points. Same voltage across each.\n\n**Equivalent resistance (R_eq):** Single resistor that replaces the combination."
+      },
+      {
+        "title": "Key Concepts of Series Combination",
+        "content": "**Important points:**\n• **Formula:** R_eq = R₁ + R₂ + R₃ + ... + Rₙ (for n resistors in series)\n• **Current:** Same in all resistors (I = I₁ = I₂ = I₃)\n• **Voltage:** Divides among resistors (V = V₁+V₂+V₃). V₁ = IR₁, V₂ = IR₂, etc.\n• **Advantage:** Simple, voltage divider circuit\n• **Disadvantage:** If one bulb fails, entire circuit breaks (e.g., old Christmas lights)"
+      },
+      {
+        "title": "Key Concepts of Parallel Combination",
+        "content": "**Important points:**\n• **Formula:** 1/R_eq = 1/R₁ + 1/R₂ + 1/R₃ + ... + 1/Rₙ. R_eq = (R₁×R₂)/(R₁+R₂) for 2 resistors\n• **Voltage:** Same across all resistors (V = V₁ = V₂ = V₃)\n• **Current:** Divides among branches (I = I₁+I₂+I₃). I₁ = V/R₁, I₂ = V/R₂, etc.\n• **Advantages:** Independent operation (one bulb fails, others work). Each device gets full voltage. Lower total resistance → more current from battery"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Three resistors 4Ω, 6Ω, and 12Ω are connected in parallel. Find R_eq.\n\n**Solution:**\n**Step 1:** 1/R_eq = 1/4 + 1/6 + 1/12 = (3+2+1)/12 = 6/12 = 1/2\n**Step 2:** R_eq = 2 Ω\n\n**Answer:** R_eq = 2 Ω (less than each individual resistance)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Two resistors 6Ω and 3Ω in series. Find R_eq.\n\n**Answer:** R_eq = 6+3 = 9 Ω.\n\n---\n\n**Q2.** Two resistors 6Ω and 3Ω in parallel. Find R_eq.\n\n**Answer:** 1/R_eq = 1/6+1/3 = 1/2 → R_eq = 2 Ω.\n\n---\n\n**Q3.** Why is household wiring done in parallel?\n\n**Answer:** Each appliance gets same voltage (220V), independent ON/OFF, total current = sum of individual."
+      }
+    ]
+  },
+  "802125cb8704627f": {
+    "summary": "Joule's law of heating: H = I²Rt. Current through resistor → heat. Applications: electric heater, iron, bulb (heating of filament). Filament bulbs: ~90% energy as heat, ~10% as light. Tungsten filament (high MP, 3422°C). Fuse: safety device melts at high current.",
+    "chunks": [
+      {
+        "title": "Understanding Heating Effect of Electric Current",
+        "content": "**Heating Effect of Electric Current** is a key topic in Electricity for CBSE Class X Science.\n\n**Joule's law of heating:**\nHeat produced when current flows through a resistor:\n\nH = I² × R × t\n\nWhere I = current (A), R = resistance (Ω), t = time (s)\n\n**Alternative forms:**\nH = VIt (since V=IR)\nH = V²t/R"
+      },
+      {
+        "title": "Key Concepts of Applications of Heating Effect",
+        "content": "**Important points:**\n• **Electric heater/iron:** Nichrome coil (high resistivity, high MP) converts electrical energy to heat. I²R loss is USEFUL here\n• **Incandescent bulb:** Tungsten filament (MP=3422°C) heated to white hot (~2500°C) → emits light. ~90% heat, ~10% light (inefficient). Inert gas filling (Ar/N₂) prevents oxidation\n• **Electric fuse:** Thin wire (low melting point alloy) in series. If current exceeds safe limit → I²R heat melts fuse → breaks circuit → protects appliances from damage"
+      },
+      {
+        "title": "Key Concepts of Electric Power",
+        "content": "**Important points:**\n• **Power (P):** Rate at which electrical energy is consumed or produced\n• P = VI = I²R = V²/R (Watt, W)\n• **Energy (E):** E = P×t = VIt (Joules or kWh)\n• **kWh (unit):** 1 kWh = 3.6×10⁶ J. Electricity bills in kWh (units)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** An electric heater draws 5 A at 220 V for 2 hours. Calculate (a) power (b) energy in kWh.\n\n**Solution:**\n**Step 1:** (a) P = VI = 220×5 = 1100 W = 1.1 kW\n**Step 2:** (b) E = P×t = 1.1 kW × 2 h = 2.2 kWh\n\n**Answer:** Power = 1100 W. Energy = 2.2 kWh (units)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** State Joule's law of heating.\n\n**Answer:** H = I²Rt. Heat = current² × resistance × time.\n\n---\n\n**Q2.** Why is tungsten used in bulb filaments?\n\n**Answer:** Highest melting point (3422°C), can glow white hot without melting.\n\n---\n\n**Q3.** An iron of 1000 W runs at 250 V. Calculate current and resistance.\n\n**Answer:** I = 1000/250 = 4 A. R = V/I = 250/4 = 62.5 Ω."
+      }
+    ]
+  },
+  "4aadaaddf6b90aee": {
+    "summary": "Electric power P = VI = I²R = V²/R. Unit: Watt (W). Commercial unit: kWh. 1 kWh = 3.6×10⁶ J. Power rating (e.g., 100 W bulb) indicates energy consumption rate. Appliances: power + time → energy consumed.",
+    "chunks": [
+      {
+        "title": "Understanding Power",
+        "content": "**Power** is a key topic in Electricity for CBSE Class X Science.\n\n**Electric power:** Rate at which electrical work is done or energy is consumed.\n\n**Formulas:**\nP = V × I (from V = W/Q and I = Q/t)\nP = I² × R (using V=IR)\nP = V²/R (using I=V/R)\n\n**SI unit:** Watt (W). 1 W = 1 J/s = 1 V·A"
+      },
+      {
+        "title": "Key Concepts of Commercial Unit and Power Rating",
+        "content": "**Important points:**\n• **Kilowatt-hour (kWh):** Energy consumed by a 1 kW appliance in 1 hour. 1 kWh = 1000 W × 3600 s = 3.6×10⁶ J. Electricity bills charge per kWh (per 'unit'). In India: ~₹5-8 per unit\n• **Power rating:** Marked on appliances (e.g., 100 W bulb, 2000 W iron, 1500 W AC). Power rating × operating time = energy consumed\n• **Bulbs in series:** Total voltage divides. Each bulb gets less voltage → dimmer. 2 bulbs of same rating in series → each gets half voltage → each dissipates 1/4 rated power"
+      },
+      {
+        "title": "Key Concepts of Numerical Problems",
+        "content": "**Important points:**\n• **Example:** 100 W bulb operated 10 h/day for 30 days: E = 0.1 kW × 10 h × 30 = 30 kWh = 30 units. Cost at ₹6/unit = ₹180\n• **Fuse rating:** I = P/V. 1000 W iron at 220 V: I = 1000/220 ≈ 4.5 A. Use 5 A fuse"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Two bulbs (100 W, 250 V) and (200 W, 250 V) are connected in series across 250 V. Which glows brighter?\n\n**Solution:**\n**Step 1:** R₁ = V²/P₁ = 250²/100 = 625 Ω. R₂ = 250²/200 = 312.5 Ω\n**Step 2:** I = V/(R₁+R₂) = 250/937.5 = 0.267 A\n**Step 3:** P₁ (actual) = I²R₁ = (0.267)²×625 = 44.4 W. P₂ = I²R₂ = 22.2 W\n**Step 4:** 100 W bulb glows brighter (higher actual power in series)\n\n**Answer:** 100 W bulb glows brighter (44.4 W vs 22.2 W)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is 1 kWh in Joules?\n\n**Answer:** 1 kWh = 3.6×10⁶ J.\n\n---\n\n**Q2.** A 1500 W heater runs for 4 h daily. Find energy in kWh for 30 days.\n\n**Answer:** E = 1.5 × 4 × 30 = 180 kWh.\n\n---\n\n**Q3.** Find current drawn by 60 W bulb at 220 V.\n\n**Answer:** I = P/V = 60/220 ≈ 0.27 A."
+      }
+    ]
+  },
+  "4533b3f29b0625c6": {
+    "summary": "Magnetism: properties of magnets (N/S poles, attract/repel, earth as magnet). Magnetic field lines: direction N→S outside, closed loops, never cross, crowded near poles (strong field). Compass needle aligns with field lines.",
+    "chunks": [
+      {
+        "title": "Understanding Magnetic Field and Field Lines",
+        "content": "**Magnetic Field and Field Lines** is a key topic in Magnetic Effects of Electric Current for CBSE Class X Science.\n\n**Magnetism:** A fundamental force. Certain materials (iron, nickel, cobalt) attract other magnetic materials.\n\n**Basic properties:**\n• Like poles REPEL, unlike poles ATTRACT\n• A freely suspended magnet aligns NS direction (Earth's magnetic field)\n• Magnets always have both poles (cannot isolate N or S)"
+      },
+      {
+        "title": "Key Concepts of Magnetic Field and Field Lines",
+        "content": "**Important points:**\n• **Magnetic field (B):** Region around magnet where magnetic force acts. Vector quantity (has direction). SI unit: Tesla (T)\n• **Magnetic field lines (imaginary):** Direction: North → South OUTSIDE magnet. Closed loops (from N→S outside, S→N inside). Never intersect (would give two directions at one point). Crowded = strong field (near poles). Widely spaced = weak field\n• **Uniform field:** Parallel, equally spaced lines (between opposite poles of two magnets). **Non-uniform:** Curved, varying spacing"
+      },
+      {
+        "title": "Key Concepts of Earth's Magnetism",
+        "content": "**Important points:**\n• **Earth as magnet:** Geomagnetic field. Earth's magnetic south pole is near geographic north pole (and vice versa)\n• **Declination:** Angle between geographic meridian and magnetic meridian. Varies with location\n• **Inclination (dip):** Angle of magnetic field with horizontal. Equator: 0° (horizontal). Poles: 90° (vertical)\n• **Compass:** Small magnetised needle, aligns with Earth's magnetic field. Always points (magnetic) north-south"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why do magnetic field lines not intersect each other?\n\n**Solution:**\n**Step 1:** If lines intersected, two directions for magnetic field at one point\n**Step 2:** The compass needle can point in only ONE direction at a point\n**Step 3:** Contradiction → field lines cannot intersect\n\n**Answer:** If they intersected, magnetic field would have two directions at that point (impossible)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the direction of magnetic field lines outside a magnet?\n\n**Answer:** From North pole to South pole.\n\n---\n\n**Q2.** Which pole of Earth's magnet is near the geographic North Pole?\n\n**Answer:** Earth's magnetic SOUTH pole is near geographic North Pole (that's why N pole of compass points there).\n\n---\n\n**Q3.** What does crowding of field lines indicate?\n\n**Answer:** Stronger magnetic field."
+      }
+    ]
+  },
+  "e3594ad70e8a6c2f": {
+    "summary": "Oersted's experiment: current-carrying wire deflects compass (magnetic field around current). Right-hand thumb rule: thumb = current direction, curled fingers = magnetic field direction. Patterns: straight wire (concentric circles), circular loop (like a disc magnet), solenoid (like a bar magnet).",
+    "chunks": [
+      {
+        "title": "Understanding Magnetic Field due to a Current-Carrying Conductor",
+        "content": "**Magnetic Field due to a Current-Carrying Conductor** is a key topic in Magnetic Effects of Electric Current for CBSE Class X Science.\n\n**Hans Christian Oersted (1820):** Discovered that a compass needle is deflected near a current-carrying wire. This proved the connection between electricity and magnetism.\n\n**Key fact:** Every current-carrying conductor produces a magnetic field around it."
+      },
+      {
+        "title": "Key Concepts of Patterns of Magnetic Fields",
+        "content": "**Important points:**\n• **Straight conductor:** Magnetic field lines are concentric circles around the wire. Direction depends on current direction. Right-hand rule: grasp wire with thumb in current direction → curled fingers show field direction. Field strength B ∝ I/r (more current = stronger, more distance = weaker) 🔄\n• **Circular loop:** Field similar to a short bar magnet. Polarity determined by direction of current. Clockwise → S pole. Anticlockwise → N pole. B ∝ I/R. Multiple loops = stronger field\n• **Solenoid:** Many circular turns of insulated wire. Field inside solenoid: uniform, strong, parallel to axis. Field pattern similar to a BAR MAGNET. One end = N pole, other = S pole. B ∝ nI (n = number of turns per unit length)"
+      },
+      {
+        "title": "Key Concepts of Electromagnet",
+        "content": "**Important points:**\n• **Electromagnet:** Solenoid with soft iron core. Becomes a strong magnet when current flows. Stops being magnetic when current stops\n• **Factors affecting strength:** Number of turns, current magnitude, nature of core material (soft iron best). Stronger than permanent magnet, can be controlled\n• **Uses:** Electric bells, cranes (lift scrap iron), MRI machines, speakers, relays, magnetic locks"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A current-carrying solenoid is suspended freely. What will be its orientation?\n\n**Solution:**\n**Step 1:** Solenoid behaves like a bar magnet with N and S poles\n**Step 2:** Earth's magnetic field will align it like a compass\n**Step 3:** The solenoid will align in the N-S direction (like a bar magnet)\n\n**Answer:** Solenoid aligns in N-S direction (like a bar magnet) due to Earth's magnetic field."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What did Oersted's experiment demonstrate?\n\n**Answer:** Current-carrying wire produces a magnetic field (deflects compass).\n\n---\n\n**Q2.** State the right-hand thumb rule.\n\n**Answer:** Grip wire with right hand, thumb = current direction, curled fingers = magnetic field direction.\n\n---\n\n**Q3.** How can the strength of an electromagnet be increased?\n\n**Answer:** Increase number of turns, increase current, use soft iron core."
+      }
+    ]
+  },
+  "342bdf01987a78c2": {
+    "summary": "A current-carrying conductor in a magnetic field experiences force (motor effect). Fleming's left-hand rule: thumb = force, index = field, middle = current. F = BIL sin θ. Direction: perpendicular to both B and I. Application: electric motor, loudspeaker.",
+    "chunks": [
+      {
+        "title": "Understanding Force on a Current-Carrying Conductor in a Magnetic Field",
+        "content": "**Force on a Current-Carrying Conductor in a Magnetic Field** is a key topic in Magnetic Effects of Electric Current for CBSE Class X Science.\n\n**Key discovery:** A current-carrying conductor placed in a magnetic field experiences a FORCE. This is the basis of the electric motor.\n\n**Condition:** The force is maximum when conductor is perpendicular to field; zero when parallel."
+      },
+      {
+        "title": "Key Concepts of Fleming's Left-Hand Rule",
+        "content": "**Important points:**\n• **Rule:** Stretch left hand so thumb, forefinger (index), and middle finger are mutually perpendicular (L-shape)\n• **Forefinger:** Direction of Magnetic Field (N→S)\n• **Middle finger:** Direction of Current (conventional, +→−)\n• **Thumb:** Direction of Force (motion)\n• **Formula:** F = BIL sin θ. F = force (N), B = magnetic field (T), I = current (A), L = length (m). θ = angle between B and I"
+      },
+      {
+        "title": "Key Concepts of Applications",
+        "content": "**Important points:**\n• **Electric motor:** Current-carrying coil in magnetic field → rotates (converts electrical energy → mechanical energy)\n• **Loudspeaker:** Current in voice coil (in magnetic field) → force moves coil → attached cone vibrates → sound\n• **Galvanometer:** Current in coil in magnetic field → coil deflects → indicates current. Scale measures deflection"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A conductor of length 0.5 m carrying 3 A is placed perpendicular to a magnetic field of 0.2 T. Find force.\n\n**Solution:**\n**Step 1:** Given: L=0.5 m, I=3 A, B=0.2 T, θ=90°\n**Step 2:** F = BIL sin 90° = 0.2 × 3 × 0.5 × 1 = 0.3 N\n\n**Answer:** F = 0.3 N."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** State Fleming's left-hand rule.\n\n**Answer:** Thumb = Force (motion), Forefinger = Field (N→S), Middle finger = Current (+→−).\n\n---\n\n**Q2.** When is the force on a current-carrying conductor maximum in a magnetic field?\n\n**Answer:** When conductor is PERPENDICULAR to magnetic field (θ=90°, sin 90°=1).\n\n---\n\n**Q3.** A conductor parallel to magnetic field carries current. Is there force?\n\n**Answer:** No. θ=0°, sin 0°=0 → F=0."
+      }
+    ]
+  },
+  "7a5d4c50c495ea28": {
+    "summary": "Electric motor: converts electrical → mechanical energy. Principle: current-carrying coil in magnetic field experiences torque (rotates). DC motor: armature (coil), split-ring commutator (reverses current every half-turn), brushes, magnets. Commercial motor: many turns, electromagnet, laminated core.",
+    "chunks": [
+      {
+        "title": "Understanding Electric Motor",
+        "content": "**Electric Motor** is a key topic in Magnetic Effects of Electric Current for CBSE Class X Science.\n\n**Electric motor:** A device that converts electrical energy into mechanical energy (rotation).\n\n**Principle:** A current-carrying coil placed in a magnetic field experiences a torque and rotates (Fleming's left-hand rule).\n\n**DC motor:** Most common type for low-power applications."
+      },
+      {
+        "title": "Key Concepts of Construction and Working of DC Motor",
+        "content": "**Important points:**\n• **Parts:** Armature (rectangular coil ABCD of insulated Cu wire), Strong magnet (N-S), Split-ring commutator (two halves, reverses current every ½ turn), Carbon brushes (fixed, contact with commutator), Battery/DC supply\n• **Working:** Current enters through brush → commutator → coil → magnetic force (up on one side, down on other) → coil rotates. After ½ turn, commutator halves swap connections → current direction in coil reverses → continuous rotation\n• **Split ring commutator:** KEY component for DC motor. Ensures torque is always in same direction"
+      },
+      {
+        "title": "Key Concepts of Commercial Motors and Improvements",
+        "content": "**Important points:**\n• **Electromagnet instead of permanent magnet:** Stronger field → more torque\n• **Many turns (armature coil):** More turns = greater force (F=nBIL)\n• **Laminated soft iron core:** Concentrates magnetic field, reduces eddy current losses\n• **Multiple poles:** Smoother rotation, more uniform torque\n• **Uses:** Fans, pumps, electric vehicles, toys, elevators, washing machines, drills"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Explain the role of split-ring commutator in a DC motor.\n\n**Solution:**\n**Step 1:** Coil rotates in magnetic field due to torque\n**Step 2:** After half turn, the sides of coil that were up are now down\n**Step 3:** Without commutator, current would create opposite torque → coil would stop\n**Step 4:** Split-ring commutator reverses current direction in coil every half turn\n**Step 5:** Result: torque always in same direction → continuous rotation\n\n**Answer:** Commutator reverses current every ½ turn, ensuring continuous rotation in same direction."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the principle of an electric motor?\n\n**Answer:** Current-carrying coil in magnetic field experiences torque → rotates (Fleming's LH rule).\n\n---\n\n**Q2.** Name the device that reverses current direction in a DC motor.\n\n**Answer:** Split-ring commutator.\n\n---\n\n**Q3.** What happens if the split-ring commutator is replaced by slip rings?\n\n**Answer:** Current does NOT reverse. Coil oscillates back and forth (wouldn't rotate continuously). Slip rings are for AC generators."
+      }
+    ]
+  },
+  "598d4371324c8ea7": {
+    "summary": "Electromagnetic induction (Faraday, 1831): changing magnetic field induces current in a conductor. Faraday's experiments with coil and magnet. Induced EMF depends on rate of change of flux, number of turns, magnetic field strength. Applications: generators, transformers, induction cooktops.",
+    "chunks": [
+      {
+        "title": "Understanding Electromagnetic Induction",
+        "content": "**Electromagnetic Induction** is a key topic in Magnetic Effects of Electric Current for CBSE Class X Science.\n\n**Michael Faraday (1831):** Discovered that a changing magnetic field can induce an electric current in a conductor.\n\n**Electromagnetic induction:** The process of generating electric current by changing the magnetic field. This is the reverse of the motor effect."
+      },
+      {
+        "title": "Key Concepts of Faraday's Experiments",
+        "content": "**Important points:**\n• **Experiment 1:** Push bar magnet into coil → galvanometer deflects (current induced). Stop moving → no deflection. Pull out → opposite deflection. Faster motion → more deflection\n• **Experiment 2:** Primary coil connected to battery through switch. Secondary coil connected to galvanometer. Closing/opening switch → momentary deflection in secondary (changing current → changing magnetic field)\n• **Key points:** Induced current exists ONLY while magnetic field is CHANGING. Direction depends on whether field increases/decreases. Rate of change of flux determines magnitude"
+      },
+      {
+        "title": "Key Concepts of Fleming's Right-Hand Rule",
+        "content": "**Important points:**\n• **Rule:** Stretch right hand with thumb, forefinger, middle finger mutually perpendicular\n• **Forefinger:** Direction of Magnetic Field (N→S)\n• **Thumb:** Direction of Motion of conductor\n• **Middle finger:** Direction of Induced Current\n• **Factors affecting induced EMF:** Speed of motion (faster → more), Strength of magnetic field (stronger → more), Number of turns (more → higher)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** A magnet is moved towards a coil. What happens when the magnet is moved (a) faster (b) stopped inside (c) pulled away?\n\n**Solution:**\n**Step 1:** (a) Faster → larger deflection (more rate of change of flux)\n**Step 2:** (b) Stopped → no deflection (no change in flux)\n**Step 3:** (c) Pulled away → deflection in opposite direction (flux decreasing)\n\n**Answer:** (a) Large deflection. (b) No deflection. (c) Opposite deflection."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Who discovered electromagnetic induction?\n\n**Answer:** Michael Faraday (1831).\n\n---\n\n**Q2.** State Fleming's right-hand rule.\n\n**Answer:** Thumb = Motion, Forefinger = Field (N→S), Middle finger = Induced Current.\n\n---\n\n**Q3.** How can the magnitude of induced current be increased?\n\n**Answer:** Move magnet faster, use stronger magnet, increase coil turns, use larger coil area."
+      }
+    ]
+  },
+  "bcabfb804d0178d1": {
+    "summary": "Electric generator converts mechanical → electrical energy. AC generator uses slip rings (current changes direction). DC generator uses split-ring commutator (unidirectional). Principle: electromagnetic induction. National grid: step-up (transmission) and step-down (distribution) transformers.",
+    "chunks": [
+      {
+        "title": "Understanding Electric Generator",
+        "content": "**Electric Generator** is a key topic in Magnetic Effects of Electric Current for CBSE Class X Science.\n\n**Electric generator:** Device that converts mechanical energy into electrical energy.\n\n**Principle:** Electromagnetic induction (Faraday's law). When a coil rotates in a magnetic field, the magnetic flux through it changes → induced EMF.\n\n**Types:** AC generator (alternating current) and DC generator (direct current)."
+      },
+      {
+        "title": "Key Concepts of AC Generator",
+        "content": "**Important points:**\n• **Construction:** Coil (armature) rotated in magnetic field. Slip rings (complete rings, one at each end) + carbon brushes. Magnet (N-S)\n• **Working:** Coil rotates → magnetic flux through coil changes → induced current. After ½ turn, direction of induced current reverses. After full turn, one complete AC cycle. Slip rings provide continuous contact with external circuit\n• **Graph:** Sinusoidal wave. Frequency = rotations per second × pairs of poles. India: 220 V, 50 Hz (50 cycles per second)\n• **Advantages of AC:** Can be transformed (voltage stepped up/down), less power loss in transmission, simpler generators"
+      },
+      {
+        "title": "Key Concepts of DC Generator and National Grid",
+        "content": "**Important points:**\n• **DC generator:** Same as AC generator but has SPLIT-RING COMMUTATOR instead of slip rings. Produces current in one direction (but still pulsing)\n• **Transformer:** Changes AC voltage. Step-up (increases V, decreases I) for long-distance transmission. Step-down (decreases V, increases I) for household use. Power conservation: P = VI (constant)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** What is the difference between AC and DC generator?\n\n**Solution:**\n**Step 1:** AC generator uses SLIP RINGS (continuous rings). DC generator uses SPLIT-RING COMMUTATOR (split into two halves)\n**Step 2:** AC: current direction reverses each half cycle. DC: current always in same direction (but pulsing)\n**Step 3:** AC: sinusoidal waveform. DC: unidirectional but varying (can be smoothed)\n\n**Answer:** AC: slip rings → alternating current. DC: split-ring → unidirectional current."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the principle of an electric generator?\n\n**Answer:** Electromagnetic induction: rotating coil in magnetic field induces current.\n\n---\n\n**Q2.** Why is AC preferred for power transmission?\n\n**Answer:** AC voltage can be stepped up (less I → less I²R loss in transmission lines). DC cannot be easily transformed.\n\n---\n\n**Q3.** Name the device used to increase AC voltage.\n\n**Answer:** Step-up transformer (increases V, decreases I)."
+      }
+    ]
+  }
+}

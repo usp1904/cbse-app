@@ -1,0 +1,231 @@
+{
+  "9566bc6492ee1b75": {
+    "summary": "Carbon forms covalent bonds by sharing electrons. Catenation (C-C bonds) allows long chains. Carbon has 4 valence electrons, forms 4 covalent bonds. Single, double, triple bonds possible.",
+    "chunks": [
+      {
+        "title": "Understanding Bonding in Carbon - The Covalent Bond",
+        "content": "**Bonding in Carbon - The Covalent Bond** is a key topic in Carbon and its Compounds for CBSE Class X Science.\n\nCarbon has 4 valence electrons (2s²2p²). It needs 4 more to achieve octet. Instead of gaining/losing (which requires too much energy), carbon SHARES electrons — forming **covalent bonds**.\n\n**Covalent bond:** Chemical bond formed by mutual sharing of electrons between atoms."
+      },
+      {
+        "title": "Key Concepts of Types of Covalent Bonds",
+        "content": "**Important points:**\n• **Single bond (C-C):** Share 1 pair of electrons. CH₄ (methane), C₂H₆ (ethane). Strongest, but can rotate freely\n• **Double bond (C=C):** Share 2 pairs of electrons. C₂H₄ (ethene). Restricted rotation, shorter than single bond\n• **Triple bond (C≡C):** Share 3 pairs of electrons. C₂H₂ (ethyne). Shortest, strongest, linear geometry"
+      },
+      {
+        "title": "Key Concepts of Properties of Covalent Compounds",
+        "content": "**Important points:**\n• **Low MP/BP:** Weak intermolecular forces (van der Waals), little energy needed to overcome\n• **Poor conductors:** No free electrons/ions (except graphite)\n• **Insoluble in water:** Mostly non-polar, dissolve in organic solvents (alcohol, benzene, CCl₄)\n• **Usually liquids/gases** at room temperature (some solids with large molecules)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Draw electron dot structure of methane (CH₄).\n\n**Solution:**\n**Step 1:** C has 4 valence electrons\n**Step 2:** Each H has 1 valence electron\n**Step 3:** C shares 1 e⁻ with each H (4 single covalent bonds)\n**Step 4:** All 4 bonds are σ (sigma) bonds; tetrahedral shape\n\n**Answer:** CH₄: H:C:H with H above/below/left/right; all single bonds. Tetrahedral, bond angle 109.5°."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why does carbon form covalent bonds, not ionic?\n\n**Answer:** Gaining/losing 4 e⁻ requires too much energy. Sharing is more energy-efficient.\n\n---\n\n**Q2.** What is catenation? Why is carbon special?\n\n**Answer:** Ability to form bonds with same element. Carbon shows maximum catenation due to small size and strong C-C bonds.\n\n---\n\n**Q3.** Why is C₂H₄ more reactive than C₂H₆?\n\n**Answer:** C₂H₄ has a C=C double bond (π bond). π bond is weaker and can break, allowing addition reactions."
+      }
+    ]
+  },
+  "fc1f9c168d90f4d2": {
+    "summary": "Carbon's versatility: catenation (chains, branches, rings), tetravalency (4 bonds), ability to form multiple bonds, and isomerism. Allotropes: diamond (3D network), graphite (layered), fullerenes (cage-like).",
+    "chunks": [
+      {
+        "title": "Understanding Versatile Nature of Carbon",
+        "content": "**Versatile Nature of Carbon** is a key topic in Carbon and its Compounds for CBSE Class X Science.\n\nCarbon forms an enormous number of compounds (over 5 million known organic compounds). This versatility comes from:\n\n**1. Catenation:** Carbon atoms bond with each other to form long chains, branched chains, and rings\n**2. Tetravalency:** 4 covalent bonds per carbon atom\n**3. Multiple bonds:** Single, double, triple bonds\n**4. Isomerism:** Same formula, different structures"
+      },
+      {
+        "title": "Key Concepts of Allotropes of Carbon",
+        "content": "**Important points:**\n• **Diamond:** Each C bonded to 4 others (sp³, tetrahedral). Hardest natural substance. High MP. Poor conductor. Uses: cutting, drilling, jewellery\n• **Graphite:** Each C bonded to 3 others (sp², hexagonal layers). Soft, slippery. Good conductor (delocalised e⁻ between layers). Uses: lubricant, pencil leads, electrodes\n• **Fullerenes (C₆₀):** Soccer-ball shape (60 C atoms in pentagon/hexagon pattern). Third allotrope (discovered 1985). Used in nanotechnology\n• **Carbon nanotubes:** Cylindrical fullerenes. Extremely strong, good conductors"
+      },
+      {
+        "title": "Key Concepts of Isomerism in Carbon Compounds",
+        "content": "**Important points:**\n• **Structural isomers:** Same molecular formula, different structural arrangement\n• Example: Butane (C₄H₁₀) has two isomers: n-butane (straight chain) and isobutane (branched chain)\n• n-butane: CH₃−CH₂−CH₂−CH₃ (boiling point -0.5°C)\n• Isobutane: CH₃−CH(CH₃)−CH₃ (boiling point -11.7°C)\n• C₅H₁₂ has 3 isomers; C₆H₁₄ has 5; C₇H₁₆ has 9"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why is graphite used as a lubricant and as an electrode?\n\n**Solution:**\n**Step 1:** Lubricant: Weak van der Waals forces between layers allow them to slide over each other\n**Step 2:** Electrode: Delocalised electrons between layers can move — conducts electricity\n\n**Answer:** Lubricant: layers slide. Electrode: delocalised electrons conduct."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What are the 3 allotropes of carbon?\n\n**Answer:** Diamond (hard, insulating), Graphite (soft, conducting), Fullerenes (cage-like).\n\n---\n\n**Q2.** Write structural formula of butane and isobutane.\n\n**Answer:** n-butane: CH₃CH₂CH₂CH₃. Isobutane: CH₃CH(CH₃)CH₃.\n\n---\n\n**Q3.** Why does diamond not conduct electricity?\n\n**Answer:** All 4 e⁻ of each C in covalent bonds (no delocalised/free electrons)."
+      }
+    ]
+  },
+  "77e63425b956445a": {
+    "summary": "Carbon compounds undergo combustion, oxidation, addition, and substitution reactions. Functional groups (-OH, -CHO, -COOH, -NH₂, etc.) determine reactivity and properties of organic compounds.",
+    "chunks": [
+      {
+        "title": "Understanding Chemical Properties of Carbon Compounds",
+        "content": "**Chemical Properties of Carbon Compounds** is a key topic in Carbon and its Compounds for CBSE Class X Science.\n\n**Functional group:** An atom or group of atoms that determines the chemical properties of a carbon compound.\n\n**Common functional groups:**\n• -OH: Alcohol (ethanol C₂H₅OH)\n• -CHO: Aldehyde (ethanal CH₃CHO)\n• -COOH: Carboxylic acid (ethanoic acid CH₃COOH)\n• -NH₂: Amine\n• -X: Halo group (Cl, Br)"
+      },
+      {
+        "title": "Key Concepts of Types of Chemical Reactions",
+        "content": "**Important points:**\n• **Combustion:** CₓHᵧ + O₂ → CO₂ + H₂O + heat+light. Saturated hydrocarbons burn with clean blue flame. Unsaturated burn with smoky yellow flame (more C, incomplete combustion)\n• **Oxidation:** Alcohols oxidise to carboxylic acids (using alkaline KMnO₄ or K₂Cr₂O₇). C₂H₅OH + 2[O] → CH₃COOH + H₂O. Agent: KMnO₄/OH⁻ or K₂Cr₂O₇/H⁺\n• **Addition reaction:** Unsaturated + H₂/Ni → saturated (hydrogenation). C₂H₄ + H₂ → C₂H₆. Used to convert vegetable oils to vanaspati ghee (margarine)\n• **Substitution reaction:** Saturated + Cl₂/hv → H replaced by Cl. CH₄ + Cl₂ → CH₃Cl + HCl (in sunlight)"
+      },
+      {
+        "title": "Key Concepts of Homologous Series",
+        "content": "**Important points:**\n• Series of compounds with same functional group, differing by -CH₂- unit\n• Gradual change in physical properties (MP, BP increase with chain length)\n• Similar chemical properties within the series\n• **Alkane series:** CH₄, C₂H₆, C₃H₈, C₄H₁₀... General formula CₙH₂ₙ₊₂\n• **Alcohol series:** CH₃OH, C₂H₅OH, C₃H₇OH... General formula CₙH₂ₙ₊₁OH"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Identify the reaction: CH₄ + Cl₂ → CH₃Cl + HCl.\n\n**Solution:**\n**Step 1:** One H atom in CH₄ replaced by Cl atom\n**Step 2:** Requires sunlight (hv) as catalyst\n**Step 3:** This is a substitution reaction\n**Step 4:** Further substitution can give CH₂Cl₂, CHCl₃, CCl₄\n\n**Answer:** Substitution reaction (halogenation of methane)."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is hydrogenation? Write equation.\n\n**Answer:** Addition of H₂ to unsaturated compounds. C₂H₄ + H₂ → C₂H₆ (Ni catalyst). Used to harden oils.\n\n---\n\n**Q2.** Why is combustion of C₂H₅OH called clean? Give equation.\n\n**Answer:** C₂H₅OH + 3O₂ → 2CO₂ + 3H₂O. Complete combustion, no soot.\n\n---\n\n**Q3.** What is the functional group in: (a) CH₃OH (b) CH₃CHO (c) CH₃COOH\n\n**Answer:** (a) -OH alcohol (b) -CHO aldehyde (c) -COOH carboxylic acid."
+      }
+    ]
+  },
+  "9310606bdcafe140": {
+    "summary": "Ethanol (C₂H₅OH): produced by fermentation, used in beverages, antiseptic, fuel. Ethanoic acid (CH₃COOH): vinegar (5-8%), used in cooking, preservative, production of esters. Reactions: esterification, saponification.",
+    "chunks": [
+      {
+        "title": "Understanding Some Important Carbon Compounds - Ethanol and Ethanoic Acid",
+        "content": "**Some Important Carbon Compounds - Ethanol and Ethanoic Acid** is a key topic in Carbon and its Compounds for CBSE Class X Science.\n\n**Ethanol (C₂H₅OH):** \nAlso called alcohol, spirit. Produced by fermentation of sugarcane/molasses.\n\n**Ethanoic acid (CH₃COOH):**\nAlso called acetic acid. 5-8% solution in water = vinegar. Pure = glacial acetic acid."
+      },
+      {
+        "title": "Key Concepts of Properties and Uses of Ethanol",
+        "content": "**Important points:**\n• **Physical:** Colourless liquid, miscible with water, BP=78°C, characteristic smell, burning taste\n• **Reaction with Na:** 2C₂H₅OH + 2Na → 2C₂H₅ONa + H₂↑ (sodium ethoxide + H₂ gas)\n• **Dehydration:** C₂H₅OH → C₂H₄ + H₂O (hot conc. H₂SO₄, 170°C). Ethene produced\n• **Oxidation:** C₂H₅OH + 2[O] → CH₃COOH + H₂O (with alkaline KMnO₄/acidified K₂Cr₂O₇)\n• **Uses:** Alcoholic beverages, antiseptic (70% solution), fuel, solvent\n• **Effects on health:** Depressant, affects CNS, liver damage (cirrhosis), addiction"
+      },
+      {
+        "title": "Key Concepts of Properties and Uses of Ethanoic Acid",
+        "content": "**Important points:**\n• **Physical:** Colourless liquid, pungent smell, MP=17°C (freezes to ice-like solid = glacial acetic acid), BP=118°C\n• **Acidic:** Turns blue litmus red. Weak acid (partially ionises). Reacts with bases: CH₃COOH + NaOH → CH₃COONa + H₂O\n• **Esterification:** CH₃COOH + C₂H₅OH → CH₃COOC₂H₅ + H₂O (conc. H₂SO₄). Ethyl ethanoate (ester) — fruity smell\n• **Reaction with NaHCO₃/Na₂CO₃:** CH₃COOH + NaHCO₃ → CH₃COONa + CO₂↑ + H₂O. CO₂ gas (effervescence)"
+      },
+      {
+        "title": "Key Concepts of Soaps and Detergents (preview)",
+        "content": "**Important points:**\n• Soaps: Sodium/potassium salts of long-chain carboxylic acids (esters → saponification)\n• Saponification: Ester + NaOH → Glycerol + Soap\n• CH₃COOC₂H₅ + NaOH → CH₃COONa + C₂H₅OH (ester + base → salt + alcohol)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** What happens when ethanol is heated with concentrated H₂SO₄ at 170°C?\n\n**Solution:**\n**Step 1:** Conc. H₂SO₄ acts as dehydrating agent (removes H₂O)\n**Step 2:** C₂H₅OH → C₂H₄ + H₂O\n**Step 3:** Ethene (unsaturated) is produced\n**Step 4:** Test: ethene decolourises bromine water (addition reaction)\n\n**Answer:** Dehydration of ethanol to ethene."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Why is ethanoic acid called glacial acetic acid?\n\n**Answer:** Pure CH₃COOH freezes at 17°C to ice-like crystals (glacial = icy).\n\n---\n\n**Q2.** Write the esterification reaction between ethanol and ethanoic acid.\n\n**Answer:** CH₃COOH + C₂H₅OH ↔ CH₃COOC₂H₅ + H₂O (conc. H₂SO₄, heat). Fruity smell.\n\n---\n\n**Q3.** How can you distinguish between ethanol and ethanoic acid using NaHCO₃?\n\n**Answer:** Ethanoic acid reacts with NaHCO₃ → CO₂ bubbles (effervescence). Ethanol does not."
+      }
+    ]
+  },
+  "81f8c80f687136c8": {
+    "summary": "Soaps (Na/K salts of fatty acids) clean by forming micelles: hydrophobic tail dissolves grease, hydrophilic head remains in water. Detergents work in hard water (form scum-free lather), while soaps form scum with Ca²⁺/Mg²⁺.",
+    "chunks": [
+      {
+        "title": "Understanding Soaps and Detergents",
+        "content": "**Soaps and Detergents** is a key topic in Carbon and its Compounds for CBSE Class X Science.\n\n**Soap:** Sodium or potassium salt of a long-chain carboxylic acid.\n\n**Preparation (Saponification):**\nFat/Oil (ester) + NaOH → Glycerol + Sodium salt of fatty acid (soap)\n• Vegetable oils (cottonseed, groundnut, coconut) + NaOH\n• The process: heating fat with NaOH solution → soap + glycerol"
+      },
+      {
+        "title": "Key Concepts of Cleaning Action of Soap",
+        "content": "**Important points:**\n• **Structure of soap molecule:** Hydrophilic head (COO⁻Na⁺, water-loving) + Hydrophobic tail (long C-chain, water-hating/grease-loving)\n• **Micelle formation:** In water, soap molecules arrange in a spherical structure with tails pointing inward (dissolve grease) and heads pointing outward (in water)\n• **Emulsification:** Dirt/grease trapped inside micelle. Micelle suspended in water (emulsion). Rinsed away with water"
+      },
+      {
+        "title": "Key Concepts of Soaps vs Detergents",
+        "content": "**Important points:**\n• **Soap in hard water (Ca²⁺/Mg²⁺):** Forms insoluble precipitate (scum). 2C₁₇H₃₅COONa + Ca²⁺ → (C₁₇H₃₅COO)₂Ca↓ + 2Na⁺. Wasting soap, clothes get grey\n• **Detergent:** Sodium salts of sulphonic acids (alkyl benzene sulphonates). Do NOT form scum with hard water — Ca/Mg salts of sulphonates are soluble\n• **Detergent advantages:** Work in hard water, stronger cleaning, effective in acidic medium\n• **Disadvantage:** Non-biodegradable (persist in environment → water pollution). Soaps are biodegradable"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why do soaps not work well in hard water?\n\n**Solution:**\n**Step 1:** Hard water contains Ca²⁺, Mg²⁺ ions\n**Step 2:** Soap anions react with them to form insoluble Ca/Mg soaps (scum)\n**Step 3:** Scum appears as white precipitate, soap wasted\n**Step 4:** No lather formed until all Ca/Mg ions precipitated\n**Step 5:** Detergent sodium sulphonates do not form such precipitates\n\n**Answer:** Soaps form insoluble scum with Ca²⁺/Mg²⁺. Detergents don't — their Ca/Mg salts are soluble."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is saponification? Give equation.\n\n**Answer:** Fat/ oil + NaOH → soap + glycerol. Ester + base → salt of fatty acid + alcohol.\n\n---\n\n**Q2.** Draw a labelled diagram of a soap micelle.\n\n**Answer:** Spherical: tails (hydrocarbon) inside facing each other, heads (COO⁻Na⁺) outside in water.\n\n---\n\n**Q3.** Why are detergents preferred for washing clothes in hard water areas?\n\n**Answer:** Detergents do not form scum with Ca²⁺/Mg²⁺ (their Ca/Mg salts are soluble). Soaps form insoluble scum."
+      }
+    ]
+  },
+  "a45057e8f3c62f91": {
+    "summary": "Nutrition: autotrophic (photosynthesis) and heterotrophic (holozoic, saprophytic, parasitic). Photosynthesis: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂. Stomata for gas exchange. Chlorophyll captures sunlight energy.",
+    "chunks": [
+      {
+        "title": "Understanding Nutrition",
+        "content": "**Nutrition** is a key topic in Life Processes for CBSE Class X Science.\n\n**Nutrition:** The process by which organisms obtain and utilise food for energy, growth, and repair.\n\n**Modes:**\n1. **Autotrophic:** Make own food (plants) — photosynthesis\n2. **Heterotrophic:** Depend on others for food\n   • Holozoic (ingestion of food, e.g., humans)\n   • Saprophytic (dead organic matter, e.g., fungi)\n   • Parasitic (living host, e.g., tapeworm)"
+      },
+      {
+        "title": "Key Concepts of Photosynthesis",
+        "content": "**Important points:**\n• **Equation:** 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂ (sunlight + chlorophyll)\n• **Requirements:** CO₂ (from air via stomata), H₂O (from roots), Sunlight, Chlorophyll (in chloroplasts)\n• **Process:** Light reaction (light→chemical energy, ATP+NADPH) and Dark reaction/Calvin cycle (CO₂→glucose)\n• **Stomata:** Pores in leaf epidermis, surrounded by guard cells. Open when guard cells turgid, close when flaccid. Regulate gas exchange and transpiration"
+      },
+      {
+        "title": "Key Concepts of Human Digestive System",
+        "content": "**Important points:**\n• **Alimentary canal:** Mouth → Oesophagus → Stomach → Small intestine → Large intestine → Anus\n• **Mouth:** Teeth (mechanical digestion), Saliva (salivary amylase breaks starch→maltose)\n• **Stomach:** HCl (kills bacteria, acidic pH for pepsin), Pepsin (protein→peptides), Mucus (protects stomach lining)\n• **Small intestine:** Duodenum (bile from liver emulsifies fats; pancreatic juice: trypsin, lipase, amylase). Jejunum/Ileum (absorption via villi — finger-like projections increase SA)\n• **Large intestine:** Absorbs water, minerals; forms faeces"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** What is the role of villi in the small intestine?\n\n**Solution:**\n**Step 1:** Villi are finger-like projections in the inner lining of small intestine\n**Step 2:** Increase surface area for absorption\n**Step 3:** Rich blood supply — absorb digested food into bloodstream\n**Step 4:** Glucose, amino acids, fatty acids, glycerol, vitamins, minerals all absorbed here\n\n**Answer:** Villi increase SA for absorption of digested food into blood."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the main difference between autotrophic and heterotrophic nutrition?\n\n**Answer:** Autotrophs make own food (photosynthesis). Heterotrophs depend on others.\n\n---\n\n**Q2.** Name the enzyme in saliva. What does it digest?\n\n**Answer:** Salivary amylase. Digests starch to maltose.\n\n---\n\n**Q3.** What happens to protein in the stomach?\n\n**Answer:** Stomach HCl denatures proteins. Pepsin (activated from pepsinogen by HCl) breaks proteins to peptides."
+      }
+    ]
+  },
+  "2ec240721646b01b": {
+    "summary": "Respiration: breakdown of glucose to release energy. Aerobic: C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + 38 ATP. Anaerobic: C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ + 2 ATP (yeast) or 2C₃H₆O₃ + 2 ATP (muscles).",
+    "chunks": [
+      {
+        "title": "Understanding Respiration",
+        "content": "**Respiration** is a key topic in Life Processes for CBSE Class X Science.\n\n**Respiration:** The process by which food (glucose) is broken down to release energy (ATP).\n\n**Types:**\n1. **Aerobic respiration:** With O₂ → 38 ATP per glucose\n2. **Anaerobic respiration:** Without O₂ → 2 ATP per glucose"
+      },
+      {
+        "title": "Key Concepts of Aerobic vs Anaerobic Respiration",
+        "content": "**Important points:**\n• **Aerobic (in mitochondria):** Glycolysis (cytoplasm, glucose→pyruvate+2ATP+NADH) → Krebs cycle (mitochondrial matrix, pyruvate→CO₂+NADH+FADH₂) → ETC (inner mitochondrial membrane, ATP synthesis). Net: 38 ATP per glucose\n• **Anaerobic (in cytoplasm):** Glucose→pyruvate→ethanol+CO₂ (yeast, fermentation) OR lactate (muscle cells during O₂ debt). Net: 2 ATP per glucose\n• **Yeast:** C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ + 2ATP (used in baking, brewing)\n• **Muscle cells:** C₆H₁₂O₆ → 2C₃H₆O₃ (lactic acid) + 2ATP. Causes muscle cramps"
+      },
+      {
+        "title": "Key Concepts of Human Respiratory System",
+        "content": "**Important points:**\n• **Pathway:** Nostrils → Nasal cavity → Pharynx → Larynx → Trachea → Bronchi → Bronchioles → Alveoli\n• **Alveoli:** Tiny air sacs in lungs. Thin walls (one-cell thick). Surrounded by capillaries. Site of gas exchange (O₂ in, CO₂ out)\n• **Diaphragm:** Sheet of muscle below lungs. Contracts (moves down) → inhalation. Relaxes (moves up) → exhalation\n• **Breathing rate:** ~12-16 breaths/min at rest. Increases during exercise (more O₂ needed, more CO₂ to remove)\n• **CO₂ transport:** Mostly as bicarbonate (HCO₃⁻) in plasma. O₂ transport: Mostly bound to haemoglobin (oxyhaemoglobin) in RBCs"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why do we get muscle cramps after heavy exercise?\n\n**Solution:**\n**Step 1:** During intense exercise, O₂ supply to muscles is insufficient\n**Step 2:** Muscles switch to anaerobic respiration\n**Step 3:** Anaerobic respiration produces lactic acid (C₃H₆O₃)\n**Step 4:** Lactic acid accumulates → muscle cramps\n\n**Answer:** Anaerobic breakdown of glucose produces lactic acid, causing cramps."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Differentiate between aerobic and anaerobic respiration.\n\n**Answer:** Aerobic: with O₂, 38ATP, end products CO₂+H₂O. Anaerobic: without O₂, 2ATP, end products ethanol+CO₂ or lactic acid.\n\n---\n\n**Q2.** What is the role of alveoli?\n\n**Answer:** Site of gas exchange. Thin walls + large SA + rich blood supply allow efficient O₂/CO₂ diffusion.\n\n---\n\n**Q3.** Name the by-product of fermentation in yeast.\n\n**Answer:** Ethanol (C₂H₅OH) and CO₂. Used in production of alcoholic beverages and bread."
+      }
+    ]
+  },
+  "650edf420c6a5586": {
+    "summary": "Transport in humans: heart (4 chambers), blood (RBC, WBC, platelets, plasma), blood vessels (arteries, veins, capillaries), double circulation. Transport in plants: xylem (water/minerals), phloem (food).",
+    "chunks": [
+      {
+        "title": "Understanding Transportation",
+        "content": "**Transportation** is a key topic in Life Processes for CBSE Class X Science.\n\n**Why transport?** To carry O₂, nutrients, hormones to cells and remove CO₂, waste products.\n\n**In humans:**  Blood circulatory system + Lymphatic system\n**In plants:**  Xylem (water/minerals) + Phloem (food)"
+      },
+      {
+        "title": "Key Concepts of Human Circulatory System",
+        "content": "**Important points:**\n• **Heart:** 4 chambers. RA (deoxy blood from body) → RV → Lungs (O₂) → LA → LV → Body. LV has thickest wall (pumps to whole body)\n• **Blood vessels:** Arteries (thick, elastic, carry blood AWAY from heart, high pressure, no valves). Veins (thin, carry blood TO heart, low pressure, valves). Capillaries (one-cell thick, site of exchange)\n• **Double circulation:** Pulmonary (heart↔lungs) + Systemic (heart↔body). Separation ensures oxygenated/deoxygenated blood don't mix"
+      },
+      {
+        "title": "Key Concepts of Blood Components and Plant Transport",
+        "content": "**Important points:**\n• **Plasma:** 55% of blood. Water+proteins (albumin, globulin, fibrinogen)+nutrients+hormones+waste\n• **RBCs (Erythrocytes):** 4.5-5.5 million/mm³. Biconcave, no nucleus. Contain haemoglobin (O₂ transport). Life ~120 days\n• **WBCs (Leukocytes):** 6000-8000/mm³. Nucleated. Immune defence. Types: neutrophils, lymphocytes, monocytes, etc.\n• **Platelets (Thrombocytes):** 1.5-4 lakh/mm³. Blood clotting (fibrin mesh)\n• **Xylem:** Transports water+minerals from roots→leaves. Transpiration pull (cohesion-tension). Vessels and tracheids\n• **Phloem:** Transports food (sucrose, amino acids) from leaves→all parts. Sieve tubes + companion cells. Translocation"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Why is the left ventricle wall thicker than the right?\n\n**Solution:**\n**Step 1:** LV pumps blood to the entire body (long distance, high resistance)\n**Step 2:** RV pumps blood only to the lungs (short distance, low resistance)\n**Step 3:** Thicker muscular wall needed for higher pressure in LV\n\n**Answer:** LV pumps to whole body (higher pressure needed); RV pumps only to lungs."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the difference between arteries and veins?\n\n**Answer:** Arteries: carry blood away from heart, thick walls, high pressure, no valves. Veins: carry blood to heart, thin walls, low pressure, valves.\n\n---\n\n**Q2.** How does water move up in plants?\n\n**Answer:** Transpiration pull: water evaporates from leaves → creates suction → water column moves up xylem (cohesion-tension).\n\n---\n\n**Q3.** What is the function of platelets?\n\n**Answer:** Blood clotting. Platelets release clotting factors → fibrinogen→fibrin (mesh) → clot."
+      }
+    ]
+  },
+  "d560e92a2ac2382e": {
+    "summary": "Excretion removes metabolic waste. Humans: kidneys (nephron → urine), ureters, bladder, urethra. Lung (CO₂), skin (sweat), liver (bile pigments). Plants: transpiration, leaf fall, storage in bark/vacuoles.",
+    "chunks": [
+      {
+        "title": "Understanding Excretion",
+        "content": "**Excretion** is a key topic in Life Processes for CBSE Class X Science.\n\n**Excretion:** The process of removing metabolic waste products from the body.\n\n**Major excretory products:**\n• CO₂ (from respiration) — excreted by lungs\n• Nitrogenous waste (urea from protein breakdown) — excreted by kidneys\n• Excess water, salts, heat — excreted by skin (sweat)\n• Bile pigments (from Hb breakdown) — excreted by liver"
+      },
+      {
+        "title": "Key Concepts of Human Excretory System",
+        "content": "**Important points:**\n• **Kidneys:** 2 bean-shaped organs (~11 cm). Each has ~1 million nephrons (filtering units)\n• **Nephron structure:** Glomerulus (capillary network) → Bowman's capsule → PCT → Loop of Henle → DCT → Collecting duct\n• **Filtration:** Blood → glomerulus → filtrate (H₂O, glucose, salts, urea) forced into Bowman's capsule by high BP\n• **Reabsorption:** PCT reabsorbs ~70% of filtrate (glucose, amino acids, most H₂O, salts). Loop of Henle concentrates urine. DCT adjusts pH, salt balance\n• **Urine:** Collecting duct → ureter → urinary bladder → urethra. ~1-1.5 L/day. Contains urea, salts, water"
+      },
+      {
+        "title": "Key Concepts of Other Excretory Organs and Dialysis",
+        "content": "**Important points:**\n• **Skin:** Sweat glands secrete sweat (H₂O+NaCl+urea). Cools body (evaporation)\n• **Lungs:** Excrete CO₂ and water vapour (exhalation)\n• **Liver:** Converts ammonia to urea (less toxic). Excretes bile pigments (bilirubin from haemoglobin) into intestine (faeces colour)\n• **Artificial Kidney (Dialysis):** Used when kidneys fail. Blood passes through semipermeable membrane. Waste (urea, excess salts) diffuse out. Clean blood returns to body. 3-4 sessions/week, 4h each"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Draw and label a nephron. Describe ultrafiltration.\n\n**Solution:**\n**Step 1:** High BP in glomerulus (afferent arteriole wider than efferent)\n**Step 2:** H₂O, glucose, amino acids, salts, urea forced through capillary walls\n**Step 3:** Large proteins and blood cells remain in blood\n**Step 4:** Filtrate enters Bowman's capsule\n\n**Answer:** Ultrafiltration: pressure-driven filtration of blood in glomerulus. Filtrate = blood minus cells+proteins."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** What is the difference between excretion and egestion?\n\n**Answer:** Excretion = removal of metabolic waste. Egestion = removal of undigested food (faeces).\n\n---\n\n**Q2.** Name the excretory unit of kidney.\n\n**Answer:** Nephron (contains glomerulus + tubules). ~1 million per kidney.\n\n---\n\n**Q3.** Why is dialysis used?\n\n**Answer:** Kidney failure → artificial removal of urea, excess salts, water. Blood passes through semipermeable membrane (dialyser)."
+      }
+    ]
+  }
+}

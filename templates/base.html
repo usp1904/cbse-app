@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="description" content="Free Class X education platform for CBSE, AP & TS Boards. Gamified learning with streaks, lives & XP.">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+    {{ extra_css }}
+</head>
+<body class="{{ body_class }}">
+    <div id="gamification-bar" class="gbar">
+        <div class="gbar-inner">
+            <div class="gbar-left">
+                <a href="/profile" class="gbar-link" title="My Profile">👤</a>
+                <span class="gbar-item" id="gbar-streak" title="Learning Streak">🔥 <span id="streak-count">0</span></span>
+                <span class="gbar-item" id="gbar-xp" title="Experience Points">⭐ <span id="xp-count">0</span></span>
+                <span class="gbar-item" id="gbar-level" title="Level">🏆 Lv.<span id="level-num">1</span></span>
+            </div>
+            <div class="gbar-center">
+                <span class="gbar-item lives-display" id="gbar-lives" title="Lives">❤️<span id="lives-count">5</span></span>
+            </div>
+            <div class="gbar-right">
+                <a href="/about" class="gbar-link" title="About">ℹ️</a>
+            </div>
+        </div>
+    </div>
+    <header>
+        <h1>Class X Education Platform</h1>
+        <p>CBSE · Andhra Pradesh · Telangana · NEP 2020</p>
+    </header>
+    <nav>
+        <div class="inner">
+            <a href="/">Home</a>
+            <a href="/board/cbse">CBSE</a>
+            <a href="/board/ap">AP Board</a>
+            <a href="/board/ts">TS Board</a>
+            <a href="/exams">📝 Exams</a>
+            <a href="/challenge">🔥 Challenge</a>
+            <a href="/badges">🎖️ Badges</a>
+            <a href="/competitive">🎯 Competitive</a>
+            <a href="/electives">🌟 Electives</a>
+            <a href="/tools">🛠️ Tools</a>
+            <a href="/ai">🧠 AI Studio</a>
+            <a href="/review">🔁 Review</a>
+            <a href="/tutor">🧠 Tutor</a>
+            <a href="/leaderboard">🏆 Leaderboard</a>
+            <a href="/profile">👤 Profile</a>
+            <a href="/login">🔐 Login</a>
+            <div class="nav-right">
+                <form class="search-bar" action="/search" method="GET">
+                    <input type="text" name="q" placeholder="Search any topic..." aria-label="Search" id="nav-search">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        {{ content }}
+    </div>
+
+    <div class="ai-chat-panel" id="ai-chat">
+        <div class="ai-chat-header" onclick="toggleChat()">
+            <span>AI Tutor</span>
+            <span class="toggle-btn" id="chat-toggle">−</span>
+        </div>
+        <div class="ai-chat-messages" id="chat-messages">
+            <div class="ai-chat-msg assistant">
+                <div class="msg-label">AI Tutor</div>
+                Hi! Ask me about any topic. I can explain concepts, solve problems, and help you study better.
+            </div>
+        </div>
+        <div class="ai-chat-input">
+            <input type="text" id="chat-input" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button onclick="sendChat()">Ask</button>
+        </div>
+    </div>
+
+    <div id="tts-player" class="tts-player" style="display:none;">
+        <div class="tts-inner">
+            <span id="tts-label" style="font-size:0.85rem;color:#555;">🔊 Voiceover</span>
+            <audio id="tts-audio" controls style="height:32px;flex:1;"></audio>
+            <button onclick="document.getElementById('tts-player').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:1.2rem;">×</button>
+        </div>
+    </div>
+
+    <footer>
+        Free Class X Education Platform · <a href="/about" style="color:#0f3460;">About</a> · Data: NCERT / SCERT · NEP 2020 Aligned
+    </footer>
+
+    <script>
+    let _gamificationData = null;
+    let _katexInited = false;
+
+    async function loadGamification() {
+        try {
+            const resp = await fetch('/api/gamification');
+            const data = await resp.json();
+            _gamificationData = data;
+            document.getElementById('streak-count').textContent = data.streak;
+            document.getElementById('xp-count').textContent = data.xp;
+            document.getElementById('level-num').textContent = data.level;
+            const livesEl = document.getElementById('lives-count');
+            livesEl.textContent = '❤️'.repeat(data.lives) + '🖤'.repeat(Math.max(0, data.max_lives - data.lives));
+        } catch(e) {}
+    }
+
+    async function recordStudy(chapterId, topicId) {
+        try {
+            const resp = await fetch('/api/study?chapter_id=' + encodeURIComponent(chapterId || '') + '&topic_id=' + encodeURIComponent(topicId || ''));
+            const data = await resp.json();
+            _gamificationData = data;
+            document.getElementById('streak-count').textContent = data.streak;
+            document.getElementById('xp-count').textContent = data.xp;
+            document.getElementById('level-num').textContent = data.level;
+        } catch(e) {}
+    }
+
+    async function useLifeline(type, chapterId, topicId) {
+        try {
+            const resp = await fetch('/api/lifeline?type=' + encodeURIComponent(type) + '&chapter_id=' + encodeURIComponent(chapterId || '') + '&topic_id=' + encodeURIComponent(topicId || ''));
+            const data = await resp.json();
+            loadGamification();
+            return data;
+        } catch(e) { return {success: false}; }
+    }
+
+    function playTTS(text, lang) {
+        const player = document.getElementById('tts-player');
+        const audio = document.getElementById('tts-audio');
+        const label = document.getElementById('tts-label');
+        label.textContent = '🔊 Voiceover (' + (lang || 'en') + ')';
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang || 'en-IN';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+            player.style.display = 'flex';
+            audio.style.display = 'none';
+            setTimeout(() => { player.style.display = 'none'; }, text.length * 60);
+        } else {
+            player.style.display = 'flex';
+            audio.style.display = 'block';
+        }
+    }
+
+    function stopTTS() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        document.getElementById('tts-player').style.display = 'none';
+    }
+
+    function exportNotebookLM(chapterId, topicId) {
+        let url = '/api/notebooklm?';
+        if (chapterId) url += 'chapter_id=' + encodeURIComponent(chapterId) + '&';
+        if (topicId) url += 'topic_id=' + encodeURIComponent(topicId) + '&';
+        fetch(url).then(r => r.json()).then(data => {
+            const blob = new Blob([data.markdown], {type: 'text/markdown'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'study_notes.md';
+            a.click();
+            alert('📥 Study notes exported! Import into NotebookLM for AI-powered visualization.');
+        }).catch(() => alert('Could not export.'));
+    }
+
+    function toggleChat() {
+        const panel = document.getElementById('ai-chat');
+        const toggle = document.getElementById('chat-toggle');
+        panel.classList.toggle('collapsed');
+        toggle.textContent = panel.classList.contains('collapsed') ? '+' : '−';
+    }
+
+    async function sendChat() {
+        const input = document.getElementById('chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+        input.value = '';
+        const container = document.getElementById('chat-messages');
+        container.innerHTML += '<div class="ai-chat-msg user"><div class="msg-label">You</div>' + escapeHtml(msg) + '</div>';
+        container.innerHTML += '<div class="ai-chat-msg assistant" id="thinking-msg"><div class="msg-label">AI Tutor</div><em>Thinking...</em></div>';
+        container.scrollTop = container.scrollHeight;
+        try {
+            const resp = await fetch('/api/explain?topic=' + encodeURIComponent(msg) + '&chapter=General&level=simple');
+            const data = await resp.json();
+            document.getElementById('thinking-msg').outerHTML =
+                '<div class="ai-chat-msg assistant"><div class="msg-label">AI Tutor</div>' +
+                escapeHtml(data.explanation || 'Could not process that.') + '</div>';
+        } catch(e) {
+            document.getElementById('thinking-msg').outerHTML =
+                '<div class="ai-chat-msg assistant"><div class="msg-label">AI Tutor</div>Offline mode. Please try again.</div>';
+        }
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadGamification();
+        const searchInput = document.getElementById('nav-search');
+        if (searchInput) searchInput.addEventListener('focus', function() { this.select(); });
+        renderMath();
+    });
+    function renderMath() {
+        if (typeof katex === 'undefined') {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js';
+            s.onload = function() {
+                document.querySelectorAll('.chunk-content, .ai-content, .problem-text, .formula-used, .solution-steps, .formula-card').forEach(function(el) {
+                    el.innerHTML = el.innerHTML.replace(/\$\$(.*?)\$\$/g, function(_, m) {
+                        try { return katex.renderToString(m, {displayMode:true,throwOnError:false}); }
+                        catch(e) { return '<span class="math-error">' + m + '</span>'; }
+                    });
+                    el.innerHTML = el.innerHTML.replace(/\$(.*?)\$/g, function(_, m) {
+                        try { return katex.renderToString(m, {displayMode:false,throwOnError:false}); }
+                        catch(e) { return '<span class="math-error">' + m + '</span>'; }
+                    });
+                });
+            };
+            document.head.appendChild(s);
+        }
+    }
+    function checkMCQ(el) {
+        var box = el.closest('.mcq-box');
+        var correct = box.dataset.answer;
+        var feedback = box.querySelector('.mcq-feedback');
+        feedback.style.display = 'block';
+        if (el.value === correct) {
+            feedback.innerHTML = '✅ Correct! ' + (box.querySelector('.mcq-explanation')?.textContent || 'Well done!');
+            feedback.style.color = '#2ecc71';
+        } else {
+            feedback.innerHTML = '❌ Not quite. The correct answer is ' + correct + '.';
+            feedback.style.color = '#e74c3c';
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+{
+  "5431267dd9267dea": {
+    "summary": "Similar figures have the same shape but not necessarily the same size. Two polygons are similar if their corresponding angles are equal and corresponding sides are in the same ratio. For triangles, similarity means equal corresponding angles and proportional corresponding sides.",
+    "chunks": [
+      {
+        "title": "Similar Figures",
+        "content": "**Similar figures** are figures that have the same shape but different sizes. Two figures are said to be similar if one can be obtained from the other by a uniform scaling (enlarging or reducing).\n\n**Key properties of similar figures:**\n- All corresponding angles are equal\n- All corresponding sides are in the same ratio (scale factor)\n\n**Examples of similar figures:**\n- Any two circles are always similar\n- Any two squares are always similar\n- Two equilateral triangles are always similar\n- Two photographs of the same object at different magnifications\n\n**Examples of figures that are NOT necessarily similar:**\n- Two rectangles may not be similar (different ratios of sides)\n- Two isosceles triangles may not be similar (different vertex angles)\n\n**Congruence vs Similarity:**\n- Congruent figures: same shape AND same size\n- Similar figures: same shape, different sizes\n- All congruent figures are similar, but not vice versa\n\n**Real-life applications of similarity:**\n- Maps and scale drawings\n- Blueprints and architectural models\n- Shadow measurement for heights"
+      },
+      {
+        "title": "Properties of Similar Figures",
+        "content": "**1. Ratio of Corresponding Sides:**\nIf two figures are similar, the ratio of any two corresponding sides is constant (the scale factor k).\nIf triangle ABC ~ triangle DEF, then AB/DE = BC/EF = CA/FD = k\n\n**2. Ratio of Perimeters:**\nThe ratio of perimeters of two similar figures equals the scale factor k.\n\n**3. Ratio of Areas:**\nThe ratio of areas of two similar figures equals k squared.\nArea(triangle ABC)/Area(triangle DEF) = k²\n\n**4. Symmetry of Similarity:**\n- If A~B then B~A (symmetric)\n- If A~B and B~C then A~C (transitive)\n- A~A (reflexive)\n\n**5. Basic Proportionality Theorem (Thales Theorem):**\nIf a line is drawn parallel to one side of a triangle, it divides the other two sides proportionally.\n\n**6. Scale Factor Applications:**\n- If k > 1: the figure is enlarged\n- If 0 < k < 1: the figure is reduced\n- If k = 1: the figures are congruent"
+      },
+      {
+        "title": "Worked Example: Identifying Similar Figures",
+        "content": "**Problem:** Check whether a rectangle with sides 4 cm and 6 cm is similar to another rectangle with sides 8 cm and 12 cm.\n\n**Solution:**\n\n**Step 1:** For similar rectangles, corresponding angles are equal (all 90°). Check side ratios.\nRatio of lengths: 6/12 = 1/2\nRatio of breadths: 4/8 = 1/2\n\n**Step 2:** Both ratios are equal (1/2) and all angles are 90°.\nTherefore, the rectangles are **similar**.\n\n---\n\n**Problem:** A 5.6 m high vertical pole casts a shadow 3.2 m long. At the same time, a tower casts a shadow 12 m long. Find the tower's height.\n\n**Solution:**\nSun's rays make equal angles, so triangles are similar.\nHeight of pole / Shadow of pole = Height of tower / Shadow of tower\n5.6/3.2 = h/12\nh = 12 × 5.6/3.2 = 12 × 1.75 = 21 m\n\nThe tower is **21 m** high."
+      },
+      {
+        "title": "Common Mistakes and Tips for Similar Figures",
+        "content": "**Common Mistakes:**\n\nMissing: **Confusing similarity with congruence** — Similar figures have the same shape; congruent figures have the same shape AND size.\n\nMissing: **Assuming all rectangles are similar** — Two rectangles are similar only if their length:breadth ratios are equal.\n\nMissing: **Wrong correspondence** — When checking similarity, correctly identify which sides correspond.\n\n**Tips and Tricks:**\n\nCheck angles first — For polygons, if corresponding angles are not equal, the figures cannot be similar.\n\nConsistency check — If any two pairs of corresponding sides give different ratios, the figures are NOT similar.\n\nMaps and models — If a map has scale 1:100,000, then 1 cm on the map represents 1 km on the ground.\n\nNotation — Similarity is denoted by the symbol ~ (tilde)."
+      },
+      {
+        "title": "Practice Problems on Similar Figures",
+        "content": "**Problem 1 (Basic):**\nAre all squares similar?\n\n**Answer:** Yes. All squares have all angles = 90°. The ratio of corresponding sides of any two squares is constant.\n\n---\n\n**Problem 2 (Intermediate):**\nTwo similar triangles have perimeters 30 cm and 45 cm. If a side of the smaller triangle is 8 cm, find the corresponding side of the larger triangle.\n\n**Answer:** Scale factor = 30/45 = 2/3. Let larger side = x. 8/x = 2/3 → x = 12 cm.\n\n---\n\n**Problem 3 (Advanced):**\nA 5 m 60 cm high vertical pole casts a shadow 3 m 20 cm long. At the same time, a tower casts a shadow 12 m long. Find the height of the tower.\n\n**Answer:** Height of pole = 5.6 m, Shadow = 3.2 m. Let tower height = h m. h/5.6 = 12/3.2 = 3.75. h = 5.6 × 3.75 = 21 m."
+      }
+    ]
+  },
+  "d99d58775d420507": {
+    "summary": "Two triangles are similar if their corresponding angles are equal (AA criterion) or their corresponding sides are in the same ratio (SSS criterion) or two sides are in proportion with the included angle equal (SAS criterion). The Basic Proportionality Theorem (Thales Theorem) is fundamental to proving similarity.",
+    "chunks": [
+      {
+        "title": "Similarity of Triangles",
+        "content": "Two triangles are **similar** if their corresponding angles are equal and their corresponding sides are in the same proportion.\n\n**Basic Proportionality Theorem (Thales Theorem):**\nIf a line is drawn parallel to one side of a triangle intersecting the other two sides, then it divides those two sides in the same ratio.\n\nIn triangle ABC, if DE ∥ BC with D on AB and E on AC, then:\nAD/DB = AE/EC\n\n**Converse:** If a line divides two sides of a triangle in the same ratio, then it is parallel to the third side.\n\n**Criteria for Similarity:**\n\n**1. AA Similarity:** If two angles of one triangle equal two angles of another triangle, the triangles are similar. (The third angle automatically matches since sum is 180°.)\n\n**2. SSS Similarity:** If the ratios of corresponding sides of two triangles are equal, the triangles are similar.\n\n**3. SAS Similarity:** If one angle equals one angle of another triangle and the sides including these angles are in proportion, the triangles are similar."
+      },
+      {
+        "title": "Key Theorems and Properties of Similar Triangles",
+        "content": "**1. Basic Proportionality Theorem (Thales Theorem):**\nStatement: If a line is drawn parallel to one side of a triangle, it divides the other two sides proportionally.\n\n**2. AA Similarity Criterion:**\nIf two angles of one triangle are equal to two angles of another triangle, the triangles are similar.\n\n**3. SSS Similarity Criterion:**\nIf the three sides of one triangle are proportional to the three sides of another, the triangles are similar.\n\n**4. SAS Similarity Criterion:**\nIf two sides are proportional and the included angle is equal, the triangles are similar.\n\n**5. Properties of Similar Triangles:**\n- Ratio of corresponding sides = scale factor k\n- Ratio of perimeters = k\n- Ratio of areas = k²\n- Ratio of corresponding medians = k\n- Ratio of corresponding altitudes = k\n\n**6. Important Results:**\n- In a right triangle, the altitude from the right angle creates two triangles similar to the original\n- The Pythagoras theorem can be proved using similarity of triangles"
+      },
+      {
+        "title": "Worked Example: Proving Triangle Similarity",
+        "content": "**Problem:** In triangle ABC, D and E are points on AB and AC such that DE ∥ BC. If AD = 4 cm, DB = 6 cm, and AE = 5 cm, find EC.\n\n**Solution:**\n\n**Step 1:** Apply the Basic Proportionality Theorem.\nSince DE ∥ BC: AD/DB = AE/EC\n\n**Step 2:** Substitute known values.\n4/6 = 5/EC\n\n**Step 3:** Cross-multiply.\n4 × EC = 6 × 5 = 30\nEC = 30/4 = 7.5 cm\n\n**Step 4:** Verify.\nAD/DB = 4/6 = 2/3\nAE/EC = 5/7.5 = 2/3 ✓\n\n---\n\n**Problem 2:** Check if triangle ABC with sides 4,6,8 is similar to triangle DEF with sides 6,9,12.\n\n**Solution:**\nCheck SSS criterion:\nAB/DE = 4/6 = 2/3\nBC/EF = 6/9 = 2/3\nCA/FD = 8/12 = 2/3\nAll ratios equal. So triangle ABC ~ triangle DEF by SSS criterion."
+      },
+      {
+        "title": "Common Mistakes and Tips for Triangle Similarity",
+        "content": "**Common Mistakes:**\n\nConfusing similarity criteria with congruence — SSS similarity requires proportional sides (not equal).\n\nWrong correspondence — When checking similarity, ensure correct vertices correspond.\n\nApplying Thales theorem incorrectly — The parallel line must intersect the other TWO sides, not their extensions.\n\n**Tips and Tricks:**\n\nAA is easiest — If you can show two angles are equal, the triangles are automatically similar.\n\nCheck SAS carefully — The angle must be BETWEEN the two proportional sides.\n\nDrawing helps — Mark equal angles and proportional sides on the diagram.\n\nCommon angle pairs — Vertically opposite angles, alternate angles, and corresponding angles are often used to establish AA similarity."
+      },
+      {
+        "title": "Practice Problems on Triangle Similarity",
+        "content": "**Problem 1 (Basic):**\nIn triangle ABC, DE ∥ BC, AD = 3 cm, DB = 5 cm, AC = 12 cm. Find AE.\n\n**Answer:** 3/5 = AE/(12-AE) → 3(12-AE) = 5AE → 36-3AE = 5AE → 36 = 8AE → AE = 4.5 cm.\n\n---\n\n**Problem 2 (Intermediate):**\nDetermine if triangle ABC with sides 3,4,5 and triangle PQR with sides 9,12,15 are similar.\n\n**Answer:** 3/9=4/12=5/15=1/3. All ratios equal. Yes, by SSS similarity.\n\n---\n\n**Problem 3 (Advanced):**\nA girl 90 cm tall walks away from a lamp-post 3.6 m high at 1.2 m/s. Find the length of her shadow after 4 seconds.\n\n**Answer:** Distance from lamp-post = 4.8 m. Let shadow = x m. By similar triangles: x/(4.8+x) = 0.9/3.6 = 1/4. 4x = 4.8+x → 3x = 4.8 → x = 1.6 m."
+      }
+    ]
+  },
+  "ab3f38d401f700f9": {
+    "summary": "The criteria for similarity of triangles — AA, SSS, and SAS — provide efficient ways to establish similarity. AA requires two equal angles, SSS requires three proportional sides, and SAS requires two proportional sides with equal included angle.",
+    "chunks": [
+      {
+        "title": "Criteria for Similarity of Triangles",
+        "content": "Three main criteria establish similarity between triangles without checking all six conditions:\n\n**1. AA (Angle-Angle) Similarity Criterion:**\nIf two angles of one triangle are equal to two angles of another triangle, the triangles are similar.\nThis is the most commonly used criterion.\n\n**2. SSS (Side-Side-Side) Similarity Criterion:**\nIf the three sides of one triangle are proportional to the three sides of another triangle, the triangles are similar.\nAB/DE = BC/EF = CA/FD\n\n**3. SAS (Side-Angle-Side) Similarity Criterion:**\nIf two sides of one triangle are proportional to two sides of another triangle, and the included angles are equal, the triangles are similar.\nAB/DE = AC/DF and angle A = angle D\n\n**Important Distinction:**\n- AAA (angle-angle-angle) is equivalent to AA (since sum of angles is 180°)\n- AAA is a similarity criterion, NOT a congruence criterion\n\n**Comparison with Congruence:**\n- AA similarity ~ no direct congruence equivalent\n- SSS similarity ~ SSS congruence (but sides proportional, not equal)\n- SAS similarity ~ SAS congruence (but sides proportional, not equal)"
+      },
+      {
+        "title": "Using Similarity Criteria: Examples and Applications",
+        "content": "**1. AA Criterion in Action:**\nIf triangle ABC has angles 50°, 70°, 60° and triangle DEF has angles 50°, 60°, 70°, then by AA criterion, they are similar.\n\n**2. SSS Criterion in Action:**\nTriangle ABC with sides 3, 4, 5 and triangle DEF with sides 6, 8, 10.\n3/6 = 4/8 = 5/10 = 1/2. By SSS, triangle ABC ~ triangle DEF.\n\n**3. SAS Criterion in Action:**\nIn triangles ABC and DEF: AB=5, AC=7, DE=10, DF=14, angle A = angle D = 60°.\nAB/DE = 5/10 = 1/2, AC/DF = 7/14 = 1/2, included angles equal.\nBy SAS, triangle ABC ~ triangle DEF.\n\n**4. Applications:**\n- Finding unknown lengths in geometric figures\n- Proving geometric relationships\n- Shadow and height measurement problems\n- Map scaling"
+      },
+      {
+        "title": "Worked Example: Applying Similarity Criteria",
+        "content": "**Problem:** Determine if triangles ABC and PQR are similar:\n(a) AB=6, BC=8, CA=10; PQ=9, QR=12, RP=15\n(b) angle A=45°, angle B=75°, angle P=45°, angle Q=60°\n\n**Solution (a) — SSS criterion:**\nAB/PQ = 6/9 = 2/3\nBC/QR = 8/12 = 2/3\nCA/RP = 10/15 = 2/3\nAll ratios = 2/3. Triangles are similar. ✓\n\n**Solution (b) — AA criterion:**\nangle A = 45° = angle P\nangle C = 180-45-75 = 60° = angle Q\nBy AA criterion, triangles are similar (A↔P, C↔Q, B↔R).\n\n---\n\n**Quick Check:** Are all right-angled isosceles triangles similar?\n**Answer:** Yes. Every right-angled isosceles triangle has angles 45°, 45°, 90°. By AA criterion, any two such triangles are similar."
+      },
+      {
+        "title": "Common Mistakes and Tips for Similarity Criteria",
+        "content": "**Common Mistakes:**\n\nAAA vs AA — We only need to check two angles (AA). The third automatically follows.\n\nSSS similarity vs SSS congruence — In SSS similarity, sides are PROPORTIONAL, not equal.\n\nSAS requires included angle — The equal angle must be BETWEEN the two proportional sides.\n\nWrong correspondence — When stating similarity, the order of vertices matters.\n\n**Tips and Tricks:**\n\nAA is usually fastest — Proving two angles equal is easier than checking three side ratios.\n\nVertically opposite angles — Often used in AA proofs (always equal).\n\nCommon angle — If two triangles share an angle, it provides one pair of equal angles for AA.\n\nParallel lines — Alternate interior and corresponding angles from parallel lines provide equal angles."
+      },
+      {
+        "title": "Practice Problems on Similarity Criteria",
+        "content": "**Problem 1 (Basic):**\nCheck similarity: triangle ABC with AB=4, BC=5, CA=6 and triangle DEF with DE=8, EF=10, FD=12.\n\n**Answer:** 4/8=5/10=6/12=1/2. By SSS, triangles are similar.\n\n---\n\n**Problem 2 (Intermediate):**\nIn triangle ABC, angle A=60°, angle B=50°. In triangle DEF, angle D=60°, angle F=70°. Show similarity.\n\n**Answer:** angle C = 180-110 = 70° = angle F. angle A = angle D = 60°. By AA, triangles are similar.\n\n---\n\n**Problem 3 (Advanced):**\nIn a trapezium ABCD with AB ∥ DC, diagonals AC and BD intersect at O. Prove AO/OC = BO/OD.\n\n**Answer:** In triangles AOB and COD: angle AOB = angle COD (vertically opposite). angle OAB = angle OCD (alternate angles, AB∥CD). By AA, triangles AOB ~ COD. Therefore AO/OC = BO/OD."
+      }
+    ]
+  },
+  "858538c9c7f376bc": {
+    "summary": "The ratio of areas of two similar triangles equals the square of the ratio of their corresponding sides. If triangle ABC ~ triangle DEF with scale factor k, then Area(triangle ABC)/Area(triangle DEF) = k².",
+    "chunks": [
+      {
+        "title": "Areas of Similar Triangles",
+        "content": "The relationship between areas of similar triangles connects similarity with area measurement.\n\n**Theorem:** The ratio of the areas of two similar triangles is equal to the square of the ratio of their corresponding sides.\n\nIf triangle ABC ~ triangle DEF with scale factor k = AB/DE = BC/EF = CA/FD, then:\n\n**Area(triangle ABC) / Area(triangle DEF) = k²**\n\n**Proof idea:**\n- Draw altitudes from corresponding vertices\n- The altitudes are in the same ratio as the sides\n- Area = ½ × base × height\n- Area ratio = (b₁/b₂)(h₁/h₂) = k × k = k²\n\n**Example:**\nIf triangle ABC ~ triangle PQR and AB:PQ = 2:3, then:\nArea(ABC)/Area(PQR) = 4:9\n\n**Applications:**\n- Finding areas when side ratios are known\n- Finding side ratios when area ratios are known\n- Solving problems involving maps and models"
+      },
+      {
+        "title": "Properties and Applications of Area Ratios",
+        "content": "**1. Area Ratio Formula:**\nIf triangle ABC ~ triangle DEF with scale factor k:\nArea(ABC)/Area(DEF) = k²\n\n**2. Finding Side Ratio from Area Ratio:**\nIf area ratio = m:n, then side ratio = √m:√n\n\n**3. Examples:**\n\n**Example 1:** Two similar triangles have areas 36 cm² and 49 cm². Find the ratio of their sides.\nArea ratio = 36/49\nSide ratio = √(36/49) = 6/7\n\n**Example 2:** Triangle ABC ~ triangle PQR. AB = 5 cm, PQ = 15 cm. Area of ABC = 20 cm². Find area of PQR.\nk = 5/15 = 1/3, Area ratio = (1/3)² = 1/9\nArea(PQR) = 9 × 20 = 180 cm²\n\n**4. Practical Application:**\nIf a map has scale 1:10000, a park of area 5 cm² on the map has actual area = 5 × (10000)² = 5 × 10⁸ cm² = 5 hectares."
+      },
+      {
+        "title": "Worked Example: Area of Similar Triangles",
+        "content": "**Problem:** Triangle ABC ~ triangle DEF. Area(ABC) = 121 cm², Area(DEF) = 64 cm². If BC = 9.9 cm, find EF.\n\n**Solution:**\n\n**Step 1:** Area ratio = 121/64\n\n**Step 2:** (BC/EF)² = 121/64\n\n**Step 3:** BC/EF = √(121/64) = 11/8\n\n**Step 4:** 9.9/EF = 11/8 → EF = 9.9 × 8/11 = 7.2 cm\n\n**Verification:** BC/EF = 9.9/7.2 = 99/72 = 11/8 ✓\nArea ratio = (11/8)² = 121/64 ✓\n\n---\n\n**Problem 2:** The areas of two similar triangles are 81 cm² and 144 cm². If the perimeter of the smaller is 27 cm, find the perimeter of the larger.\n\n**Solution:**\nArea ratio = 81/144 = 9/16\nSide ratio = √(9/16) = 3/4 = perimeter ratio\n27/P = 3/4 → P = 36 cm"
+      },
+      {
+        "title": "Common Mistakes and Tips for Area Ratios",
+        "content": "**Common Mistakes:**\n\nForgetting to square — Area ratio is k², not k. If sides are in ratio 2:3, areas are in ratio 4:9.\n\nSquare root — When going from area ratio to side ratio, take the square root.\n\nPerimeter vs Area — Perimeter ratio = k (scale factor). Area ratio = k². They are different.\n\n**Tips and Tricks:**\n\nMemory aid: 'Area is squared, so the ratio is squared.' Side ratio = k, area ratio = k².\n\nQuick calculation: If sides are in ratio m:n, areas are in ratio m²:n².\n\nVerification: If the larger triangle has larger sides, its area should be proportionally larger (by the square)."
+      },
+      {
+        "title": "Practice Problems on Areas of Similar Triangles",
+        "content": "**Problem 1 (Basic):**\nTriangle ABC ~ triangle XYZ. AB=4 cm, XY=12 cm. Area(ABC)=20 cm². Find area(XYZ).\n\n**Answer:** k=4/12=1/3. Area ratio=1/9. Area(XYZ)=9×20=180 cm².\n\n---\n\n**Problem 2 (Intermediate):**\nCorresponding medians of two similar triangles are in ratio 4:7. Find ratio of areas.\n\n**Answer:** Medians are in same ratio as sides. Side ratio=4:7. Area ratio=16:49.\n\n---\n\n**Problem 3 (Advanced):**\nTriangle ABC ~ triangle PQR. AD and PM are medians. Prove Area(ABC)/Area(PQR)=AD²/PM².\n\n**Answer:** AD/PM=k (medians same ratio as sides). Area ratio=k²=(AD/PM)²=AD²/PM²."
+      }
+    ]
+  },
+  "19a051d6510e2494": {
+    "summary": "Pythagoras theorem states that in a right triangle, the square of the hypotenuse equals the sum of squares of the other two sides (a²+b²=c²). Its converse states that if a²+b²=c², the triangle is right-angled. The theorem is proved using similarity of triangles.",
+    "chunks": [
+      {
+        "title": "Pythagoras Theorem",
+        "content": "The **Pythagoras Theorem** is one of the most famous results in mathematics, relating the sides of a right-angled triangle.\n\n**Statement:** In a right-angled triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides.\n\nIf triangle ABC is right-angled at B:\n**AC² = AB² + BC²**\n\n**Named after:** The Greek mathematician Pythagoras (c. 570-495 BCE), though known earlier to Babylonian and Indian mathematicians (Baudhayana theorem, c. 800 BCE).\n\n**Proof using Similarity:**\n1. Draw BD ⟂ AC (altitude from right angle to hypotenuse)\n2. This creates triangles ABD and BDC\n3. Triangle ABC ~ triangle ABD ~ triangle BDC (by AA similarity)\n4. From ABC ~ ABD: AB/AD = AC/AB → AB² = AC × AD\n5. From ABC ~ BDC: BC/DC = AC/BC → BC² = AC × DC\n6. Adding: AB² + BC² = AC(AD + DC) = AC × AC = AC²\n\nThis proof shows the connection between similarity and the Pythagoras theorem."
+      },
+      {
+        "title": "Key Results and Applications",
+        "content": "**1. Standard Form:**\nIn a right triangle with legs a, b and hypotenuse c:\na² + b² = c²\nc = √(a² + b²)\n\n**2. Converse of Pythagoras Theorem:**\nIf in a triangle, the square of one side equals the sum of squares of the other two sides, then the triangle is right-angled (right angle opposite the longest side).\n\n**3. Pythagorean Triplets:**\nSets of three positive integers satisfying a²+b²=c²:\n- (3,4,5): 9+16=25\n- (5,12,13): 25+144=169\n- (7,24,25): 49+576=625\n- (8,15,17): 64+225=289\n- Any multiple of a triplet is also a triplet: (6,8,10), (9,12,15)\n\n**4. Applications:**\n- Finding distances (shortest distance, diagonal of rectangle)\n- Height and distance problems\n- Navigation and surveying\n- Coordinate geometry (distance formula)"
+      },
+      {
+        "title": "Worked Example: Pythagoras Theorem",
+        "content": "**Problem:** A ladder 25 m long reaches a window 24 m above the ground. Find the distance of the foot of the ladder from the wall.\n\n**Solution:**\n\n**Step 1:** Right triangle formed by ladder (hypotenuse=25 m), wall height=24 m, ground distance=x.\n\n**Step 2:** Apply Pythagoras theorem:\n25² = 24² + x²\n\n**Step 3:** Solve for x:\n625 = 576 + x²\nx² = 49\nx = 7 m\n\n**Verification:** 24²+7² = 576+49 = 625 = 25² ✓\n\nTherefore, the foot of the ladder is **7 m** from the wall.\n\n---\n\n**Problem 2:** Determine if a triangle with sides 9 cm, 40 cm, 41 cm is right-angled.\n\n**Solution:**\nCheck: 41² = 9² + 40²? 81+1600=1681=41² ✓\nYes, the triangle is right-angled with hypotenuse 41 cm."
+      },
+      {
+        "title": "Common Mistakes and Tips for Pythagoras Theorem",
+        "content": "**Common Mistakes:**\n\nWrong side as hypotenuse — The hypotenuse is always opposite the right angle (longest side).\n\nForgetting the square root — c = √(a²+b²), not c = a²+b².\n\nApplying to non-right triangles — Pythagoras theorem ONLY applies to right-angled triangles.\n\n**Tips and Tricks:**\n\nShortcuts with triplets — Memorise common Pythagorean triplets (3-4-5, 5-12-13, 8-15-17, 7-24-25).\n\nCheck if triangle is right — Use the converse: if a²+b²=c² for longest side c, the triangle is right-angled.\n\nDiagonal of a rectangle — d = √(l²+w²). This is a common application.\n\nDistance formula — Derived from Pythagoras theorem."
+      },
+      {
+        "title": "Practice Problems on Pythagoras Theorem",
+        "content": "**Problem 1 (Basic):**\nFind the hypotenuse of a right triangle with legs 6 cm and 8 cm.\n\n**Answer:** c = √(36+64) = √100 = 10 cm.\n\n---\n\n**Problem 2 (Intermediate):**\nA tree breaks due to storm. The broken top touches the ground 8 m from the foot, making a 30° angle with the ground. Find the height of the tree.\n\n**Answer:** Let standing part = AB, broken part = AC. AB/8 = tan 30° = 1/√3 → AB = 8/√3. AC/8 = sec 30° = 2/√3 → AC = 16/√3. Total height = 24/√3 = 8√3 m.\n\n---\n\n**Problem 3 (Advanced):**\nBl and CM are medians of triangle ABC right-angled at A. Prove that 4(BL²+CM²) = 5BC².\n\n**Answer:** BC² = AB²+AC². BL² = AB²+(AC/2)² = AB²+AC²/4. CM² = AC²+(AB/2)² = AC²+AB²/4. BL²+CM² = (5/4)(AB²+AC²) = (5/4)BC². So 4(BL²+CM²) = 5BC²."
+      }
+    ]
+  }
+}

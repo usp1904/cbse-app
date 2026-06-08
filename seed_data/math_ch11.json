@@ -1,0 +1,52 @@
+{
+  "ec4bc225170d712b": {
+    "summary": "To divide a line segment AB in a given ratio m:n, we draw an acute ray AX, mark m+n equal points on it, join the last point to B, and draw a line parallel to that from the mth point to intersect AB at the required point.",
+    "chunks": [
+      {
+        "title": "Understanding Division of a Line Segment",
+        "content": "**Division of a Line Segment** is a key concept in Constructions of CBSE Class X Mathematics.\n\n**Given:** Line segment AB. To divide it in ratio m:n.\n\n**Steps:**\n1. Draw AB. Draw ray AX making acute angle with AB.\n2. Mark m+n equal parts on AX (using compass with same radius).\n3. Join the last (m+n)th point C to B.\n4. From the mth point D, draw a line parallel to CB intersecting AB at P.\n5. P divides AB in ratio m:n (AP:PB = m:n).\n\n**Key points to remember:**\n• The ratio can be internal division only\n• The ray AX can be above or below AB\n• Use the same compass radius for equal divisions\n• Draw parallel lines using set-square or compass"
+      },
+      {
+        "title": "Properties and Applications of Division of a Line Segment",
+        "content": "**1. Properties:**\n• AP:PB = m:n\n• By Basic Proportionality Theorem (Thales theorem)\n• A shorter method: directly measure and mark\n• Verify by measuring AP and PB\n\n**2. Important Formulas:**\nAP:PB = m:n\nNumber of points on ray = m+n\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nDivide AB=7 cm in ratio 3:2.\nMark 3+2=5 points on ray. Join 5th to B. Draw line from 3rd point ∥ to join line. P divides AB as AP:PB=3:2."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** Divide a 10 cm line segment internally in the ratio 4:1.\n\n**Solution:**\n\n**Step 1:** Draw AB = 10 cm\n**Step 2:** Draw ray AX at acute angle\n**Step 3:** Mark A₁ through A₅ (5 points, 4+1=5)\n**Step 4:** Join A₅ to B\n**Step 5:** From A₄ draw line ∥ A₅B meeting AB at P\n**Step 6:** P divides AB as AP:PB = 4:1\n\nTherefore, AP = 8 cm, PB = 2 cm (ratio 4:1 verified)."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Wrong number of points:** Mark m+n points, not m or n alone\n\n**Tips and Tricks:**\n\n✓ **Draw parallel carefully:** Use set-square or compass method"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nDivide 8 cm segment in ratio 3:5.\n\n**Answer:** Mark 8 points on ray. From 3rd point draw ∥ to join of 8th to B.\n\n---\n\n**Problem 2 (Intermediate):**\nDivide 9 cm segment in ratio 2:7.\n\n**Answer:** Mark 9 points. From 2nd draw ∥. AP=2cm, PB=7cm.\n\n---\n\n**Problem 3 (Advanced):**\nDivide 6 cm segment in ratio 5:3.\n\n**Answer:** Mark 8 points. From 5th draw ∥. AP=3.75cm, PB=2.25cm."
+      }
+    ]
+  },
+  "b635dfec66f98053": {
+    "summary": "To construct tangents to a circle from an external point: join the centre to the point, draw the perpendicular bisector of this segment to find the midpoint, draw a circle with this midpoint as centre and half the distance as radius. The intersections give the tangent points.",
+    "chunks": [
+      {
+        "title": "Understanding Construction of Tangents to a Circle",
+        "content": "**Construction of Tangents to a Circle** is a key concept in Constructions of CBSE Class X Mathematics.\n\n**Given:** Circle with centre O, external point P.\n\n**Steps:**\n1. Join OP. Find its midpoint M.\n2. Draw circle with centre M and radius MO (or MP).\n3. Let this circle intersect the original circle at Q and R.\n4. Join PQ and PR — these are the required tangents.\n\n**Why this works:**\n∠OQP = 90° (angle in semicircle OQP). Since OQ is radius, PQ is tangent. Similarly, PR is tangent.\n\n**Key points to remember:**\n• Two tangents from external point\n• Tangents are equal in length (PQ = PR)\n• OQ ⟂ PQ and OR ⟂ PR\n• The construction uses Thales' theorem"
+      },
+      {
+        "title": "Properties and Applications of Construction of Tangents to a Circle",
+        "content": "**1. Properties:**\n• PQ = PR = √(OP²-r²)\n• ∠OQP = 90° (angle in semicircle)\n• The midpoint M is centre of auxiliary circle\n• Need radius > distance from M to original circle\n\n**2. Important Formulas:**\nPQ = PR = √(OP²-r²)\nAuxiliary circle: centre M, radius = OP/2\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nCircle r=2 cm, P at 6 cm from O. Construct tangents.\nOP=6, M at midpoint (3 cm from O). Circle radius=3 cm.\nIntersections Q, R give tangent points."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** Construct tangents from external point P to a circle radius 3 cm with OP=7 cm.\n\n**Solution:**\n\n**Step 1:** Draw circle centre O radius 3 cm\n**Step 2:** Mark P at 7 cm from O\n**Step 3:** Find midpoint M of OP (3.5 cm from O)\n**Step 4:** Draw circle centre M radius 3.5 cm\n**Step 5:** Mark intersection points Q and R\n**Step 6:** Join PQ and PR — these are tangents\n**Step 7:** Measure PQ = √(49-9) = √40 = 6.32 cm\n\nTherefore, Tangents PQ and PR constructed, each ≈ 6.32 cm."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Wrong auxiliary centre:** M is midpoint of OP, not centre of original circle\n\n**Tips and Tricks:**\n\n✓ **Verify with Pythagoras:** PQ² = OP² - r²"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nConstruct tangent to circle r=2.5 cm from P at 6.5 cm from O.\n\n**Answer:** M at 3.25 cm, auxiliary circle r=3.25 cm, tangents ≈ 6 cm.\n\n---\n\n**Problem 2 (Intermediate):**\nCircle r=3.5 cm, OP=8 cm. Construct tangents.\n\n**Answer:** M at 4 cm, auxiliary r=4 cm, PQ=√(64-12.25)=√51.75≈7.19 cm.\n\n---\n\n**Problem 3 (Advanced):**\nConstruct tangent to circle r=2 cm from point on circle (from point on circumference).\n\n**Answer:** For point on circle: tangent ⟂ radius at that point. Only one tangent."
+      }
+    ]
+  }
+}

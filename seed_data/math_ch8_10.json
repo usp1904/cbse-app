@@ -1,0 +1,177 @@
+{
+  "c5f80097885c89be": {
+    "summary": "Trigonometric ratios (sin, cos, tan, cosec, sec, cot) relate angles of a right triangle to ratios of its sides. For angle A: sin A = opposite/hypotenuse, cos A = adjacent/hypotenuse, tan A = opposite/adjacent.",
+    "chunks": [
+      {
+        "title": "Understanding Trigonometric Ratios",
+        "content": "**Trigonometric Ratios** is a key concept in Introduction to Trigonometry of CBSE Class X Mathematics.\n\nFor a right triangle ABC with right angle at B:\n• sin A = opposite/hypotenuse = BC/AC\n• cos A = adjacent/hypotenuse = AB/AC\n• tan A = opposite/adjacent = BC/AB\n• cosec A = 1/sin A = AC/BC\n• sec A = 1/cos A = AC/AB\n• cot A = 1/tan A = AB/BC\n\n**Key points to remember:**\n• SOH CAH TOA: Sin=Opp/Hyp, Cos=Adj/Hyp, Tan=Opp/Adj\n• Trigonometry (Greek: trigonon=triangle, metron=measure)\n• All six ratios are defined for acute angles in right triangles\n• The three reciprocal pairs: sin-cosec, cos-sec, tan-cot"
+      },
+      {
+        "title": "Properties and Applications of Trigonometric Ratios",
+        "content": "**1. Key Properties:**\n• sin²A + cos²A = 1 (from Pythagoras theorem)\n• tan A = sin A/cos A\n• cot A = cos A/sin A\n• Values range: sin, cos between 0 and 1 for acute angles\n\n**2. Important Formulas:**\nsin²A + cos²A = 1\nsec²A = 1 + tan²A\ncosec²A = 1 + cot²A\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nIf AB=3, BC=4, AC=5 in right triangle ABC (right angle at B):\nsin A = 4/5, cos A = 3/5, tan A = 4/3\nCheck: sin²A+cos²A = 16/25+9/25 = 1 ✓"
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** In right triangle ABC right-angled at B, AB=7 cm, BC=24 cm. Find sin A, cos A, and tan A.\n\n**Solution:**\n\n**Step 1:** Find AC: AC = √(49+576) = √625 = 25 cm\n**Step 2:** sin A = opposite/hypotenuse = 24/25\n**Step 3:** cos A = adjacent/hypotenuse = 7/25\n**Step 4:** tan A = opposite/adjacent = 24/7\n\nTherefore, sin A = 24/25, cos A = 7/25, tan A = 24/7.\n\n**Verification:**\nsin²A+cos²A = (576+49)/625 = 1 ✓"
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Confusing opposite and adjacent:** Opposite is across from the angle; adjacent is next to it\n\n**Tips and Tricks:**\n\n✓ **SOH CAH TOA:** Sin=Opp/Hyp, Cos=Adj/Hyp, Tan=Opp/Adj\n\n✓ **Draw and label:** Label the triangle clearly before computing\n\nMastering these will help you avoid errors and solve problems efficiently."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nIf sin A = 3/5, find cos A and tan A.\n\n**Answer:** cos²A=1-9/25=16/25 → cos A=4/5. tan A=sin A/cos A=3/4.\n\n---\n\n**Problem 2 (Intermediate):**\nIn triangle ABC right-angled at B, if tan A = √3, find sin A and cos A.\n\n**Answer:** tan A = √3 = opp/adj. Let opp=√3k, adj=k. Hyp=√(3k²+k²)=2k. sin A=√3/2, cos A=1/2.\n\n---\n\n**Problem 3 (Advanced):**\nIf ∠A and ∠B are acute with cos A = cos B, prove ∠A = ∠B.\n\n**Answer:** cos A = cos B implies adjacent/hypotenuse are equal. In a right triangle with common hypotenuse, this implies A = B = 45°."
+      }
+    ]
+  },
+  "5f0556a9da228d2a": {
+    "summary": "Trigonometric ratios for 0°, 30°, 45°, 60°, 90° have exact values derived from geometric constructions. The 45° values come from an isosceles right triangle; 30° and 60° values from an equilateral triangle.",
+    "chunks": [
+      {
+        "title": "Understanding Trigonometric Ratios of Some Specific Angles",
+        "content": "**Trigonometric Ratios of Some Specific Angles** is a key concept in Introduction to Trigonometry of CBSE Class X Mathematics.\n\nThe angles 0°, 30°, 45°, 60°, and 90° have exact trigonometric values derived from simple geometric figures.\n\n**Values Table:**\n| Angle | 0° | 30° | 45° | 60° | 90° |\n| sin | 0 | 1/2 | 1/√2 | √3/2 | 1 |\n| cos | 1 | √3/2 | 1/√2 | 1/2 | 0 |\n| tan | 0 | 1/√3 | 1 | √3 | ∞ |\n\n**Key points to remember:**\n• sin values follow pattern: √0/2, √1/2, √2/2, √3/2, √4/2\n• cos values are sin in reverse order\n• tan = sin/cos — derive if you forget\n• 45° comes from isosceles right triangle with legs 1, hypotenuse √2"
+      },
+      {
+        "title": "Properties and Applications of Trigonometric Ratios of Specific Angles",
+        "content": "**1. Key Properties:**\n• sin 0°=0, sin 90°=1 (boundary values)\n• cos 0°=1, cos 90°=0\n• tan 45°=1 (special value to remember)\n• tan 90° is undefined (not 0 or 1)\n\n**2. Important Formulas:**\nsin 30° = 1/2, sin 45° = 1/√2, sin 60° = √3/2\ncos 30° = √3/2, cos 45° = 1/√2, cos 60° = 1/2\ntan 30° = 1/√3, tan 45° = 1, tan 60° = √3\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nFind 2sin²30° - 3cos²45° + tan²60°\n= 2(1/4) - 3(1/2) + 3 = 1/2 - 3/2 + 3 = 2"
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** Evaluate: (sin 30° + cos 45° - tan 60°) / (cot 45° + sec 30° - cosec 60°)\n\n**Solution:**\n\n**Step 1:** Values: sin 30°=1/2, cos 45°=1/√2, tan 60°=√3, cot 45°=1, sec 30°=2/√3, cosec 60°=2/√3\n**Step 2:** Numerator = 1/2 + 1/√2 - √3\n**Step 3:** Denominator = 1 + 2/√3 - 2/√3 = 1\n**Step 4:** Expression = 1/2 + 1/√2 - √3\n\nTherefore, the value is 1/2 + 1/√2 - √3."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Confusing sin and cos values:** sin 30°=1/2, sin 60°=√3/2 (smaller angle, smaller sine)\n\n**Tips and Tricks:**\n\n✓ **√ pattern:** sin: √0/2, √1/2, √2/2, √3/2, √4/2\n\n✓ **Reverse for cos:** cos is sin in reverse order\n\nMastering these will help you avoid errors and solve problems efficiently."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nFind 2sin²30° - 3cos²45° + tan²60°.\n\n**Answer:** 2(1/4)-3(1/2)+3 = 1/2-3/2+3 = 2.\n\n---\n\n**Problem 2 (Intermediate):**\nIf sin(A+B)=1 and cos(A-B)=√3/2, find A and B (acute).\n\n**Answer:** A+B=90°, A-B=30°. A=60°, B=30°.\n\n---\n\n**Problem 3 (Advanced):**\nProve (sin 30°+cos 60°) - (sin 60°+cos 30°) = -(sin 45°+cos 45°).\n\n**Answer:** LHS = (1/2+1/2)-(√3/2+√3/2) = 1-√3. RHS = -(1/√2+1/√2) = -√2. Not equal — this is false; it's an evaluation problem."
+      }
+    ]
+  },
+  "27973af099cc7581": {
+    "summary": "Complementary angle relations: sin(90°-A)=cos A, cos(90°-A)=sin A, tan(90°-A)=cot A, etc. These show sine and cosine (and other pairs) are complementary functions, simplifying trigonometric expressions.",
+    "chunks": [
+      {
+        "title": "Understanding Trigonometric Ratios of Complementary Angles",
+        "content": "**Trigonometric Ratios of Complementary Angles** is a key concept in Introduction to Trigonometry of CBSE Class X Mathematics.\n\nTwo angles are complementary if their sum is 90°. In a right triangle, the acute angles are complementary.\n\n**Relations:**\nsin(90°-A) = cos A\ncos(90°-A) = sin A\ntan(90°-A) = cot A\ncot(90°-A) = tan A\nsec(90°-A) = cosec A\ncosec(90°-A) = sec A\n\n**Memory aid:** 'co' in cosine/cosec/cot stands for 'complementary'.\n\n**Key points to remember:**\n• If A+B=90°, then sin A = cos B, tan A = cot B\n• Useful for simplifying expressions\n• Works both ways: sin(90°-A)=cos A AND cos A=sin(90°-A)\n• Only for acute angles in Class X"
+      },
+      {
+        "title": "Properties and Applications of Complementary Angle Relations",
+        "content": "**1. Key Properties:**\n• sin 30° = cos 60° (since 30°+60°=90°)\n• tan 50° = cot 40°\n• sec 70° = cosec 20°\n• cos A = sin(90°-A) — always true\n\n**2. Important Formulas:**\nsin(90°-A)=cos A, cos(90°-A)=sin A\ntan(90°-A)=cot A, cot(90°-A)=tan A\nsec(90°-A)=cosec A, cosec(90°-A)=sec A\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nEvaluate tan 35°/cot 55° + cot 78°/tan 12°\ncot 55° = tan(90°-55°) = tan 35°, so first term = 1\ncot 78° = tan(90°-78°) = tan 12°, so second term = 1\nSum = 2"
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** If sin 3A = cos(A-26°), where 3A is acute, find A.\n\n**Solution:**\n\n**Step 1:** sin 3A = cos(90°-3A) (using complementary relation)\n**Step 2:** cos(90°-3A) = cos(A-26°)\n**Step 3:** So 90°-3A = A-26°\n**Step 4:** 90°+26° = A+3A → 116° = 4A → A = 29°\n**Step 5:** Verification: sin 87° = cos 3° and cos(29°-26°) = cos 3° ✓\n\nTherefore, A = 29°."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Confusing complementary (90°) with supplementary (180°):** These are different concepts\n\n**Tips and Tricks:**\n\n✓ **The 'co' trick:** cosine = sine of complementary angle\n\n✓ **Quick conversion:** sin↔cos, tan↔cot, sec↔cosec\n\nMastering these will help you avoid errors and solve problems efficiently."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nEvaluate: tan 35°/cot 55° + cot 78°/tan 12°\n\n**Answer:** cot 55°=tan 35°, so 1st=1. cot 78°=tan 12°, so 2nd=1. Sum=2.\n\n---\n\n**Problem 2 (Intermediate):**\nIf tan 2A = cot(A-18°), find A.\n\n**Answer:** tan 2A = cot(90°-2A) = cot(A-18°) → 90°-2A = A-18° → 108°=3A → A=36°.\n\n---\n\n**Problem 3 (Advanced):**\nProve sin(90°-θ)cos(90°-θ) = tan θ/(1+tan²θ).\n\n**Answer:** LHS = cosθ·sinθ. RHS = (sinθ/cosθ)/sec²θ = (sinθ/cosθ)cos²θ = sinθ cosθ = LHS ✓."
+      }
+    ]
+  },
+  "44aea0e51ce5c4af": {
+    "summary": "The three fundamental trigonometric identities: sin²A+cos²A=1, sec²A=1+tan²A, cosec²A=1+cot²A. These are used to simplify expressions and prove other trigonometric relationships.",
+    "chunks": [
+      {
+        "title": "Understanding Trigonometric Identities",
+        "content": "**Trigonometric Identities** is a key concept in Introduction to Trigonometry of CBSE Class X Mathematics.\n\nA trigonometric identity is an equation involving trigonometric ratios that is true for all values for which the ratios are defined.\n\n**Three Fundamental Identities:**\n1. sin²A + cos²A = 1\n2. sec²A = 1 + tan²A\n3. cosec²A = 1 + cot²A\n\n**Derivation:** Identity 1 comes from Pythagoras theorem. Dividing by cos²A gives Identity 2. Dividing by sin²A gives Identity 3.\n\n**Key points to remember:**\n• sin²A means (sin A)², NOT sin(A²)\n• Identity 1 works for all angles\n• Identities 2 and 3 have domain restrictions\n• Use these to prove other identities"
+      },
+      {
+        "title": "Properties and Applications of Trigonometric Identities",
+        "content": "**1. Key Properties:**\n• sin²A + cos²A = 1 → sin²A = 1-cos²A, cos²A = 1-sin²A\n• sec²A = 1+tan²A → sec²A-tan²A = 1\n• cosec²A = 1+cot²A → cosec²A-cot²A = 1\n• Convert to sin and cos when stuck\n\n**2. Important Formulas:**\nsin²A + cos²A = 1\nsec²A = 1 + tan²A\ncosec²A = 1 + cot²A\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nProve (cosec A - sin A)(sec A - cos A) = 1/(tan A + cot A)\nLHS = (1/sinA-sinA)(1/cosA-cosA) = (cos²A/sinA)(sin²A/cosA) = cosA sinA\nRHS = 1/(sinA/cosA+cosA/sinA) = 1/((sin²A+cos²A)/(sinA cosA)) = sinA cosA\nLHS = RHS ✓"
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** Prove (cosec A - sin A)(sec A - cos A) = 1/(tan A + cot A)\n\n**Solution:**\n\n**Step 1:** LHS = (1/sin A - sin A)(1/cos A - cos A)\n**Step 2:** = ((1-sin²A)/sin A)((1-cos²A)/cos A)\n**Step 3:** = (cos²A/sin A)(sin²A/cos A) = cos A sin A\n**Step 4:** RHS = 1/(sin A/cos A + cos A/sin A)\n**Step 5:** = 1/((sin²A+cos²A)/(sin A cos A)) = sin A cos A\n**Step 6:** LHS = RHS ✓\n\nTherefore, the identity is proved."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **sin²A vs sin(A²):** sin²A = (sin A)², not sin(A²)\n\n**Tips and Tricks:**\n\n✓ **Convert to sin and cos:** This usually simplifies the expression\n\n✓ **Start with complex side:** Simplify the more complicated side first\n\nMastering these will help you avoid errors and solve problems efficiently."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nProve (1+cos A)(1-cos A) = sin²A.\n\n**Answer:** LHS = 1-cos²A = sin²A = RHS ✓.\n\n---\n\n**Problem 2 (Intermediate):**\nProve (sec A+tan A)(sec A-tan A) = 1.\n\n**Answer:** LHS = sec²A-tan²A = 1 = RHS ✓ (using sec²A = 1+tan²A).\n\n---\n\n**Problem 3 (Advanced):**\nProve √((1+sin A)/(1-sin A)) = sec A + tan A.\n\n**Answer:** LHS = √((1+sinA)²/(1-sin²A)) = (1+sinA)/|cosA|. For acute A, cosA>0, so = (1+sinA)/cosA = secA+tanA = RHS ✓."
+      }
+    ]
+  },
+  "dce12fac6c378302": {
+    "summary": "Heights and distances problems use trigonometric ratios to measure inaccessible heights. The angle of elevation (looking up) or depression (looking down) forms a right triangle with the height and distance.",
+    "chunks": [
+      {
+        "title": "Understanding Heights and Distances",
+        "content": "**Heights and Distances** is a key concept in Some Applications of Trigonometry of CBSE Class X Mathematics.\n\n**Angle of Elevation:** The angle formed by the line of sight with the horizontal when the object is above the observer (looking UP).\n**Angle of Depression:** The angle formed by the line of sight with the horizontal when the object is below the observer (looking DOWN).\n\n**Key Fact:** Angle of elevation from A to B = Angle of depression from B to A (alternate interior angles).\n\n**Basic Setup:**\ntan θ = height/distance\nsin θ = opposite/hypotenuse\ncos θ = adjacent/hypotenuse\n\n**Key points to remember:**\n• Draw a clear diagram first\n• Use tan when relating height and distance\n• Angle of elevation = angle of depression (from other side)\n• Common angles: 30°, 45°, 60° have exact values"
+      },
+      {
+        "title": "Properties and Applications of Heights and Distances",
+        "content": "**1. Key Properties:**\n• tan θ = height of object / distance from object\n• sin θ = height / line-of-sight length\n• For two-position problems, set up two equations\n• Reject negative/non-realistic answers\n\n**2. Important Formulas:**\ntan θ = opposite/adjacent = height/distance\nsin θ = opposite/hypotenuse\ncos θ = adjacent/hypotenuse\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nA tower casts a shadow 15 m long when sun's altitude is 30°.\ntan 30° = h/15 → 1/√3 = h/15 → h = 15/√3 = 5√3 ≈ 8.66 m"
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** The angle of elevation of the top of a building from a point is 45°. On moving 20 m closer, the angle becomes 60°. Find the height.\n\n**Solution:**\n\n**Step 1:** Let height = h m, initial distance = d m\n**Step 2:** First: tan 45° = h/d → h = d\n**Step 3:** Second: tan 60° = h/(d-20) → h = √3(d-20)\n**Step 4:** d = √3(d-20) → d = √3d - 20√3 → 20√3 = d(√3-1)\n**Step 5:** d = 20√3/(√3-1) = 10(3+√3) ≈ 47.32 m\n**Step 6:** h = d = 10(3+√3) ≈ 47.32 m\n\nTherefore, the height is 10(3+√3) ≈ 47.32 m.\n\n**Verification:**\nAt 47.32 m, tan=1 ✓. At 27.32 m, tan=47.32/27.32≈√3 ✓"
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Elevation vs Depression:** Elevation = looking UP, Depression = looking DOWN\n\n**Tips and Tricks:**\n\n✓ **Draw a diagram first:** Essential for understanding the geometry\n\n✓ **Angle equality:** Angle of elevation = angle of depression (alternate angles)\n\nMastering these will help you avoid errors and solve problems efficiently."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nA pole casts shadow 15 m long when sun's altitude is 30°. Find pole height.\n\n**Answer:** tan 30° = h/15 → h = 15/√3 = 5√3 ≈ 8.66 m.\n\n---\n\n**Problem 2 (Intermediate):**\nA kite flies at 60 m height with string making 60° angle with ground. Find string length.\n\n**Answer:** sin 60° = 60/L → L = 120/√3 = 40√3 ≈ 69.28 m.\n\n---\n\n**Problem 3 (Advanced):**\nFrom a 45 m lighthouse, depression angles of two ships are 30° and 45°. Find distance between ships.\n\n**Answer:** tan 45°=45/d₁ → d₁=45. tan 30°=45/d₂ → d₂=45√3. Distance = 45(√3-1) ≈ 32.94 m."
+      }
+    ]
+  },
+  "ae71fff4c23c7719": {
+    "summary": "A tangent touches a circle at exactly one point. The radius to the point of contact is perpendicular to the tangent. From an external point, two tangents of equal length can be drawn.",
+    "chunks": [
+      {
+        "title": "Understanding Tangent to a Circle",
+        "content": "**Tangent to a Circle** is a key concept in Circles of CBSE Class X Mathematics.\n\nA **tangent** is a line that touches a circle at exactly one point (the point of contact).\n\n**Key Property:** The tangent at any point of a circle is perpendicular to the radius through the point of contact.\n\nA **secant** intersects the circle at two points. A tangent is a secant where the two intersection points coincide.\n\n**Key points to remember:**\n• Tangent ⟂ radius at point of contact\n• Exactly one tangent at any point on the circle\n• From an external point: TWO tangents of equal length\n• Use Pythagoras to find tangent length"
+      },
+      {
+        "title": "Properties and Applications of Tangent to a Circle",
+        "content": "**1. Key Properties:**\n• Radius to point of contact ⟂ tangent\n• Tangents from same external point are equal\n• The line joining centre to external point bisects the angle between tangents\n• Quadrilateral formed by centre, two points of contact, and external point has sum 360°\n\n**2. Important Formulas:**\nPA = PB (tangents from external point P)\nPA² = OP² - r² (Pythagoras, where O=centre, r=radius)\nsin(θ/2) = r/OP (θ = angle between tangents)\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nFind tangent length from point 10 cm away from centre of circle radius 6 cm.\nPT = √(100-36) = √64 = 8 cm."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** A tangent PQ at point P of a circle of radius 5 cm meets a line through centre O at Q such that OQ=13 cm. Find PQ.\n\n**Solution:**\n\n**Step 1:** Given: OP=5 cm (radius), OQ=13 cm\n**Step 2:** Tangent ⟂ radius → ∠OPQ = 90°\n**Step 3:** By Pythagoras: PQ² = OQ²-OP²\n**Step 4:** = 169-25 = 144\n**Step 5:** PQ = √144 = 12 cm\n\nTherefore, PQ = 12 cm.\n\n**Verification:**\nOP²+PQ² = 25+144 = 169 = 13² ✓"
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Tangent vs secant:** Tangent touches at 1 point; secant intersects at 2 points\n\n**Tips and Tricks:**\n\n✓ **Mark right angle:** Tangent ⟂ radius creates a right triangle\n\n✓ **Two equal tangents:** From external point, two tangents of equal length\n\nMastering these will help you avoid errors and solve problems efficiently."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nFind tangent length from point 17 cm away from centre of circle radius 8 cm.\n\n**Answer:** PT = √(289-64) = √225 = 15 cm.\n\n---\n\n**Problem 2 (Intermediate):**\nTwo tangents TP, TQ are drawn to a circle from external point T. Prove ∠PTQ = 2∠OPQ.\n\n**Answer:** In quadrilateral OPTQ: ∠OPT=∠OQT=90°. Sum=360° → ∠POQ+∠PTQ=180°. In △OPQ: OP=OQ, so ∠OPQ=∠OQP. ∠POQ+2∠OPQ=180°. Therefore ∠PTQ=2∠OPQ.\n\n---\n\n**Problem 3 (Advanced):**\nFind tangent length from point 25 cm from centre of circle radius 7 cm.\n\n**Answer:** PT = √(625-49) = √576 = 24 cm."
+      }
+    ]
+  },
+  "39c510c9af0e165f": {
+    "summary": "From an external point, exactly two tangents of equal length can be drawn. From a point on the circle, one tangent. From inside, no tangents. The angle between tangents is supplementary to the central angle.",
+    "chunks": [
+      {
+        "title": "Understanding Number of Tangents from a Point on a Circle",
+        "content": "**Number of Tangents from a Point on a Circle** is a key concept in Circles of CBSE Class X Mathematics.\n\nThe number of tangents depends on the point's position:\n• **Inside** the circle: ZERO tangents\n• **On** the circle: EXACTLY ONE tangent\n• **Outside** the circle: EXACTLY TWO tangents (equal length)\n\n**For two tangents from external point P:**\nPA = PB (lengths equal)\n∠AOB + ∠APB = 180° (supplementary)\nOP bisects ∠APB and ∠AOB\n\n**Key points to remember:**\n• PA = PB = √(OP²-r²)\n• PA ⟂ OA and PB ⟂ OB\n• ∠AOB + ∠APB = 180°\n• As P moves farther, angle between tangents decreases"
+      },
+      {
+        "title": "Properties and Applications of Number of Tangents from a Point",
+        "content": "**1. Key Properties:**\n• Point inside: 0 tangents\n• Point on circle: 1 tangent (perp. to radius)\n• Point outside: 2 tangents (equal length)\n• Tangent length = √(OP²-r²)\n\n**2. Important Formulas:**\nPA = PB = √(OP²-r²)\nsin(θ/2) = r/OP (θ = ∠APB)\n∠AOB + ∠APB = 180°\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nTwo tangents from P to circle radius 5 cm. OP=13 cm.\nPA = √(169-25) = √144 = 12 cm\nsin(θ/2) = 5/13 → θ/2 = sin⁻¹(5/13)"
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** From external point P, two tangents PT, PS are drawn to a circle with centre O. OP=17 cm, radius=8 cm. Find PT and the angle between tangents.\n\n**Solution:**\n\n**Step 1:** In right triangle OTP: PT² = OP²-OT² = 289-64 = 225\n**Step 2:** PT = √225 = 15 cm\n**Step 3:** Since PS=PT: PS = 15 cm\n**Step 4:** sin(∠OPT) = OT/OP = 8/17\n**Step 5:** ∠TPS = 2×∠OPT = 2 sin⁻¹(8/17)\n\nTherefore, PT = PS = 15 cm, angle = 2 sin⁻¹(8/17)."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Inside vs outside:** From inside: no tangents. From outside: two tangents.\n\n**Tips and Tricks:**\n\n✓ **Count check:** Inside(0), On(1), Outside(2)\n\n✓ **Supplementary:** ∠AOB+∠APB=180° — useful for finding angles\n\nMastering these will help you avoid errors and solve problems efficiently."
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nA point P is 10 cm from centre of circle radius 6 cm. Find tangent length.\n\n**Answer:** PT = √(100-36) = √64 = 8 cm.\n\n---\n\n**Problem 2 (Intermediate):**\nTwo concentric circles have radii 5 cm and 3 cm. Find chord length of larger circle touching the smaller.\n\n**Answer:** Half-chord = √(25-9) = 4 cm. Full chord = 8 cm.\n\n---\n\n**Problem 3 (Advanced):**\nProve angle between tangents from external point is supplementary to the central angle.\n\n**Answer:** In quadrilateral OAPB: ∠OAP=∠OBP=90°. Sum=360° → ∠AOB+90°+90°+∠APB=360° → ∠AOB+∠APB=180°."
+      }
+    ]
+  }
+}

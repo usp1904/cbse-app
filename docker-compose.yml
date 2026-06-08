@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "9090:9090"
+    environment:
+      - PORT=9090
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=qwen3:latest
+    volumes:
+      - ./cbse_content.db:/app/cbse_content.db
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  mesh:
+    build: .
+    ports:
+      - "9090:9090"
+    environment:
+      - WORKER_COUNT=4
+      - BASE_PORT=9091
+      - LB_PORT=9090
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_MODEL=qwen3:latest
+    volumes:
+      - ./cbse_content.db:/app/cbse_content.db
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - mesh
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

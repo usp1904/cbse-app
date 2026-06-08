@@ -1,0 +1,77 @@
+{
+  "02cc57701d06a99b": {
+    "summary": "Perimeter/circumference of a circle = 2πr. Area of a circle = πr². These are fundamental to advanced concepts like sector area, segment area, and area of combinations of plane figures.",
+    "chunks": [
+      {
+        "title": "Understanding Perimeter and Area of a Circle",
+        "content": "**Perimeter and Area of a Circle** is a key concept in Areas Related to Circles of CBSE Class X Mathematics.\n\n**Circle:** Set of points equidistant from a fixed centre.\n**Perimeter (Circumference):** C = 2πr = πd\n**Area:** A = πr²\n\nπ (pi) ≈ 22/7 ≈ 3.14159 — the ratio of circumference to diameter.\n\n**Relationship:** A = C²/(4π), C = √(4πA)\n\n**Key points to remember:**\n• C = 2πr or πd (diameter = 2r)\n• A = πr²\n• Use π ≈ 22/7 or 3.14 as specified\n• Area/Circumference ratio gives r"
+      },
+      {
+        "title": "Properties and Applications of Perimeter and Area of a Circle",
+        "content": "**1. Properties:**\n• π is irrational; 22/7 and 3.14 are approximations\n• Doubling radius quadruples area\n• Semicircle: Perimeter = πr+2r, Area = πr²/2\n• Quarter circle: Perimeter = πr/2+2r, Area = πr²/4\n\n**2. Important Formulas:**\nCircumference C = 2πr = πd\nArea A = πr²\nA = C²/(4π)\nC = 2√(πA)\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nFind circ. and area of circle radius 14 cm.\nC = 2×22/7×14 = 88 cm\nA = 22/7×196 = 616 cm²"
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** The circumference of a circle is 220 cm. Find its radius and area.\n\n**Solution:**\n\n**Step 1:** C = 2πr → 220 = 2×22/7×r\n**Step 2:** r = 220×7/44 = 35 cm\n**Step 3:** A = πr² = 22/7×35×35 = 3850 cm²\n\nTherefore, r = 35 cm, A = 3850 cm²."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **π≈22/7 vs 3.14:** Both are approximations; use what's specified\n\n**Tips and Tricks:**\n\n✓ **C = 2πr NOT πr²:** Don't confuse circumference with area formula"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nFind circumference and area of circle radius 21 cm.\n\n**Answer:** C=2×22/7×21=132 cm. A=22/7×441=1386 cm².\n\n---\n\n**Problem 2 (Intermediate):**\nArea of circle is 616 cm². Find circumference.\n\n**Answer:** πr²=616 → r=14. C=2×22/7×14=88 cm.\n\n---\n\n**Problem 3 (Advanced):**\nWire bent into circle radius 14 cm. Rebent into square, find side.\n\n**Answer:** C=2×22/7×14=88. Perim(square)=88 → side=22 cm."
+      }
+    ]
+  },
+  "89bf3724d9e8b68f": {
+    "summary": "Sector: arc length l = θ/360°×2πr, area = θ/360°×πr² = ½lr. Segment area = sector area - triangle area = θ/360°×πr² - ½r² sin θ. Minor/major refer to angle < or > 180°.",
+    "chunks": [
+      {
+        "title": "Understanding Areas of Sector and Segment of a Circle",
+        "content": "**Areas of Sector and Segment of a Circle** is a key concept in Areas Related to Circles of CBSE Class X Mathematics.\n\n**Sector:** Region between two radii and the corresponding arc.\n**Segment:** Region between a chord and its corresponding arc.\n\n**Formulas:**\nArc length (l) = θ/360° × 2πr\nSector area = θ/360° × πr² = ½lr\nSegment area = Sector area - Triangle area\n= θ/360°×πr² - ½r² sin θ\n\n**Key points to remember:**\n• Minor sector: θ<180°, Major: θ>180°\n• Segment = Sector - Triangle\n• Arc length l, radius r → area = lr/2\n• sin θ in degrees for triangle area"
+      },
+      {
+        "title": "Properties and Applications of Areas of Sector and Segment",
+        "content": "**1. Properties:**\n• Sector area proportional to central angle\n• l = rθ (if θ in radians)\n• Segment area = r²(πθ/360° - sin θ/2)\n• Perpendicular from centre bisects chord\n\n**2. Important Formulas:**\nArc length l = θ/360° × 2πr\nSector area = θ/360° × πr² = ½lr\nSegment area = r²(πθ/360° - ½ sin θ)\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nChord of radius 10 cm subtends 90° at centre. Segment area = 25π-50 = 25(π-2) ≈ 28.54 cm²."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** A circle radius 14 cm has sector angle 60°. Find sector area and arc length.\n\n**Solution:**\n\n**Step 1:** Sector area = 60/360 × 22/7 × 196 = 1/6 × 616 = 102.67 cm²\n**Step 2:** Arc length = 60/360 × 2 × 22/7 × 14 = 1/6 × 88 = 14.67 cm\n\nTherefore, Area = 102.67 cm², Arc = 14.67 cm."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Sector vs segment:** Sector includes centre; segment is between chord and arc\n\n**Tips and Tricks:**\n\n✓ **Segment = Sector - Triangle:** Always subtract the triangle"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nA circle radius 7 cm has sector angle 60°. Find sector area.\n\n**Answer:** 60/360×22/7×49=77/6≈12.83 cm².\n\n---\n\n**Problem 2 (Intermediate):**\nA chord subtends 90° at centre of circle radius 10 cm. Find segment area.\n\n**Answer:** Sector=25π, Triangle=50, Segment=25(π-2)≈28.54 cm².\n\n---\n\n**Problem 3 (Advanced):**\nA round table top has 6 equal sectors, radius 90 cm. Find each sector area.\n\n**Answer:** 60/360×π×8100=1350π≈4241.15 cm²."
+      }
+    ]
+  },
+  "44640b46e4a8a223": {
+    "summary": "Composite area problems combine circles with other shapes. Approach: identify all component shapes, compute each area, add or subtract as needed. Common patterns: square with inscribed circle, circular paths, rectangular sheets with circular cutouts.",
+    "chunks": [
+      {
+        "title": "Understanding Areas of Combinations of Plane Figures",
+        "content": "**Areas of Combinations of Plane Figures** is a key concept in Areas Related to Circles of CBSE Class X Mathematics.\n\n**Shaded Area = Area of larger shape - Area of cut-out regions**\n\n**Common patterns:**\n• Square with inscribed circle (shaded = square - circle)\n• Circle with inscribed square (shaded = circle - square)\n• Two semicircles on sides of a rectangle\n• Concentric circular paths (washer)\n\n**Key points to remember:**\n• Identify all component shapes first\n• Compute each area separately\n• Add or subtract as needed\n• Use π ≈ 22/7 or 3.14 as specified"
+      },
+      {
+        "title": "Properties and Applications of Areas of Combinations of Plane Figures",
+        "content": "**1. Properties:**\n• Square - inscribed circle: s² - π(s/2)²\n• Circle - inscribed square: πr² - 2r²\n• Rectangular sheet with 4 quarter circles: rectangle - circle\n• Concentric rings: π(R²-r²)\n\n**2. Important Formulas:**\nShaded = Outer - Inner(s)\nConcentric ring: π(R²-r²)\n\n**3. Step-by-Step Approach:**\n• Identify the given information\n• Apply the appropriate formula\n• Solve step by step\n• Verify the answer\n\n**4. Example:**\nA circular pond radius 7 m has a 2 m wide path around it.\nR=9, r=7. Path = π(81-49) = 32π ≈ 100.57 m²."
+      },
+      {
+        "title": "Worked Example",
+        "content": "**Problem:** A square metal sheet side 14 cm has 4 holes drilled (each radius 2 cm). Find remaining area.\n\n**Solution:**\n\n**Step 1:** Square area = 196 cm²\n**Step 2:** 4 holes = 4 × π × 4 = 16π ≈ 50.27 cm²\n**Step 3:** Remaining = 196 - 50.27 ≈ 145.73 cm²\n\nTherefore, Remaining area ≈ 145.73 cm²."
+      },
+      {
+        "title": "Common Mistakes and Tips",
+        "content": "**Common Mistakes:**\n\n❌ **Wrong radius for path:** R = r + width, NOT r - width\n\n**Tips and Tricks:**\n\n✓ **Sketch first:** Draw the figure to see the components"
+      },
+      {
+        "title": "Practice Problems",
+        "content": "**Problem 1 (Basic):**\nA square side 28 cm has four equal circles at corners (radius 7 cm). Find remaining area.\n\n**Answer:** Square=784. Four quarter-circles = one full circle = 154. Remaining=630 cm².\n\n---\n\n**Problem 2 (Intermediate):**\nA 2 m wide circular track has inner radius 14 m. Find track area.\n\n**Answer:** R=16. Area=π(256-196)=60π≈188.57 m².\n\n---\n\n**Problem 3 (Advanced):**\nFour circles of radius 7 cm cut from a rectangle 50 cm×30 cm. Find remaining area.\n\n**Answer:** Sheet=1500. Four circles=616. Remaining=884 cm²."
+      }
+    ]
+  }
+}

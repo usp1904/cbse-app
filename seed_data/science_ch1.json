@@ -1,0 +1,77 @@
+{
+  "a4abab9b604d1570": {
+    "summary": "Chemical equations represent reactions using symbols and formulas. Reactants → Products. Balancing ensures atom conservation (Law of Conservation of Mass).",
+    "chunks": [
+      {
+        "title": "Understanding Chemical Equations",
+        "content": "**Chemical Equations** is a fundamental concept in Chemical Reactions and Equations for CBSE Class X Science.\n\nA chemical equation represents a chemical reaction using symbols and formulas.\n\n**General form:**\nReactants → Products\n\n**Example:**\n2H₂ + O₂ → 2H₂O\n\n**Balancing:** Count atoms on both sides, add coefficients to equalise. The Law of Conservation of Mass states matter is neither created nor destroyed."
+      },
+      {
+        "title": "Balancing Chemical Equations",
+        "content": "**Steps to balance:**\n1. Write the unbalanced equation (skeleton equation)\n2. Count atoms of each element on both sides\n3. Add coefficients (numbers before formulas) to balance\n4. Never change subscripts (e.g., H₂O → H₂O, not H₂O₂)\n5. Verify all atoms are equal\n\n**Example:**\nFe + H₂O → Fe₃O₄ + H₂\nLHS: Fe=1, H=2, O=1\nRHS: Fe=3, H=2, O=4\nBalance: 3Fe + 4H₂O → Fe₃O₄ + 4H₂\n\n**State symbols:** (s) solid, (l) liquid, (g) gas, (aq) aqueous"
+      },
+      {
+        "title": "Types of Chemical Equations",
+        "content": "**1. Combination:** A + B → AB  (2Mg + O₂ → 2MgO)\n**2. Decomposition:** AB → A + B  (2H₂O → 2H₂ + O₂)\n**3. Displacement:** A + BC → AC + B  (Zn + CuSO₄ → ZnSO₄ + Cu)\n**4. Double Displacement:** AB + CD → AD + CB  (AgNO₃ + NaCl → AgCl↓ + NaNO₃)\n**5. Redox:** Both oxidation and reduction occur\n\n↓ = precipitate, ↑ = gas evolved"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** Balance: NaOH + H₂SO₄ → Na₂SO₄ + H₂O\n\n**Solution:**\n**Step 1:** Write: NaOH + H₂SO₄ → Na₂SO₄ + H₂O\n**Step 2:** Na: 1→2, balance Na: 2NaOH + H₂SO₄ → Na₂SO₄ + H₂O\n**Step 3:** H: 2+2=4L → 2R, balance: 2NaOH + H₂SO₄ → Na₂SO₄ + 2H₂O\n**Step 4:** O: 2+4=6L → 4+2=6R ✓\n\n**Answer:** 2NaOH + H₂SO₄ → Na₂SO₄ + 2H₂O"
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Balance: Fe + Cl₂ → FeCl₃\n\n**Answer:** 2Fe + 3Cl₂ → 2FeCl₃\n\n---\n\n**Q2.** Balance: CaCO₃ + HCl → CaCl₂ + H₂O + CO₂\n\n**Answer:** CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂\n\n---\n\n**Q3.** Balance: C₃H₈ + O₂ → CO₂ + H₂O\n\n**Answer:** C₃H₈ + 5O₂ → 3CO₂ + 4H₂O"
+      }
+    ]
+  },
+  "f98e21f45e91b899": {
+    "summary": "Five types: Combination, Decomposition, Displacement, Double Displacement, Redox. Each has distinct characteristics and examples. Redox involves simultaneous oxidation (gain O/loss H) and reduction (loss O/gain H).",
+    "chunks": [
+      {
+        "title": "Understanding Types of Chemical Reactions",
+        "content": "**Types of Chemical Reactions** is a fundamental concept in Chemical Reactions and Equations for CBSE Class X Science.\n\nChemical reactions are classified into five main types based on how reactants transform into products.\n\n**1. Combination:** Two or more substances combine to form a single product.\n**2. Decomposition:** A single compound breaks down into simpler substances.\n**3. Displacement:** A more reactive element displaces a less reactive one.\n**4. Double Displacement:** Exchange of ions between two compounds.\n**5. Redox (Oxidation-Reduction):** Simultaneous oxidation and reduction."
+      },
+      {
+        "title": "Combination, Decomposition, and Displacement Reactions",
+        "content": "**Combination Reaction:**\nA + B → AB\n• 2Mg + O₂ → 2MgO (magnesium burns with dazzling white light)\n• CaO + H₂O → Ca(OH)₂ (slaked lime, exothermic)\n\n**Decomposition Reaction:**\nAB → A + B\n• 2H₂O → 2H₂ + O₂ (electrolysis of water)\n• CaCO₃ → CaO + CO₂ (thermal decomposition)\n• 2AgCl → 2Ag + Cl₂ (photochemical, white to grey in sunlight)\n\n**Displacement Reaction:**\nA + BC → AC + B\n• Zn + CuSO₄ → ZnSO₄ + Cu (blue solution turns colourless)\n• Fe + CuSO₄ → FeSO₄ + Cu (iron nail brown coating)"
+      },
+      {
+        "title": "Double Displacement and Redox Reactions",
+        "content": "**Double Displacement:**\nAB + CD → AD + CB\n• AgNO₃ + NaCl → AgCl↓ + NaNO₃ (white precipitate)\n• Na₂SO₄ + BaCl₂ → BaSO₄↓ + 2NaCl (white precipitate)\n\n**Redox (Oxidation and Reduction):**\nOxidation: Gain of oxygen OR Loss of hydrogen\nReduction: Loss of oxygen OR Gain of hydrogen\n\n• ZnO + C → Zn + CO\n  ZnO → Zn (reduction: loss of oxygen)\n  C → CO (oxidation: gain of oxygen)\n\n**Corrosion:** Redox reaction where metal reacts with O₂/H₂O\n**Rancidity:** Oxidation of oils/fats (avoided by antioxidants)"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** What type of reaction is: 2Pb(NO₃)₂ → 2PbO + 4NO₂ + O₂?\n\n**Solution:**\n**Step 1:** One reactant breaks into multiple products\n**Step 2:** Heat is required (thermal decomposition)\n**Step 3:** Brown fumes of NO₂ observed\n\n**Answer:** Thermal Decomposition Reaction"
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Classify: CaO + H₂O → Ca(OH)₂\n\n**Answer:** Combination reaction\n\n---\n\n**Q2.** Classify: Zn + 2HCl → ZnCl₂ + H₂\n\n**Answer:** Displacement reaction (Zn more reactive than H)\n\n---\n\n**Q3.** In CuO + H₂ → Cu + H₂O, identify oxidation and reduction.\n\n**Answer:** CuO→Cu = reduction (loss O). H₂→H₂O = oxidation (gain O)."
+      }
+    ]
+  },
+  "d6f4d35bc1606c11": {
+    "summary": "Oxidation = gain of oxygen/loss of hydrogen. Reduction = loss of oxygen/gain of hydrogen. Redox reactions occur simultaneously. Oxidising agent gives oxygen, reducing agent removes oxygen.",
+    "chunks": [
+      {
+        "title": "Understanding Oxidation and Reduction Reactions",
+        "content": "**Oxidation and Reduction Reactions** is a fundamental concept in Chemical Reactions and Equations for CBSE Class X Science.\n\n**Oxidation:** Gain of oxygen OR Loss of hydrogen\n**Reduction:** Loss of oxygen OR Gain of hydrogen\n\nThese always occur together — hence **Redox** (Reduction-Oxidation).\n\n**Example:**\nCuO + H₂ → Cu + H₂O\nCuO → Cu: Reduction (lost oxygen, H₂ is reducing agent)\nH₂ → H₂O: Oxidation (gained oxygen, CuO is oxidising agent)"
+      },
+      {
+        "title": "Oxidising and Reducing Agents",
+        "content": "**Oxidising Agent (Oxidant):**\nSubstance that gives oxygen OR removes hydrogen\nGets reduced itself\n\n**Reducing Agent (Reductant):**\nSubstance that removes oxygen OR gives hydrogen\nGets oxidised itself\n\n**Examples:**\n• ZnO + C → Zn + CO: C is reducing agent, ZnO is oxidising agent\n• MnO₂ + 4HCl → MnCl₂ + 2H₂O + Cl₂: MnO₂ oxidises HCl to Cl₂\n\n**Common oxidising agents:** KMnO₄, K₂Cr₂O₇, H₂O₂, O₂, HNO₃\n**Common reducing agents:** H₂, C, CO, NaBH₄, metals (Zn, Fe)"
+      },
+      {
+        "title": "Corrosion and Rancidity",
+        "content": "**Corrosion:**\nSlow destruction of metals by reaction with O₂, H₂O, acids.\n• Rusting: Fe + O₂ + H₂O → Fe₂O₃·xH₂O (rust)\n• Tarnishing: Silver darkens (Ag + H₂S → Ag₂S)\n\n*Prevention:* Painting, oiling, galvanising (Zn coating), alloying\n\n**Rancidity:**\nOxidation of oils/fats → unpleasant smell/taste\n\n*Prevention:*\n• Air-tight containers\n• Refrigeration\n• Antioxidants (BHA, BHT, Vitamin E)\n• Nitrogen flushing in packages"
+      },
+      {
+        "title": "Solved Example",
+        "content": "**Problem:** In the reaction 2Mg + O₂ → 2MgO, identify oxidation, reduction, agent.\n\n**Solution:**\n**Step 1:** Mg + O₂ → MgO: Mg gains oxygen → Mg is OXIDISED\n**Step 2:** O₂ is reduced (gains electrons from Mg)\n**Step 3:** O₂ is OXIDISING AGENT, Mg is REDUCING AGENT\n\n**Answer:** Mg oxidised, O₂ reduced. O₂ = oxidising agent, Mg = reducing agent."
+      },
+      {
+        "title": "Practice Questions",
+        "content": "**Q1.** Identify oxidised and reduced: 2Cu₂O + Cu₂S → 6Cu + SO₂\n\n**Answer:** Cu₂O→Cu: reduction (loss O). Cu₂S→SO₂: oxidation (gain O).\n\n---\n\n**Q2.** What is the oxidising agent in MnO₂ + 4HCl → MnCl₂ + 2H₂O + Cl₂?\n\n**Answer:** MnO₂ (gives oxygen to HCl, itself reduced to MnCl₂).\n\n---\n\n**Q3.** How is galvanisation an anti-corrosion method?\n\n**Answer:** Zn coating on Fe. Zn oxidises first (sacrificial protection), protecting Fe from rusting."
+      }
+    ]
+  }
+}
