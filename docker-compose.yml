@@ -4,49 +4,53 @@ services:
   app:
     build: .
     ports:
-      - "9090:9090"
+      - "${PORT:-9090}:9090"
     environment:
       - PORT=9090
-      - OLLAMA_URL=http://ollama:11434
-      - OLLAMA_MODEL=qwen3:latest
+      - UVICORN_WORKERS=4
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///cbse_content.db}
+      - OLLAMA_URL=${OLLAMA_URL:-http://ollama:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen3:latest}
+      - ALLOWED_HOSTS=*
+      - ENV=production
     volumes:
       - ./cbse_content.db:/app/cbse_content.db
     depends_on:
       - ollama
     restart: unless-stopped
-
-  mesh:
-    build: .
-    ports:
-      - "9090:9090"
-    environment:
-      - WORKER_COUNT=4
-      - BASE_PORT=9091
-      - LB_PORT=9090
-      - OLLAMA_URL=http://ollama:11434
-      - OLLAMA_MODEL=qwen3:latest
-    volumes:
-      - ./cbse_content.db:/app/cbse_content.db
-    depends_on:
-      - ollama
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   ollama:
     image: ollama/ollama:latest
+    profiles:
+      - local-llm
     ports:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   nginx:
     image: nginx:alpine
+    profiles:
+      - full-infra
     ports:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      - mesh
+      - app
     restart: unless-stopped
 
 volumes:

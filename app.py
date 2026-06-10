@@ -780,7 +780,7 @@ class CBSEHandler(BaseHTTPRequestHandler):
             self._serve_tools_periodic_table()
         elif path == "/leaderboard":
             self._serve_leaderboard()
-        elif path == "/ai":
+        elif path == "/ai" or path == "/ai/studio":
             self._serve_ai_studio()
         elif path == "/ai/diagram":
             self._serve_ai_diagram()

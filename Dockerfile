@@ -2,13 +2,18 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY *.py requirements.txt /app/
-COPY templates/ /app/templates/
-COPY content/ /app/content/
-COPY run.sh /app/
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt 2>/dev/null || true
+COPY *.py /app/
+COPY templates/ /app/templates/
+COPY seed_data/ /app/seed_data/
+
+ENV PORT=9090
+ENV UVICORN_WORKERS=4
+ENV DATABASE_URL=postgresql://user:pass@host:5432/cbse
+ENV ALLOWED_HOSTS=*
 
 EXPOSE 9090
 
-CMD ["bash", "run.sh", "app"]
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port $PORT --workers $UVICORN_WORKERS --proxy-headers --forwarded-allow-ips='*'"]

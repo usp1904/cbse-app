@@ -1,11 +1,14 @@
-import sqlite3
+"""Database layer — delegates to db.py abstraction (SQLite or PostgreSQL/Neon).
+
+Set DATABASE_URL to switch backends:
+  sqlite:///cbse_content.db    → SQLite (local dev, default)
+  postgresql://user:pass@host/db  → PostgreSQL / Neon (production)
+"""
 import os
 import json
-import threading
+from db import get_db, DatabaseError as DbError
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "cbse_content.db")
-_local = threading.local()
-
+DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "cbse_content.db"))
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS boards (
     id TEXT PRIMARY KEY,
@@ -20,8 +23,7 @@ CREATE TABLE IF NOT EXISTS subjects (
     name TEXT NOT NULL,
     code TEXT,
     description TEXT,
-    ncert_url TEXT,
-    FOREIGN KEY (board_id) REFERENCES boards(id)
+    ncert_url TEXT
 );
 
 CREATE TABLE IF NOT EXISTS books (
@@ -29,8 +31,7 @@ CREATE TABLE IF NOT EXISTS books (
     subject_id TEXT NOT NULL,
     name TEXT NOT NULL,
     code TEXT,
-    ncert_url TEXT,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id)
+    ncert_url TEXT
 );
 
 CREATE TABLE IF NOT EXISTS chapters (
@@ -39,10 +40,7 @@ CREATE TABLE IF NOT EXISTS chapters (
     subject_id TEXT NOT NULL,
     board_id TEXT NOT NULL,
     num INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    FOREIGN KEY (book_id) REFERENCES books(id),
-    FOREIGN KEY (subject_id) REFERENCES subjects(id),
-    FOREIGN KEY (board_id) REFERENCES boards(id)
+    title TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS topics (
@@ -50,8 +48,7 @@ CREATE TABLE IF NOT EXISTS topics (
     chapter_id TEXT NOT NULL,
     num INTEGER,
     title TEXT NOT NULL,
-    content TEXT,
-    FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+    content TEXT
 );
 
 CREATE TABLE IF NOT EXISTS chunks (
@@ -63,17 +60,7 @@ CREATE TABLE IF NOT EXISTS chunks (
     title TEXT,
     content TEXT NOT NULL,
     content_type TEXT DEFAULT 'text',
-    seq INTEGER,
-    FOREIGN KEY (topic_id) REFERENCES topics(id),
-    FOREIGN KEY (chapter_id) REFERENCES chapters(id),
-    FOREIGN KEY (parent_id) REFERENCES chunks(id)
-);
-
-CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(
-    content, title,
-    content='chunks',
-    content_rowid='rowid',
-    tokenize='unicode61'
+    seq INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS problems (
@@ -83,9 +70,7 @@ CREATE TABLE IF NOT EXISTS problems (
     problem_text TEXT NOT NULL,
     solution_text TEXT,
     problem_type TEXT,
-    seq INTEGER,
-    FOREIGN KEY (topic_id) REFERENCES topics(id),
-    FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+    seq INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS content_meta (
@@ -93,12 +78,8 @@ CREATE TABLE IF NOT EXISTS content_meta (
     value TEXT
 );
 
-INSERT OR IGNORE INTO content_meta (key, value) VALUES ('schema_version', '2.0');
-INSERT OR IGNORE INTO content_meta (key, value) VALUES ('total_chunks', '0');
-INSERT OR IGNORE INTO content_meta (key, value) VALUES ('last_indexed', '');
-
 CREATE TABLE IF NOT EXISTS learner (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
+    id INTEGER PRIMARY KEY,
     name TEXT DEFAULT 'Learner',
     email TEXT,
     password_hash TEXT,
@@ -157,9 +138,6 @@ CREATE TABLE IF NOT EXISTS lifeline_log (
     used_at TEXT DEFAULT (datetime('now','localtime'))
 );
 
-INSERT OR IGNORE INTO learner (id, name, xp, level, streak, lives, max_lives, last_active, last_life_refill)
-VALUES (1, 'Learner', 0, 1, 0, 5, 5, date('now','localtime'), datetime('now','localtime'));
-
 CREATE TABLE IF NOT EXISTS daily_challenges (
     challenge_date TEXT PRIMARY KEY,
     board_id TEXT,
@@ -203,7 +181,6 @@ CREATE TABLE IF NOT EXISTS pillar_content (
     content_id TEXT NOT NULL,
     label TEXT,
     sort_order INTEGER DEFAULT 0,
-    FOREIGN KEY (pillar_id) REFERENCES content_pillars(id),
     UNIQUE(pillar_id, content_type, content_id)
 );
 
@@ -213,67 +190,77 @@ CREATE TABLE IF NOT EXISTS knowledge_graph (
     chapter_id TEXT,
     topic_id TEXT,
     concept_name TEXT NOT NULL,
-    difficulty INTEGER DEFAULT 1 CHECK (difficulty BETWEEN 1 AND 5),
+    difficulty INTEGER DEFAULT 1,
     parent_concept_id TEXT,
-    description TEXT,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id),
-    FOREIGN KEY (chapter_id) REFERENCES chapters(id),
-    FOREIGN KEY (topic_id) REFERENCES topics(id),
-    FOREIGN KEY (parent_concept_id) REFERENCES knowledge_graph(id)
+    description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS user_mastery (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     concept_id TEXT NOT NULL,
     learner_id INTEGER DEFAULT 1,
-    mastery_level REAL DEFAULT 0.0 CHECK (mastery_level BETWEEN 0.0 AND 1.0),
+    mastery_level REAL DEFAULT 0.0,
     attempts INTEGER DEFAULT 0,
     correct INTEGER DEFAULT 0,
     total INTEGER DEFAULT 0,
     last_practiced TEXT,
     streak INTEGER DEFAULT 0,
-    FOREIGN KEY (concept_id) REFERENCES knowledge_graph(id),
     UNIQUE(concept_id, learner_id)
 );
-"""
 
-TRIGGERS_SQL = """
-CREATE TRIGGER IF NOT EXISTS chunks_ai AFTER INSERT ON chunks BEGIN
-    INSERT INTO chunks_fts(rowid, content, title) VALUES (new.rowid, new.content, new.title);
-END;
-
-CREATE TRIGGER IF NOT EXISTS chunks_ad AFTER DELETE ON chunks BEGIN
-    INSERT INTO chunks_fts(chunks_fts, rowid, content, title) VALUES('delete', old.rowid, old.content, old.title);
-END;
-
-CREATE TRIGGER IF NOT EXISTS chunks_au AFTER UPDATE ON chunks BEGIN
-    INSERT INTO chunks_fts(chunks_fts, rowid, content, title) VALUES('delete', old.rowid, old.content, old.title);
-    INSERT INTO chunks_fts(rowid, content, title) VALUES (new.rowid, new.content, new.title);
-END;
+CREATE TABLE IF NOT EXISTS ai_content_cache (
+    cache_key TEXT PRIMARY KEY,
+    result_json TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 
 def get_conn():
-    if not hasattr(_local, "conn") or _local.conn is None:
-        _local.conn = sqlite3.connect(DB_PATH)
-        _local.conn.row_factory = sqlite3.Row
-        _local.conn.execute("PRAGMA journal_mode=WAL")
-        _local.conn.execute("PRAGMA synchronous=NORMAL")
-        _local.conn.execute("PRAGMA cache_size=-8000")
-    return _local.conn
+    """Return a database handle (backward-compatible with existing code).
+
+    Returns the db.Database singleton which provides execute/query/insert
+    methods and dict-like Row objects (row['col'] or row.col).
+    """
+    return get_db()
+
+
+def get_db():
+    from db import get_db as _get_db
+    return _get_db()
 
 
 def init_db():
-    conn = get_conn()
-    conn.executescript(SCHEMA_SQL)
-    # Migrate: add email/password_hash columns if missing
+    db = get_db()
+    db.executescript(SCHEMA_SQL)
+
     for col in ("email", "password_hash"):
         try:
-            conn.execute(f"ALTER TABLE learner ADD COLUMN {col} TEXT")
+            db.execute(f"ALTER TABLE learner ADD COLUMN {col} TEXT")
         except Exception:
             pass
-    conn.commit()
-    rebuild_fts_if_needed()
+
+    try:
+        db.execute("INSERT INTO learner (id, name, xp, level, streak, lives, max_lives, last_active, last_life_refill) "
+                    "VALUES (1, 'Learner', 0, 1, 0, 5, 5, date('now','localtime'), datetime('now','localtime')) "
+                    "ON CONFLICT (id) DO NOTHING")
+    except Exception:
+        try:
+            db.execute("INSERT OR IGNORE INTO learner (id, name, xp, level, streak, lives, max_lives, last_active, last_life_refill) "
+                        "VALUES (1, 'Learner', 0, 1, 0, 5, 5, date('now','localtime'), datetime('now','localtime'))")
+        except Exception:
+            pass
+
+    try:
+        db.execute("INSERT OR IGNORE INTO content_meta (key, value) VALUES ('schema_version', '2.0')")
+        db.execute("INSERT OR IGNORE INTO content_meta (key, value) VALUES ('total_chunks', '0')")
+        db.execute("INSERT OR IGNORE INTO content_meta (key, value) VALUES ('last_indexed', '')")
+    except Exception:
+        pass
+
+    from db import rebuild_fts as _rebuild_fts
+    _rebuild_fts(db)
+
     try:
         from badges import init_badges_table
         init_badges_table()
@@ -291,16 +278,6 @@ def init_db():
         pass
 
 
-def rebuild_fts_if_needed():
-    conn = get_conn()
-    count = conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0]
-    fts_count = conn.execute("SELECT COUNT(*) FROM chunks_fts").fetchone()[0]
-    if count > 0 and fts_count == 0:
-        conn.execute("INSERT INTO chunks_fts(chunks_fts) VALUES('rebuild')")
-        conn.commit()
-
-
 def close():
-    if hasattr(_local, "conn") and _local.conn:
-        _local.conn.close()
-        _local.conn = None
+    db = get_db()
+    db.close()

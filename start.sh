@@ -1,7 +1,32 @@
 #!/bin/sh
-cd /home/windows/cbse-app
-nohup python3 app.py > /tmp/cbse-app.log 2>&1 &
-echo $! > /tmp/cbse-app.pid
-echo "Server PID: $(cat /tmp/cbse-app.pid)"
-sleep 2
-curl -s http://localhost:9090/health && echo "✅ Server running on port 9090"
+# Start server — auto-detects environment and chooses the right backend
+# Usage: ./start.sh [app|server|mesh]
+
+MODE=${1:-server}
+cd "$(dirname "$0")"
+
+# Auto-install dependencies if needed
+if ! python3 -c "import fastapi" 2>/dev/null; then
+    echo "Installing FastAPI dependencies..."
+    pip3 install -r requirements.txt 2>/dev/null || \
+        python3 -m pip install -r requirements.txt 2>/dev/null || \
+        echo "WARNING: Could not install dependencies. Install manually: pip install -r requirements.txt"
+fi
+
+if [ "$MODE" = "app" ] || [ "$MODE" = "legacy" ]; then
+    echo "Starting legacy CBSEHandler on port ${PORT:-9090}..."
+    exec python3 app.py
+elif [ "$MODE" = "mesh" ]; then
+    echo "Starting Mesh Load Balancer on port ${LB_PORT:-9090}..."
+    exec python3 mesh_lb.py
+else
+    echo "Starting FastAPI server on 0.0.0.0:${PORT:-9090} with ${UVICORN_WORKERS:-4} workers..."
+    echo "Database: ${DATABASE_URL:-sqlite:///cbse_content.db}"
+    exec python3 -m uvicorn server:app \
+        --host 0.0.0.0 \
+        --port "${PORT:-9090}" \
+        --workers "${UVICORN_WORKERS:-4}" \
+        --proxy-headers \
+        --forwarded-allow-ips='*' \
+        --log-level info
+fi
