@@ -968,6 +968,7 @@ class CBSEHandler(BaseHTTPRequestHandler):
 var tutorQuestions = {json.dumps(questions)};
 var tutorSessionId = {session_id};
 var tutorQIndex = 0;
+var topicId = '{topic_id}';
 function submitTutorAnswer(sessionId){{
     var answer = document.getElementById('tutor-answer').value.trim();
     if(!answer){{ alert('Please write your answer first.'); return; }}
@@ -978,7 +979,7 @@ function submitTutorAnswer(sessionId){{
     }}).then(r=>r.json()).then(data=>{{
         var fb = document.getElementById('tutor-feedback');
         fb.style.display='block';
-        fb.innerHTML='<div class="tutor-feedback-card"><h4 style="margin-top:0;">Your Answer</h4><p style="background:#f8f9ff;padding:0.8rem;border-radius:6px;">'+answer.replace(/</g,'&lt;')+'</p><h4>Model Answer</h4><div class="tutor-model-answer"><p>'+q.model_answer+'</p></div><h4>How did you do?</h4><div style="display:flex;gap:0.5rem;flex-wrap:wrap;"><button class="tts-btn" style="background:#dcfce7;" onclick="selfAssess('+data.answer_id+','\\''correct\\'','+sessionId+')">✅ Got it right</button><button class="tts-btn" style="background:#fef9c3;" onclick="selfAssess('+data.answer_id+','\\''partial\\'','+sessionId+')">🟡 Partially correct</button><button class="tts-btn" style="background:#fee2e2;" onclick="selfAssess('+data.answer_id+','\\''wrong\\'','+sessionId+')">❌ Needs work</button></div></div>';
+        fb.innerHTML='<div class="tutor-feedback-card"><h4 style="margin-top:0;">Your Answer</h4><p style="background:#f8f9ff;padding:0.8rem;border-radius:6px;">'+answer.replace(/</g,'&lt;')+'</p><h4>How did you do?</h4><div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;"><button class="tts-btn" style="background:#dcfce7;" onclick="selfAssess('+data.answer_id+',\\'correct\\','+sessionId+')">✅ Got it right</button><button class="tts-btn" style="background:#fef9c3;" onclick="selfAssess('+data.answer_id+',\\'partial\\','+sessionId+')">🟡 Partially correct</button><button class="tts-btn" style="background:#fee2e2;" onclick="selfAssess('+data.answer_id+',\\'wrong\\','+sessionId+')">❌ Needs work</button></div></div>';
         document.getElementById('tutor-answer').disabled=true;
     }});
 }}
@@ -988,10 +989,12 @@ function selfAssess(answerId,assessment,sessionId){{
         body:'answer_id='+answerId+'&self_assessment='+assessment+'&session_id='+sessionId
     }}).then(r=>r.json()).then(data=>{{
         var fb = document.getElementById('tutor-feedback');
+        var q = tutorQuestions[tutorQIndex];
+        var showModel = '<h4 style="margin-top:0.8rem;">Model Answer</h4><div class="tutor-model-answer" style="background:#f0f9ff;padding:0.8rem;border-radius:6px;margin-bottom:0.5rem;"><p>'+q.model_answer+'</p></div>';
         if(assessment=='correct'){{
-            fb.innerHTML+='<p style="color:#16a34a;margin-top:0.8rem;">Great job! Let\\'s move on.</p>';
+            fb.innerHTML+='<p style="color:#16a34a;margin-top:0.8rem;">Great job! Let\\'s move on.</p>'+showModel;
         }}else{{
-            fb.innerHTML+=data.remedial_html;
+            fb.innerHTML+=showModel+(data.remedial_html||'');
         }}
         document.getElementById('tutor-answer').value='';
         document.getElementById('tutor-answer').disabled=false;
@@ -1013,15 +1016,26 @@ function selfAssess(answerId,assessment,sessionId){{
 }}
 function skipTutorQuestion(sessionId){{
     if(confirm('Skip this question?')){{
-        document.getElementById('tutor-answer').value='[skipped]';
-        document.getElementById('tutor-answer').disabled=false;
-        tutorQIndex++;
-        if(tutorQIndex<tutorQuestions.length){{
-            document.getElementById('tutor-question').textContent=tutorQuestions[tutorQIndex].question;
-            document.getElementById('tutor-progress').textContent='Question '+(tutorQIndex+1)+' of '+tutorQuestions.length;
-        }}else{{
-            document.getElementById('tutor-content').innerHTML='<p style="text-align:center;">Session ended.</p>';
-        }}
+        var q = tutorQuestions[tutorQIndex];
+        fetch('/api/tutor/answer',{{
+            method:'POST', headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
+            body:'session_id='+sessionId+'&question='+encodeURIComponent(q.question)+'&qtype='+q.type+'&model_answer='+encodeURIComponent(q.model_answer)+'&student_answer=[skipped]'
+        }}).then(function(){{
+            tutorQIndex++;
+            document.getElementById('tutor-answer').value='';
+            if(tutorQIndex<tutorQuestions.length){{
+                document.getElementById('tutor-question').textContent=tutorQuestions[tutorQIndex].question;
+                document.getElementById('tutor-progress').textContent='Question '+(tutorQIndex+1)+' of '+tutorQuestions.length;
+            }}else{{
+                fetch('/api/tutor/complete',{{
+                    method:'POST', headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
+                    body:'session_id='+sessionId
+                }}).then(r=>r.json()).then(d=>{{
+                    document.getElementById('tutor-content').innerHTML=\\
+                        '<div style="text-align:center;padding:2rem;"><h3>🎉 Session Complete!</h3><p style="font-size:1.2rem;margin:1rem 0;">+'+d.xp+' XP earned</p><p>Keep up the great work!</p><div style="display:flex;gap:0.5rem;justify-content:center;margin-top:1rem;"><a class="tts-btn" href="/topic/'+topicId+'">Back to Topic</a><a class="tts-btn" href="/tutor">Next Topic Suggestion</a></div></div>';
+                }}));
+            }}
+        }});
     }}
 }}
 </script>"""
@@ -1058,20 +1072,30 @@ function skipTutorQuestion(sessionId){{
         self._send_json({"session_id": session_id, "questions": questions, "topic_title": topic['title']})
 
     def _api_tutor_answer(self, query):
-        session_id = int((query.get('session_id') or ['0'])[0])
+        try:
+            session_id = int((query.get('session_id') or ['0'])[0])
+        except (ValueError, TypeError):
+            self._send_json({"error": "Invalid session_id"}); return
         question = (query.get('question') or [''])[0]
         qtype = (query.get('qtype') or [''])[0]
         model_answer = (query.get('model_answer') or [''])[0]
         student_answer = (query.get('student_answer') or [''])[0]
         if not session_id or not question:
             self._send_json({"error": "Missing fields"}); return
-        answer_id = ai_tutor.save_answer(session_id, question, qtype, model_answer)
+        conn = get_conn()
+        session = conn.execute("SELECT id FROM tutor_sessions WHERE id = ?", (session_id,)).fetchone()
+        if not session:
+            self._send_json({"error": "Invalid session"}); return
+        answer_id = ai_tutor.save_answer(session_id, question, qtype, model_answer, student_answer)
         self._send_json({"answer_id": answer_id, "status": "ok"})
 
     def _api_tutor_remedial(self, query):
-        answer_id = int((query.get('answer_id') or ['0'])[0])
+        try:
+            answer_id = int((query.get('answer_id') or ['0'])[0])
+            session_id = int((query.get('session_id') or ['0'])[0])
+        except (ValueError, TypeError):
+            self._send_json({"error": "Invalid answer_id or session_id"}); return
         self_assessment = (query.get('self_assessment') or [''])[0]
-        session_id = int((query.get('session_id') or ['0'])[0])
         if not answer_id or not self_assessment:
             self._send_json({"error": "Missing fields"}); return
         ai_tutor.update_answer(answer_id, (query.get('student_answer') or [''])[0], self_assessment)

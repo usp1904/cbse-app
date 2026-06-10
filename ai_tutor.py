@@ -293,11 +293,11 @@ def create_tutor_session(topic_id):
     conn.commit()
     return conn.execute("SELECT last_insert_rowid()").fetchone()[0]
 
-def save_answer(session_id, question, qtype, model_answer):
+def save_answer(session_id, question, qtype, model_answer, student_answer=""):
     conn = get_conn()
     conn.execute(
-        "INSERT INTO tutor_answers (session_id, question, question_type, model_answer) VALUES (?, ?, ?, ?)",
-        (session_id, question, qtype, model_answer)
+        "INSERT INTO tutor_answers (session_id, question, question_type, model_answer, student_answer) VALUES (?, ?, ?, ?, ?)",
+        (session_id, question, qtype, model_answer, student_answer)
     )
     conn.commit()
     return conn.execute("SELECT last_insert_rowid()").fetchone()[0]
@@ -305,7 +305,7 @@ def save_answer(session_id, question, qtype, model_answer):
 def update_answer(answer_id, student_answer, self_assessment):
     conn = get_conn()
     conn.execute(
-        "UPDATE tutor_answers SET student_answer = ?, self_assessment = ? WHERE id = ?",
+        "UPDATE tutor_answers SET student_answer = COALESCE(NULLIF(?, ''), student_answer), self_assessment = ? WHERE id = ?",
         (student_answer, self_assessment, answer_id)
     )
     conn.execute("UPDATE tutor_sessions SET questions_asked = (SELECT COUNT(*) FROM tutor_answers WHERE session_id = tutor_sessions.id) WHERE id = (SELECT session_id FROM tutor_answers WHERE id = ?)", (answer_id,))
