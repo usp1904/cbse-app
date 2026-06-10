@@ -153,7 +153,7 @@ Use Markdown formatting for clarity."""
     def youtube_search(self, query, max_results=5):
         """YouTube Data API v3 search — returns embedded video HTML."""
         api_key = os.environ.get("YOUTUBE_API_KEY", "")
-        if api_key:
+        if api_key and len(api_key) > 8:
             import urllib.parse
             encoded = urllib.parse.quote(query + " CBSE Class 10")
             url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={encoded}&maxResults={max_results}&type=video&key={api_key}"
