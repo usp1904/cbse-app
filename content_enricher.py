@@ -1,15 +1,55 @@
 """AI Content Enricher — generates explanations, formulas, problems for ANY topic on-the-fly"""
 import json
 import html as html_mod
+import hashlib
+import threading
+from database import get_conn
 from llm_client import get_client
 
+_enrichment_cache = {}
+_cache_lock = threading.Lock()
+
+def _ensure_cache_table():
+    conn = get_conn()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS ai_content_cache (
+            cache_key TEXT PRIMARY KEY,
+            result_json TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+
+def _get_cached(key):
+    _ensure_cache_table()
+    with _cache_lock:
+        if key in _enrichment_cache:
+            return _enrichment_cache[key]
+    conn = get_conn()
+    row = conn.execute("SELECT result_json FROM ai_content_cache WHERE cache_key = ?", (key,)).fetchone()
+    if row:
+        val = json.loads(row[0])
+        with _cache_lock:
+            _enrichment_cache[key] = val
+        return val
+    return None
+
+def _set_cached(key, value):
+    _ensure_cache_table()
+    with _cache_lock:
+        _enrichment_cache[key] = value
+    conn = get_conn()
+    conn.execute(
+        "INSERT OR REPLACE INTO ai_content_cache (cache_key, result_json) VALUES (?, ?)",
+        (key, json.dumps(value))
+    )
+    conn.commit()
 
 def _llm(prompt, system=None, max_tokens=1024, temp=0.3):
     client = get_client()
     if client.available:
         return client.query(prompt, system, max_tokens, temp)
     return ""
-
 
 def generate_explanation(topic, chapter, subject, chunk_text=""):
     prompt = f"""Create a detailed CBSE Class X explanation for:
@@ -30,7 +70,6 @@ Return the explanation in HTML with <p>, <strong>, <ul>, <li> tags.
 Use $$...$$ for LaTeX formulas."""
     return _llm(prompt, "You are a CBSE Class X subject expert who explains concepts clearly.", 1536, 0.3)
 
-
 def generate_formula_card(topic, subject):
     prompt = f"""Generate a formula/reference card for "{topic}" ({subject} CBSE Class X).
 
@@ -43,7 +82,6 @@ Include:
 Return as HTML with <div class="formula-card"> containing the content.
 Use $$...$$ for LaTeX. Use <strong> for emphasis."""
     return _llm(prompt, "You generate concise formula reference cards.", 1024, 0.2)
-
 
 def generate_solved_problem(topic, chapter, subject, difficulty="medium"):
     prompt = f"""Create a {difficulty}-difficulty CBSE Class X problem for:
@@ -79,7 +117,6 @@ Make the problem realistic for a Class X board exam. Include numerical values wh
             "topic": topic,
         }
 
-
 def generate_mcqs(topic, chapter, subject, count=5):
     prompt = f"""Generate {count} multiple-choice questions for Class X {subject} - {chapter} - {topic}.
 
@@ -97,7 +134,6 @@ Return ONLY a valid JSON array:
     except (ValueError, json.JSONDecodeError):
         return [{"question": f"What is {topic}?", "options": {"A": "Definition A", "B": "Definition B", "C": "Definition C", "D": "Definition D"}, "answer": "A", "explanation": f"The correct definition of {topic} is option A."}]
 
-
 def generate_theorem_breakdown(topic, subject):
     prompt = f"""Create a theorem/principle breakdown for "{topic}" ({subject} CBSE Class X).
 
@@ -110,7 +146,6 @@ Structure:
 
 Return as HTML with <p>, <ol>, <li> tags. Use $$...$$ for LaTeX."""
     return _llm(prompt, "You are a mathematics/science educator who explains theorems clearly.", 1536, 0.3)
-
 
 def generate_experiment_breakdown(topic, subject):
     prompt = f"""Create a laboratory experiment breakdown for "{topic}" ({subject} CBSE Class X).
@@ -128,8 +163,12 @@ Structure:
 Return as HTML with <p>, <ol>, <li>, <table> tags. Use $$...$$ for LaTeX."""
     return _llm(prompt, "You are a science lab instructor.", 1536, 0.3)
 
-
 def enrich_topic_content(topic, chapter, subject, chunk_text="", topic_type="concept"):
+    cache_key = hashlib.sha256(f"{topic}|{chapter}|{subject}|{topic_type}".encode()).hexdigest()
+    cached = _get_cached(cache_key)
+    if cached:
+        return cached
+
     explanation = generate_explanation(topic, chapter, subject, chunk_text)
     formula_card = generate_formula_card(topic, subject)
     problems = [generate_solved_problem(topic, chapter, subject, d) for d in ["easy", "medium", "hard"]]
@@ -142,14 +181,15 @@ def enrich_topic_content(topic, chapter, subject, chunk_text="", topic_type="con
     else:
         special = ""
 
-    return {
+    result = {
         "explanation": explanation if explanation and "AI Offline" not in explanation else "",
         "formula_card": formula_card if formula_card and "AI Offline" not in formula_card else "",
         "problems": problems,
         "mcqs": mcqs,
         "special": special,
     }
-
+    _set_cached(cache_key, result)
+    return result
 
 def format_ai_content(enriched):
     html = ""

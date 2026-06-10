@@ -46,6 +46,24 @@ log = logging.getLogger("cbse")
 HOST = "0.0.0.0"
 PORT = int(os.environ.get("PORT", 9090))
 
+# Auto-detect local Ollama if not explicitly configured
+if not os.environ.get("OLLAMA_URL") and not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("GEMINI_API_KEY"):
+    import urllib.request as _ur
+    try:
+        _req = _ur.Request("http://localhost:11434/api/tags")
+        with _ur.urlopen(_req, timeout=2) as _resp:
+            _data = json.loads(_resp.read())
+            if _data.get("models"):
+                os.environ["OLLAMA_URL"] = "http://localhost:11434"
+                # Prefer mistral-cpu or smallest thinking-free model
+                models = [m["name"] for m in _data["models"]]
+                for pref in ["mistral-cpu", "qwen3:4b", "deepseek-r1:1.5b", "qwen3:latest"]:
+                    if any(pref in m for m in models):
+                        os.environ["OLLAMA_MODEL"] = pref
+                        break
+    except Exception:
+        pass
+
 init_db()
 ai_tutor.init_tutor_tables()
 init_pillar_tables()
@@ -79,14 +97,22 @@ def _render_string(s, context):
 
 
 def render_math(text):
-    superscripts = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9'}
-    for c, d in superscripts.items():
-        text = text.replace(c, f'<sup>{d}</sup>')
-    subscripts = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'}
-    for c, d in subscripts.items():
-        text = text.replace(c, f'<sub>{d}</sub>')
-    text = re.sub(r'(\w)\^(\w)', r'\1<sup>\2</sup>', text)
-    text = re.sub(r'√\(([^)]*)\)', r'<span class="math-sqrt">√</span><span class="math-vec">\1</span>', text)
+    superscripts = str.maketrans({
+        '⁰': '^0', '¹': '^1', '²': '^2', '³': '^3', '⁴': '^4',
+        '⁵': '^5', '⁶': '^6', '⁷': '^7', '⁸': '^8', '⁹': '^9',
+        '⁺': '^+', '⁻': '^-', 'ⁿ': '^n', 'ⁱ': '^i', 'ᵐ': '^m',
+        'ᵏ': '^k', 'ᵗ': '^t',
+    })
+    text = text.translate(superscripts)
+    subscripts = str.maketrans({
+        '₀': '_0', '₁': '_1', '₂': '_2', '₃': '_3', '₄': '_4',
+        '₅': '_5', '₆': '_6', '₇': '_7', '₈': '_8', '₉': '_9',
+        '₊': '+', '₋': '-', 'ₒ': '_o', 'ₓ': '_x', 'ₘ': '_m', 'ₙ': '_n',
+        'ᵢ': '_i',
+    })
+
+    text = text.translate(subscripts)
+    text = re.sub(r'√\(([^)]*)\)', r'sqrt(\1)', text)
     return text
 
 def format_content(text):
@@ -450,6 +476,16 @@ footer { text-align: center; padding: 1.5rem 1rem; color: var(--text-muted); fon
 
 
 class CBSEHandler(BaseHTTPRequestHandler):
+    def do_HEAD(self):
+        self.do_GET()
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "*")
+        self.end_headers()
+
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path.rstrip("/") or "/"
@@ -607,6 +643,10 @@ class CBSEHandler(BaseHTTPRequestHandler):
             self._serve_tutor_page(topic_id)
         elif path.startswith("/interactives/"):
             topic_id = path[14:]
+            for prefix in ("matching/", "cards/", "sequence/"):
+                if topic_id.startswith(prefix):
+                    topic_id = topic_id[len(prefix):]
+                    break
             self._serve_interactives(topic_id)
         elif path == "/api/tutor/start":
             self._api_tutor_start(query)
@@ -639,6 +679,21 @@ class CBSEHandler(BaseHTTPRequestHandler):
         elif path.startswith("/knowledge-graph/concept/"):
             concept_id = path[25:]
             self._serve_concept_detail(concept_id)
+        elif path == "/api/health":
+            self._send_json({"status": "ok", "boards": len(ALL_BOARDS)})
+        elif path == "/api/boards":
+            self._send_json([{"id": bid, "name": info["name"], "description": info.get("description", "")} for bid, info in ALL_BOARDS.items()])
+        elif path.startswith("/api/subjects/"):
+            board_id = path[13:]
+            conn = get_conn()
+            rows = conn.execute("SELECT id, name, description FROM subjects WHERE board_id = ? ORDER BY name", (board_id,)).fetchall()
+            self._send_json([dict(r) for r in rows])
+        elif path.startswith("/api/graph/"):
+            subject_id = path[11:].lower()
+            self._api_knowledge_graph_subject(subject_id)
+        elif path.startswith("/api/concept/"):
+            concept_id = urllib.parse.unquote(path[12:])
+            self._api_knowledge_graph_concept(concept_id)
         elif path == "/api/knowledge-graph":
             self._api_knowledge_graph()
         elif path.startswith("/api/knowledge-graph/subject/"):
@@ -647,6 +702,12 @@ class CBSEHandler(BaseHTTPRequestHandler):
         elif path.startswith("/api/knowledge-graph/concept/"):
             concept_id = path[29:]
             self._api_knowledge_graph_concept(concept_id)
+        elif path == "/api/weaknesses":
+            self._api_knowledge_graph_weaknesses()
+        elif path == "/api/strengths":
+            self._api_knowledge_graph_strengths()
+        elif path == "/api/recommended":
+            self._api_knowledge_graph_recommended()
         elif path == "/api/knowledge-graph/weaknesses":
             self._api_knowledge_graph_weaknesses()
         elif path == "/api/knowledge-graph/strengths":
@@ -734,6 +795,19 @@ class CBSEHandler(BaseHTTPRequestHandler):
             self._api_ai_pedagogical(query)
         elif path == "/api/ai/generate":
             self._api_ai_generate(query)
+        elif path == "/api/ai/status":
+            client = get_client()
+            self._send_json(client.get_status())
+        elif path == "/api/ai/enrich":
+            topic = query.get("topic", [""])[0]
+            chapter = query.get("chapter", [""])[0]
+            subject = query.get("subject", [""])[0]
+            if not topic:
+                self._send_json({"error": "No topic", "html": ""})
+            else:
+                enriched = content_enricher.enrich_topic_content(topic, chapter, subject, "", "concept")
+                html = content_enricher.format_ai_content(enriched)
+                self._send_json({"html": html})
         elif path == "/syllabus":
             self._serve_syllabus_coverage()
         elif path == "/api/syllabus":
@@ -1450,11 +1524,19 @@ function skipTutorQuestion(sessionId){{
     # ─── AI Studio ──────────────────────────────────────────────────────────
 
     def _serve_ai_studio(self):
-        content = """
+        client = get_client()
+        status = client.get_status()
+        backend_html = f"""
+        <div id="ai-status" style="margin-bottom:1rem;padding:0.75rem 1rem;border-radius:8px;font-size:0.85rem;background:{'#f0fdf4' if status['available'] else '#fff7ed'};border:1px solid {'#bbf7d0' if status['available'] else '#fed7aa'};">
+            <strong>AI Backend:</strong> {'🟢 Online' if status['available'] else '🟡 Offline'}
+            {' · ' + status['backend'].title() + ' · ' + status['model'] if status['available'] else ' · Set GEMINI_API_KEY, ANTHROPIC_API_KEY, or OLLAMA_URL'}
+        </div>"""
+        content = f"""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> AI Studio</div>
         <div class="section">
             <h2>🧠 AI Studio</h2>
-            <p class="subtitle">Powered by Napkin AI · Gamma · Quillbot · LLM Research · Browser Music · LLM Literature · SVG Visualize · Tome · Pomelli · MetAI · NotebookLM · Gemma 4 · Google Flash</p>
+            <p class="subtitle">Powered by Gemini Flash · NotebookLM · Ollama · Napkin AI · Gamma · Quillbot · Pomelli · MetAI</p>
+            {backend_html}
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1.5rem;">
                 <a href="/ai/diagram" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
                     <div style="font-size:2.5rem;">📊</div><h3>Napkin AI</h3><p style="font-size:0.85rem;color:var(--text-muted);">Generate concept diagrams</p>
@@ -2516,21 +2598,13 @@ function exportPedagogical() {
                         {f'<details style="margin-top:0.5rem;"><summary style="cursor:pointer;color:#0f3460;font-weight:500;">Show Solution</summary><div class="chunk-content" style="margin-top:0.5rem;padding:0.8rem;background:#f8f9ff;border-radius:8px;">{sfmt}</div></details>' if p["solution_text"] else ''}
                     </div>"""
 
-            ai_enrich_html = ""
-            enriched = content_enricher.enrich_topic_content(
-                topic['title'], chapter['title'], subject['name'] if subject else "",
-                chunks[0]['content'] if chunks else "", "concept"
-            )
-            ai_html = content_enricher.format_ai_content(enriched)
-            if ai_html:
-                ai_enrich_html = f'<div class="ai-section" style="border-left-color:#e67e22;"><h3>✨ AI-Enhanced Content</h3>{ai_html}</div>'
-
             topic_sections.append(f"""
             <div class="book-section" id="topic-{topic['id']}">
                 <h3 style="cursor:pointer;" onclick="location.href='/topic/{topic['id']}'">{topic['num']}. {topic['title']}</h3>
                 {chunks_html}
                 {problems_html}
-                {ai_enrich_html}
+                <div id="ai-enrich-{topic['id']}" style="display:none;"></div>
+                <button class="tts-btn" onclick="loadAI('{topic['id']}','{topic['title']}','{chapter['title']}','{subject['name'] if subject else ''}')" style="margin-top:0.5rem;font-size:0.85rem;">✨ AI Enhance</button>
                 <div style="margin-top:0.5rem;">
                     <a class="ncert-link" style="font-size:0.8rem;padding:0.3rem 0.8rem;" href="/topic/{topic['id']}">View Full Topic →</a>
                 </div>
@@ -2549,7 +2623,7 @@ function exportPedagogical() {
             <h2>Chapter {chapter["num"]}: {chapter["title"]}</h2>
             <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
                 <button class="tts-btn" onclick="playTTS(document.querySelector('.section h2')?.innerText || '{chapter['title']}','en-IN')">🔊 Listen</button>
-                <button class="tts-btn" onclick="recordStudy({chapter_id}, null)">✅ Mark Studying</button>
+                <button class="tts-btn" onclick="recordStudy('{chapter_id}', null)">✅ Mark Studying</button>
                 <a class="tts-btn" href="/notes/{chapter_id}" style="text-decoration:none;">📖 Notes</a>
                 <a class="tts-btn" href="/revision/{chapter_id}" style="text-decoration:none;">⚡ Revision</a>
             </div>
@@ -2559,6 +2633,24 @@ function exportPedagogical() {
             {"".join(topic_sections)}
         </div>"""
 
+        content += """
+<script>
+function loadAI(topicId, topicTitle, chapterTitle, subjectName) {
+    var container = document.getElementById('ai-enrich-' + topicId);
+    if (container.style.display !== 'none' && container.innerHTML.trim() !== '') return;
+    container.style.display = 'block';
+    container.innerHTML = '<p style="color:#888;"><em>Loading AI content...</em></p>';
+    var btn = container.parentElement.querySelector('.tts-btn');
+    if (btn) btn.disabled = true;
+    fetch('/api/ai/enrich?topic=' + encodeURIComponent(topicTitle) + '&chapter=' + encodeURIComponent(chapterTitle) + '&subject=' + encodeURIComponent(subjectName))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.html) container.innerHTML = '<div class="ai-section" style="border-left-color:#e67e22;"><h3>✨ AI-Enhanced Content</h3>' + data.html + '</div>';
+            else container.innerHTML = '<div class="ai-section"><p style="color:#888;">AI content not available.</p></div>';
+        })
+        .catch(function() { container.innerHTML = '<div class="ai-section"><p style="color:#888;">Could not load AI content.</p></div>'; });
+}
+</script>"""
         html = render_template("base.html", title=f"Ch {chapter['num']}: {chapter['title']} - Class X",
                                body_class="", extra_css="", content=content,
                                board_name=board_name)
@@ -2680,15 +2772,6 @@ function exportPedagogical() {
                     {f'<details style="margin-top:0.5rem;"><summary style="cursor:pointer;color:#0f3460;font-weight:500;">Show Solution</summary><div class="chunk-content" style="margin-top:0.5rem;padding:0.8rem;background:#f8f9ff;border-radius:8px;">{sfmt}</div></details>' if p["solution_text"] else ''}
                 </div>"""
 
-        ai_enrich_html = ""
-        enriched = content_enricher.enrich_topic_content(
-            topic['title'], chapter['title'], subject['name'] if subject else "",
-            chunks[0]['content'] if chunks else "", "concept"
-        )
-        ai_html = content_enricher.format_ai_content(enriched)
-        if ai_html:
-            ai_enrich_html = f'<div class="ai-section" style="border-left-color:#e67e22;"><h3>✨ AI-Enriched Content</h3>{ai_html}</div>'
-
         sibling_html = ""
         if sibling_topics:
             sibling_html = '<div style="margin-top:2rem;"><h3 style="color:#0f3460;margin-bottom:0.5rem;">Related Topics</h3><div class="topic-nav">' + \
@@ -2706,8 +2789,8 @@ function exportPedagogical() {
             <h2>{topic['title']}</h2>
             <p style="color:#666;margin-bottom:1rem;">Chapter {chapter['num']}: {chapter['title']}</p>
             <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
-                <button class="tts-btn" onclick="recordStudy({chapter['id']},{topic_id});playTTS(document.getElementById('topic-content-{topic_id}')?.innerText || '{topic['title']}','en-IN')">🔊 Listen</button>
-                <button class="tts-btn" onclick="recordStudy({chapter['id']},{topic_id})">✅ Mark Studying</button>
+                <button class="tts-btn" onclick="recordStudy('{chapter['id']}','{topic_id}');playTTS(document.getElementById('topic-content-{topic_id}')?.innerText || '{topic['title']}','en-IN')">🔊 Listen</button>
+                <button class="tts-btn" onclick="recordStudy('{chapter['id']}','{topic_id}')">✅ Mark Studying</button>
                 <button class="tts-btn" onclick="location.href='/mindmap/{topic_id}'">🧠 Mind Map</button>
                 <button class="tts-btn" onclick="location.href='/tutor/{topic_id}'">🧑‍🏫 AI Tutor</button>
                 <button class="tts-btn" onclick="location.href='/interactives/{topic_id}'">🎮 Interactive</button>
@@ -2717,10 +2800,29 @@ function exportPedagogical() {
             <div id="topic-content-{topic_id}">
             {chunks_html}
             {problems_html}
-            {ai_enrich_html}
+            <div id="ai-enrich-topic"></div>
+            <button class="tts-btn" onclick="loadAI('topic','{topic['title']}','{chapter['title']}','{subject['name'] if subject else ''}')" style="margin-top:0.5rem;font-size:0.85rem;">✨ AI Enhance</button>
             </div>
             {sibling_html}
         </div>"""
+        content += """
+<script>
+function loadAI(topicId, topicTitle, chapterTitle, subjectName) {
+    var container = document.getElementById('ai-enrich-' + topicId);
+    if (!container) container = document.getElementById('ai-enrich-topic');
+    if (!container) return;
+    if (container.style.display !== 'none' && container.innerHTML.trim() !== '') return;
+    container.style.display = 'block';
+    container.innerHTML = '<p style="color:#888;"><em>Loading AI content...</em></p>';
+    fetch('/api/ai/enrich?topic=' + encodeURIComponent(topicTitle) + '&chapter=' + encodeURIComponent(chapterTitle) + '&subject=' + encodeURIComponent(subjectName))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.html) container.innerHTML = '<div class="ai-section" style="border-left-color:#e67e22;"><h3>✨ AI-Enhanced Content</h3>' + data.html + '</div>';
+            else container.innerHTML = '<div class="ai-section"><p style="color:#888;">AI content not available.</p></div>';
+        })
+        .catch(function() { container.innerHTML = '<div class="ai-section"><p style="color:#888;">Could not load AI content.</p></div>'; });
+}
+</script>"""
         content += f"""
         <script>
         function openReview(topicId, topicTitle) {{
@@ -2895,6 +2997,20 @@ function exportPedagogical() {
             return
         engine = get_engine()
         results = engine.search(q, board=board, limit=20)
+        if not results and len(q.split()) <= 2:
+            conn = get_conn()
+            like_q = f"%{q}%"
+            rows = conn.execute("""
+                SELECT c.* FROM chunks c
+                JOIN chapters ch ON c.chapter_id = ch.id
+                WHERE c.content LIKE ? OR c.title LIKE ?
+                LIMIT 20
+            """, (like_q, like_q)).fetchall()
+            results = [dict(r) for r in rows]
+            for r in results:
+                chapter = conn.execute("SELECT title, num FROM chapters WHERE id = ?", (r["chapter_id"],)).fetchone()
+                r["chapter_title"] = chapter["title"] if chapter else ""
+                r["chapter_num"] = chapter["num"] if chapter else 0
         self._send_json({"results": results})
 
     def _api_explain(self, query):
@@ -3727,9 +3843,20 @@ function exportPedagogical() {
         year = query.get("year", [""])[0] or None
         qtype = query.get("type", [""])[0] or None
         limit = self._safe_int(query.get("limit", ["20"])[0], 20)
-        questions = get_questions(board_id, subject_id, chapter, year, qtype, limit)
-        patterns = get_past_year_patterns(board_id, subject_id) if subject_id else {}
-        self._send_json({"questions": questions, "patterns": patterns, "count": len(questions)})
+        if not subject_id and chapter:
+            conn = get_conn()
+            ch = conn.execute("SELECT subject_id FROM chapters WHERE id = ?", (chapter,)).fetchone()
+            if ch:
+                subject_id = ch["subject_id"]
+        if not subject_id:
+            self._send_error(400, "subject or chapter required")
+            return
+        try:
+            questions = get_questions(board_id, subject_id, chapter, year, qtype, limit)
+            patterns = get_past_year_patterns(board_id, subject_id) if subject_id else {}
+            self._send_json({"questions": questions, "patterns": patterns, "count": len(questions)})
+        except ValueError as e:
+            self._send_error(400, str(e))
 
     def _api_model_paper(self, query):
         from question_bank import generate_model_paper
@@ -4429,7 +4556,7 @@ function exportPedagogical() {
             </div>
             <div style="text-align:center;margin-top:1rem;">
                 <button class="tts-btn" onclick="playTTS(document.querySelector('pre').textContent,'en-IN')">🔊 Listen</button>
-                <button class="notebooklm-btn" onclick="exportNotebookLM({topic['chapter_id']},'{topic_id}')">📥 Export</button>
+                <button class="notebooklm-btn" onclick="exportNotebookLM('{topic['chapter_id']}','{topic_id}')">📥 Export</button>
             </div>
         </div>"""
         html = render_template("base.html", title=f"Mind Map: {topic['title']} - Class X",
@@ -4687,7 +4814,10 @@ self.addEventListener('fetch', e => {
             self._send_json(result)
 
     def log_message(self, format, *args):
-        print(f"[{self.log_date_time_string()}] {args[0]} {args[1]} {args[2]}")
+        try:
+            print(f"[{self.log_date_time_string()}] {args[0]} {args[1]} {args[2]}")
+        except IndexError:
+            print(f"[{self.log_date_time_string()}] {' '.join(str(a) for a in args)}")
 
 
 templates_dir = os.path.join(os.path.dirname(__file__), "templates")

@@ -2,7 +2,26 @@ import subprocess
 import json
 import os
 import threading
+import urllib.request
+import re
 
+_AVAILABLE_MODELS_CACHE = None
+
+def _detect_ollama(url="http://localhost:11434"):
+    try:
+        req = urllib.request.Request(url.rstrip("/") + "/api/tags")
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            data = json.loads(resp.read())
+            models = [m["name"] for m in data.get("models", [])]
+            return url, models
+    except Exception:
+        return "", []
+
+def _detect_gemini(api_key):
+    return bool(api_key)
+
+def _detect_claude(api_key):
+    return bool(api_key)
 
 class LLMClient:
     def __init__(self, model_path=None, server_url=None, claude_api_key=None, claude_model=None,
@@ -11,22 +30,57 @@ class LLMClient:
         self.server_url = server_url or os.environ.get("LLAMA_SERVER_URL", "")
         self.claude_api_key = claude_api_key or os.environ.get("ANTHROPIC_API_KEY", "")
         self.claude_model = claude_model or os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-20250514")
-        self.ollama_url = ollama_url or os.environ.get("OLLAMA_URL", "")
-        self.ollama_model = ollama_model or os.environ.get("OLLAMA_MODEL", "qwen3:latest")
+        
+        ollama_url_env = ollama_url or os.environ.get("OLLAMA_URL", "")
+        if ollama_url_env:
+            self.ollama_url = ollama_url_env
+            self.ollama_model = ollama_model or os.environ.get("OLLAMA_MODEL", "qwen3:latest")
+        else:
+            detected_url, models = _detect_ollama()
+            self.ollama_url = detected_url
+            preferred = self._preferred_ollama_model or os.environ.get("OLLAMA_MODEL", "")
+            # Prefer non-thinking models for speed; fallback to available models
+            if preferred and preferred in models:
+                self.ollama_model = preferred
+            else:
+                priority = ["mistral-cpu:latest", "qwen3:4b", "deepseek-r1:1.5b", "qwen3:latest"]
+                self.ollama_model = next((m for p in priority for m in models if p in m), models[0] if models else "")
+        
         self.gemini_api_key = gemini_api_key or os.environ.get("GEMINI_API_KEY", "")
         self.gemini_model = gemini_model or os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+        # Use mistral-cpu as faster default if available (no thinking mode)
+        self._preferred_ollama_model = ollama_model or os.environ.get("OLLAMA_MODEL", "")
         self.process = None
         self.lock = threading.Lock()
+        self._model_priority = self._detect_priority()
+
+    def _detect_priority(self):
+        if self.gemini_api_key:
+            return "gemini"
+        if self.claude_api_key:
+            return "claude"
+        if self.ollama_url:
+            return "ollama"
+        if self.server_url or (self.model_path and os.path.exists(self.model_path)):
+            return "local"
+        return "none"
 
     @property
     def available(self):
-        if self.claude_api_key:
-            return True
-        if self.gemini_api_key:
-            return True
-        if self.ollama_url:
-            return True
-        return bool(self.model_path and os.path.exists(self.model_path)) or bool(self.server_url)
+        return self._model_priority != "none"
+
+    @property
+    def backend_name(self):
+        return self._model_priority
+
+    @property
+    def model_name(self):
+        return {
+            "gemini": self.gemini_model,
+            "claude": self.claude_model,
+            "ollama": self.ollama_model,
+            "local": self.model_path,
+        }.get(self._model_priority, "none")
 
     def query(self, prompt, system_prompt=None, max_tokens=512, temperature=0.3):
         if self.gemini_api_key:
@@ -47,7 +101,6 @@ class LLMClient:
             "detailed": "Provide a thorough, textbook-quality explanation with all important details.",
             "advanced": "Provide an in-depth explanation including derivations, proofs, and connections.",
         }.get(level, "Explain clearly for a Class X student.")
-
         prompt = f"""Topic: {topic_name}
 Chapter: {chapter_name}
 
@@ -72,7 +125,6 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
         return self.query(prompt, max_tokens=1024, temperature=0.2)
 
     def _query_claude(self, prompt, system_prompt, max_tokens, temperature):
-        import urllib.request
         body = json.dumps({
             "model": self.claude_model,
             "max_tokens": max_tokens,
@@ -90,7 +142,7 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
                     "anthropic-version": "2023-06-01",
                 },
             )
-            with urllib.request.urlopen(req, timeout=60) as resp:
+            with urllib.request.urlopen(req, timeout=30) as resp:
                 result = json.loads(resp.read())
                 text = ""
                 for block in result.get("content", []):
@@ -103,7 +155,6 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
             return self._fallback_response(prompt, error=f"Claude API error: {e}")
 
     def _query_gemini(self, prompt, system_prompt, max_tokens, temperature):
-        import urllib.request
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.gemini_model}:generateContent?key={self.gemini_api_key}"
         contents = []
         if system_prompt:
@@ -119,7 +170,7 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
         }).encode()
         try:
             req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=60) as resp:
+            with urllib.request.urlopen(req, timeout=30) as resp:
                 result = json.loads(resp.read())
                 candidates = result.get("candidates", [])
                 if candidates:
@@ -133,7 +184,6 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
             return self._fallback_response(prompt, error=f"Gemini error: {e}")
 
     def _query_ollama(self, prompt, system_prompt, max_tokens, temperature):
-        import urllib.request
         url = self.ollama_url.rstrip("/") + "/api/generate"
         body = json.dumps({
             "model": self.ollama_model,
@@ -149,7 +199,7 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
             req = urllib.request.Request(
                 url, data=body, headers={"Content-Type": "application/json"},
             )
-            with urllib.request.urlopen(req, timeout=120) as resp:
+            with urllib.request.urlopen(req, timeout=15) as resp:
                 result = json.loads(resp.read())
                 text = result.get("response", "")
                 if text:
@@ -159,7 +209,6 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
             return self._fallback_response(prompt, error=f"Ollama error: {e}")
 
     def _query_server(self, prompt, system_prompt, max_tokens, temperature):
-        import urllib.request
         payloads = [
             {
                 "prompt": prompt,
@@ -191,7 +240,7 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
                             data=json.dumps(payload).encode(),
                             headers={"Content-Type": "application/json"},
                         )
-                        with urllib.request.urlopen(req, timeout=30) as resp:
+                        with urllib.request.urlopen(req, timeout=15) as resp:
                             result = json.loads(resp.read())
                             text = (result.get("content") or result.get("text")
                                     or result.get("response") or "")
@@ -212,14 +261,14 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
         try:
             result = subprocess.run(
                 [self.model_path, "--prompt", full_prompt, "-n", str(max_tokens)],
-                capture_output=True, text=True, timeout=60,
+                capture_output=True, text=True, timeout=30,
             )
             return result.stdout.strip() or self._fallback_response(prompt)
         except Exception as e:
             return self._fallback_response(prompt, error=str(e))
 
     def _fallback_response(self, prompt, error=""):
-        topic_match = __import__("re").search(r"Topic: (.+)", prompt)
+        topic_match = re.search(r"Topic: (.+)", prompt)
         topic = topic_match.group(1) if topic_match else ""
         return f"""[AI Offline Mode - LLM not loaded]
 
@@ -242,6 +291,16 @@ To enable AI-powered explanations:
 • Attempt the practice problems without looking at solutions first
 { f"\\nNote: {error}" if error else "" }"""
 
+    def get_status(self):
+        return {
+            "available": self.available,
+            "backend": self.backend_name,
+            "model": self.model_name,
+            "gemini_configured": bool(self.gemini_api_key),
+            "claude_configured": bool(self.claude_api_key),
+            "ollama_configured": bool(self.ollama_url),
+        }
+
 
 _client = None
 
@@ -250,3 +309,7 @@ def get_client():
     if _client is None:
         _client = LLMClient()
     return _client
+
+def reset_client():
+    global _client
+    _client = None
