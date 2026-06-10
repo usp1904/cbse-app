@@ -807,6 +807,14 @@ class CBSEHandler(BaseHTTPRequestHandler):
             self._serve_ai_metai()
         elif path == "/ai/pedagogical":
             self._serve_ai_pedagogical()
+        elif path == "/ai/youtube":
+            self._serve_ai_youtube()
+        elif path == "/ai/opengrok":
+            self._serve_ai_opengrok()
+        elif path.startswith("/api/ai/youtube"):
+            self._api_ai_youtube(query)
+        elif path.startswith("/api/ai/opengrok"):
+            self._api_ai_opengrok(query)
         elif path.startswith("/api/ai/diagram"):
             self._api_ai_diagram(query)
         elif path.startswith("/api/ai/presentation"):
@@ -1573,7 +1581,7 @@ function skipTutorQuestion(sessionId){{
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> AI Studio</div>
         <div class="section">
             <h2>🧠 AI Studio</h2>
-            <p class="subtitle">Powered by Gemini Flash · NotebookLM · Ollama · Napkin AI · Gamma · Quillbot · Pomelli · MetAI</p>
+            <p class="subtitle">MetaAI Llama 3 · YouTube Data API v3 · OpenGrok · Gemini Flash · NotebookLM · Ollama · Napkin AI · Gamma · Quillbot · Pomelli · MetAI</p>
             {backend_html}
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1.5rem;">
                 <a href="/ai/diagram" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
@@ -1611,6 +1619,12 @@ function skipTutorQuestion(sessionId){{
                 </a>
                 <a href="/api/notebooklm?board=cbse&subject=science" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
                     <div style="font-size:2.5rem;">📥</div><h3>NotebookLM Export</h3><p style="font-size:0.85rem;color:var(--text-muted);">Export study notes</p>
+                </a>
+                <a href="/ai/youtube" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
+                    <div style="font-size:2.5rem;">▶️</div><h3>YouTube Videos</h3><p style="font-size:0.85rem;color:var(--text-muted);">Google YouTube Data API v3 — Free Tier</p>
+                </a>
+                <a href="/ai/opengrok" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
+                    <div style="font-size:2.5rem;">📐</div><h3>Formulas & Theorems</h3><p style="font-size:0.85rem;color:var(--text-muted);">OpenGrok + Local Formula Database</p>
                 </a>
             </div>
         </div>"""
@@ -2152,6 +2166,98 @@ function exportPedagogical() {
         body = render_template("base.html", title="NotebookLM Pedagogy - Class X", body_class="", extra_css="", content=content, board_name="")
         self._send_html(body)
 
+    # ─── YouTube: Video Integration ────────────────────────────────────────────
+
+    def _serve_ai_youtube(self):
+        content = """
+<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> YouTube Videos</div>
+<div class="section">
+<h2>▶️ YouTube Video Search</h2>
+<p class="subtitle">Powered by Google YouTube Data API v3 (Free Tier) — Search CBSE Class 10 educational videos</p>
+<div class="book-section" style="padding:1.5rem;margin-top:1rem;">
+  <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Topic</label>
+  <input type="text" id="yt-topic" value="Photosynthesis" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;">
+  <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Chapter / Subject (optional)</label>
+  <input type="text" id="yt-chapter" value="Life Processes Science" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
+  <button onclick="searchYouTube()" class="btn-primary" style="padding:0.8rem 2rem;background:#ff0000;color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">▶️ Search Videos</button>
+</div>
+<div id="yt-output" style="margin-top:1rem;"></div>
+</div>
+<script>
+async function searchYouTube() {
+  var topic = document.getElementById('yt-topic').value;
+  var chapter = document.getElementById('yt-chapter').value;
+  var out = document.getElementById('yt-output');
+  out.innerHTML = '<p style="color:#888;"><em>Searching YouTube...</em></p>';
+  try {
+    var r = await fetch('/api/ai/youtube?topic=' + encodeURIComponent(topic) + '&chapter=' + encodeURIComponent(chapter));
+    var data = await r.json();
+    var html = '';
+    if (data.videos && data.videos.length > 0) {
+      for (var v of data.videos) {
+        if (v.videoId) {
+          html += '<div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;background:#000;border-radius:8px;margin:0.5rem 0;"><iframe src="https://www.youtube.com/embed/' + v.videoId + '?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen loading="lazy" title="' + v.title.replace(/'/g,"\\\\'") + '"></iframe></div>';
+          html += '<p style="font-size:0.85rem;"><strong>' + v.title + '</strong> · ' + v.channel + '</p>';
+        } else {
+          html += '<p><a href="' + v.searchUrl + '" target="_blank" rel="noopener">📺 Search YouTube for "' + topic + '" →</a></p>';
+        }
+      }
+    } else {
+      html = '<p>No videos found. Try a different topic.</p>';
+    }
+    out.innerHTML = html;
+  } catch(e) {
+    out.innerHTML = '<p style="color:#c62828;">Search failed. YouTube API key may not be configured.</p>';
+  }
+}
+</script>"""
+        body = render_template("base.html", title="YouTube Videos - Class X", body_class="", extra_css="", content=content, board_name="")
+        self._send_html(body)
+
+    # ─── OpenGrok: Formulas & Theorems Search ──────────────────────────────────
+
+    def _serve_ai_opengrok(self):
+        content = """
+<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Formulas & Theorems</div>
+<div class="section">
+<h2>📐 Formulas & Theorems Search</h2>
+<p class="subtitle">Search CBSE Class 10 formulas, theorems, and code via OpenGrok API + Local Knowledge Base</p>
+<div class="book-section" style="padding:1.5rem;margin-top:1rem;">
+  <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Search (e.g. quadratic, pythagoras, trigonometry, theorem)</label>
+  <input type="text" id="og-query" value="quadratic" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
+  <button onclick="searchOpenGrok()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">🔍 Search</button>
+</div>
+<div id="og-output" style="margin-top:1rem;"></div>
+</div>
+<script>
+async function searchOpenGrok() {
+  var q = document.getElementById('og-query').value;
+  var out = document.getElementById('og-output');
+  out.innerHTML = '<p style="color:#888;"><em>Searching formulas & theorems...</em></p>';
+  try {
+    var r = await fetch('/api/ai/opengrok?query=' + encodeURIComponent(q));
+    var data = await r.json();
+    var html = '';
+    if (data.results && data.results.length > 0) {
+      for (var res of data.results) {
+        html += '<div class="og-result" style="background:var(--card-bg);border-radius:8px;padding:0.8rem 1rem;border:1px solid var(--border);margin-bottom:0.5rem;">';
+        html += '<div style="font-size:0.95rem;font-weight:600;color:var(--primary);font-family:\\'Courier New\\',monospace;">' + res.title + '</div>';
+        if (res.category) html += '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.2rem;"><span style="background:#eef2ff;padding:0.05rem 0.4rem;border-radius:4px;">' + res.category + '</span></div>';
+        if (res.snippet) html += '<div style="font-size:0.82rem;color:#555;margin-top:0.3rem;">' + res.snippet + '</div>';
+        html += '</div>';
+      }
+    } else {
+      html = '<p style="color:#888;">No results found. Try: quadratic, pythagoras, trigonometry, circle, theorem</p>';
+    }
+    out.innerHTML = html;
+  } catch(e) {
+    out.innerHTML = '<p style="color:#c62828;">Search failed.</p>';
+  }
+}
+</script>"""
+        body = render_template("base.html", title="Formulas & Theorems - Class X", body_class="", extra_css="", content=content, board_name="")
+        self._send_html(body)
+
     # ─── AI API Handlers ────────────────────────────────────────────────────
 
     def _api_ai_diagram(self, query):
@@ -2235,6 +2341,21 @@ function exportPedagogical() {
         result = ai_services.notebooklm_pedagogical(subject, chapter, topic)
         self._send_json(result)
 
+    def _api_ai_youtube(self, query):
+        topic = query.get("topic", [""])[0]
+        chapter = query.get("chapter", [""])[0]
+        search_query = f"{topic} {chapter}" if chapter else topic
+        results = ai_services.youtube_search(search_query, max_results=5)
+        self._send_json({"videos": results, "query": search_query})
+
+    def _api_ai_opengrok(self, query):
+        search = query.get("query", [""])[0] or query.get("q", [""])[0]
+        if not search:
+            self._send_json({"results": []})
+            return
+        results = ai_services.opengrok_search(search)
+        self._send_json({"results": results, "query": search})
+
     def _api_ai_generate(self, query):
         mode = query.get("mode", ["diagram"])[0]
         if mode == "diagram":
@@ -2259,6 +2380,10 @@ function exportPedagogical() {
             self._api_ai_metai(query)
         elif mode == "pedagogical":
             self._api_ai_pedagogical(query)
+        elif mode == "youtube":
+            self._api_ai_youtube(query)
+        elif mode == "opengrok":
+            self._api_ai_opengrok(query)
         else:
             self._send_json({"success": False, "error": "Unknown mode"})
 
@@ -2670,10 +2795,52 @@ function exportPedagogical() {
                 {"".join(f'<a href="#topic-{t["id"]}">{t["num"]}. {t["title"]}</a>' for t in topics)}
             </div>
             {"".join(topic_sections)}
+            <div class="video-section" id="chapter-videos"></div>
+            <div class="opengrok-section" id="chapter-formulas"></div>
         </div>"""
 
         content += """
 <script>
+function loadChapterVideos() {
+    var v = document.getElementById('chapter-videos');
+    if (v && !v.hasChildNodes()) {
+        fetch('/api/ai/youtube?topic=' + encodeURIComponent('""" + esc_js(chapter['title']) + """') + '&chapter=' + encodeURIComponent('""" + esc_js(subject_name) + """'))
+            .then(function(r){return r.json()})
+            .then(function(d){
+                if (d.videos && d.videos.length > 0) {
+                    var html = '<h4 style="display:flex;align-items:center;gap:0.4rem;margin:1rem 0 0.5rem;color:var(--primary);">\\u25b6\\ufe0f Video Lessons</h4><div class="video-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.5rem;">';
+                    for (var vi of d.videos) {
+                        if (vi.videoId) {
+                            html += '<div class="video-card" style="background:var(--card-bg);border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:pointer;" onclick="document.getElementById(\\'vid-'+vi.videoId+'\\').scrollIntoView({behavior:\\'smooth\\'})"><div style="padding:0.5rem 0.75rem;"><div style="font-size:0.78rem;font-weight:600;color:var(--primary);line-height:1.3;">'+vi.title.slice(0,80)+'</div><div style="font-size:0.72rem;color:var(--text-muted);">'+vi.channel+'</div></div></div>';
+                        }
+                    }
+                    html += '</div>';
+                    for (var vi of d.videos) {
+                        if (vi.videoId) {
+                            html += '<div id="vid-'+vi.videoId+'" class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;background:#000;border-radius:8px;margin:0.5rem 0;"><iframe src="https://www.youtube.com/embed/'+vi.videoId+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen loading="lazy"></iframe></div>';
+                        }
+                    }
+                    html += '<p style="font-size:0.72rem;color:var(--text-muted);">Powered by Google YouTube Data API v3</p>';
+                    v.innerHTML = html;
+                }
+            });
+        fetch('/api/ai/opengrok?query=' + encodeURIComponent('""" + esc_js(chapter['title']) + """'))
+            .then(function(r){return r.json()})
+            .then(function(d){
+                var f = document.getElementById('chapter-formulas');
+                if (d.results && d.results.length > 0 && f) {
+                    var html = '<h4 style="display:flex;align-items:center;gap:0.4rem;margin:1rem 0 0.5rem;color:var(--primary);">\\ud83d\\udcd0 Formulas & Theorems</h4>';
+                    for (var res of d.results) {
+                        html += '<div class="og-result" style="background:var(--card-bg);border-radius:8px;padding:0.6rem 0.8rem;border:1px solid var(--border);margin-bottom:0.4rem;"><div style="font-size:0.88rem;font-weight:600;color:var(--primary);font-family:\\'Courier New\\',monospace;">'+res.title+'</div>';
+                        if (res.category) html += '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.2rem;"><span style="background:#eef2ff;padding:0.05rem 0.4rem;border-radius:4px;">'+res.category+'</span></div>';
+                        html += '</div>';
+                    }
+                    f.innerHTML = html;
+                }
+            });
+    }
+}
+document.addEventListener('DOMContentLoaded', loadChapterVideos);
 function loadAI(topicId, topicTitle, chapterTitle, subjectName) {
     var container = document.getElementById('ai-enrich-' + topicId);
     if (container.style.display !== 'none' && container.innerHTML.trim() !== '') return;

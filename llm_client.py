@@ -43,7 +43,8 @@ class LLMClient:
             if preferred and preferred in models:
                 self.ollama_model = preferred
             else:
-                priority = ["mistral-cpu:latest", "qwen3:4b", "deepseek-r1:1.5b", "qwen3:latest"]
+                # MetaAI (Llama 3/3.1) preferred for contextual learning; fallback to fast models
+                priority = ["llama3.1:latest", "llama3:latest", "llama3", "mistral-cpu:latest", "qwen3:4b", "deepseek-r1:1.5b", "qwen3:latest"]
                 self.ollama_model = next((m for p in priority for m in models if p in m), models[0] if models else "")
         
         self.gemini_api_key = gemini_api_key or os.environ.get("GEMINI_API_KEY", "")
@@ -82,7 +83,7 @@ class LLMClient:
             "local": self.model_path,
         }.get(self._model_priority, "none")
 
-    def query(self, prompt, system_prompt=None, max_tokens=512, temperature=0.3):
+    def query(self, prompt, system_prompt=None, max_tokens=4096, temperature=0.3):
         if self.gemini_api_key:
             return self._query_gemini(prompt, system_prompt, max_tokens, temperature)
         if self.claude_api_key:
@@ -114,15 +115,117 @@ Provide a clear, structured explanation covering:
 2. Key points to remember
 3. Step-by-step breakdown
 4. Real-life application or example"""
-        return self.query(prompt, max_tokens=1024, temperature=0.3)
+        return self.query(prompt, max_tokens=4096, temperature=0.3)
 
     def solve_problem(self, problem_text, topic_name, context_text=""):
         prompt = f"""Problem: {problem_text}
 Topic: {topic_name}
-Context: {context_text[:1000]}
+Context: {context_text[:2000]}
 
 Solve this step-by-step. Show all working, formulas used, and the final answer clearly."""
-        return self.query(prompt, max_tokens=1024, temperature=0.2)
+        return self.query(prompt, max_tokens=4096, temperature=0.2)
+
+    def contextual_learn(self, topic, chapter, subject, level="simple"):
+        level_instruction = {
+            "simple": "Explain in very simple terms suitable for a Class X student. Use everyday examples.",
+            "detailed": "Provide a thorough, textbook-quality explanation with all important details.",
+            "advanced": "Provide an in-depth explanation including derivations, proofs, and connections.",
+        }.get(level, "Explain clearly for a Class X student.")
+        prompt = f"""You are MetaAI (Llama) — an expert CBSE Class X tutor.
+
+Topic: {topic}
+Chapter: {chapter}
+Subject: {subject}
+
+{level_instruction}
+
+Provide a comprehensive contextual learning response covering:
+1. Core concept explanation
+2. Key formulas and theorems
+3. Step-by-step problem solving approach
+4. Real-life applications and examples
+5. Common mistakes to avoid
+6. Practice questions with answers
+
+Use Markdown formatting for clarity."""
+        return self.query(prompt, system_prompt="You are MetaAI (Llama 3), a helpful CBSE Class X tutor. Respond in clear Markdown.", max_tokens=4096, temperature=0.3)
+
+    def youtube_search(self, query, max_results=5):
+        """YouTube Data API v3 search — returns embedded video HTML."""
+        api_key = os.environ.get("YOUTUBE_API_KEY", "")
+        if api_key:
+            import urllib.parse
+            encoded = urllib.parse.quote(query + " CBSE Class 10")
+            url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={encoded}&maxResults={max_results}&type=video&key={api_key}"
+            try:
+                req = urllib.request.Request(url)
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    data = json.loads(resp.read())
+                    items = []
+                    for item in data.get("items", []):
+                        vid = item["id"]["videoId"]
+                        title = item["snippet"]["title"]
+                        channel = item["snippet"]["channelTitle"]
+                        thumb = item["snippet"]["thumbnails"].get("medium", {}).get("url", "")
+                        items.append({"videoId": vid, "title": title, "channel": channel, "thumb": thumb})
+                    return items
+            except Exception:
+                return self._youtube_fallback(query)
+        return self._youtube_fallback(query)
+
+    def _youtube_fallback(self, query):
+        return [{"videoId": "", "title": f"📺 CBSE Class 10: {query} — Watch on YouTube",
+                 "channel": "YouTube", "thumb": "",
+                 "searchUrl": f"https://www.youtube.com/results?search_query={'+'.join(query.split())}+CBSE+Class+10"}]
+
+    def opengrok_search(self, query, max_results=5):
+        """OpenGrok API for code/formulas/theorems — with fallback to local knowledge base."""
+        import urllib.parse
+        og_url = os.environ.get("OPENGROK_URL", "")
+        if og_url:
+            try:
+                encoded = urllib.parse.quote(query)
+                url = f"{og_url.rstrip('/')}/search?q={encoded}&projects=&count={max_results}"
+                req = urllib.request.Request(url)
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    data = resp.read().decode()
+                    results = re.findall(r'<a[^>]*href="/source[^"]*"[^>]*>([^<]+)</a>', data)
+                    return [{"title": r, "url": og_url + "/source", "snippet": f"OpenGrok result for: {query}"} for r in results[:max_results]]
+            except Exception:
+                pass
+        return self._opengrok_fallback(query)
+
+    def _opengrok_fallback(self, query):
+        import random
+        formulas = {
+            "quadratic": [
+                {"title": "Quadratic Formula: x = (-b ± √(b² - 4ac)) / 2a", "category": "Algebra"},
+                {"title": "Nature of Roots: D = b² - 4ac", "category": "Algebra"},
+            ],
+            "pythagoras": [
+                {"title": "Pythagoras Theorem: a² + b² = c²", "category": "Geometry"},
+                {"title": "Pythagorean Triplets: (3,4,5), (5,12,13), (7,24,25)", "category": "Geometry"},
+            ],
+            "trigonometry": [
+                {"title": "sin²θ + cos²θ = 1", "category": "Trigonometry"},
+                {"title": "tan θ = sin θ / cos θ", "category": "Trigonometry"},
+            ],
+            "theorem": [
+                {"title": "Euclid's Division Lemma: a = bq + r, 0 ≤ r < b", "category": "Number Theory"},
+                {"title": "Fundamental Theorem of Arithmetic: Every integer > 1 has unique prime factorization", "category": "Number Theory"},
+                {"title": "Basic Proportionality Theorem (Thales): If a line is parallel to one side of a triangle...", "category": "Geometry"},
+            ],
+            "circle": [
+                {"title": "Area of Circle: A = πr²", "category": "Mensuration"},
+                {"title": "Circumference: C = 2πr", "category": "Mensuration"},
+            ],
+        }
+        ql = query.lower()
+        for key, items in formulas.items():
+            if key in ql:
+                return [{"title": f["title"], "category": f["category"], "snippet": f"Formula from CBSE Class 10 Mathematics — {f['category']}"} for f in items]
+        return [{"title": f"Theorem/Formula Search: {query}", "category": "Mathematics",
+                 "snippet": "Results from CBSE Class 10 formula database. Install OpenGrok for full text search."}]
 
     def _query_claude(self, prompt, system_prompt, max_tokens, temperature):
         body = json.dumps({
@@ -275,10 +378,11 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
 **{topic}** — Detailed Explanation
 
 To enable AI-powered explanations:
-1. (Local) Set OLLAMA_URL=http://localhost:11434 for Ollama (e.g. qwen3)
-2. (Cloud) Set ANTHROPIC_API_KEY for Claude AI
+1. (Local) Set OLLAMA_URL=http://localhost:11434 for Ollama with MetaAI (Llama 3/3.1)
+2. (Cloud) Set ANTHROPIC_API_KEY for Claude AI or GEMINI_API_KEY for Gemini
 3. Install llama.cpp from https://github.com/ggerganov/llama.cpp
-4. Set LLAMA_MODEL_PATH or LLAMA_SERVER_URL env var
+4. Set YOUTUBE_API_KEY for video search integration
+5. Set OPENGROK_URL for code/formula/theorem search
 
 **Key Concepts:**
 • This topic covers fundamental concepts important for board exams
@@ -299,6 +403,10 @@ To enable AI-powered explanations:
             "gemini_configured": bool(self.gemini_api_key),
             "claude_configured": bool(self.claude_api_key),
             "ollama_configured": bool(self.ollama_url),
+            "youtube_configured": bool(os.environ.get("YOUTUBE_API_KEY", "")),
+            "opengrok_configured": bool(os.environ.get("OPENGROK_URL", "")),
+            "context_window": 4096,
+            "metaai_ready": self.ollama_url and ("llama" in self.ollama_model.lower() or self.available),
         }
 
 

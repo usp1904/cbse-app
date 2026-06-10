@@ -979,3 +979,123 @@ This topic connects to other chapters and builds a foundation for advanced study
 2. (Medium) Explain how {topic} works step by step.
 3. (Hard) How does {topic} connect to real-world applications?"""
     return {"success": True, "markdown": result, "title": f"Pedagogical Guide: {topic}"}
+
+
+# ─── MetaAI: Contextual Learning (Llama 3/3.1 via Ollama) ──────────────────
+
+def metaai_contextual_learn(topic, chapter="", subject="", level="simple"):
+    """Deep contextual learning powered by MetaAI Llama models through Ollama."""
+    client = get_client()
+    if client.available and client.ollama_url:
+        response = client.contextual_learn(topic, chapter, subject, level)
+        return {"success": True, "content": response, "backend": "ollama", "model": client.ollama_model}
+    return {"success": False, "content": "", "backend": "none", "model": ""}
+
+
+# ─── YouTube: Video Integration (Google YouTube Data API v3) ────────────────
+
+YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "")
+
+
+def youtube_search(query, max_results=5):
+    """Search YouTube for CBSE educational videos using Data API v3 (free tier)."""
+    client = get_client()
+    return client.youtube_search(query, max_results)
+
+
+def youtube_video_embed_html(video_id, title="", autoplay=False):
+    """Generate responsive YouTube embed HTML."""
+    if not video_id:
+        encoded = urllib.parse.quote(title + " CBSE Class 10")
+        return f'<p style="color:#888;font-size:0.85rem;">📺 <a href="https://www.youtube.com/results?search_query={encoded}" target="_blank" rel="noopener" style="color:var(--accent);">Search YouTube for "{title}" →</a></p>'
+    autoplay_str = "&autoplay=1" if autoplay else ""
+    return f"""
+    <div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;background:#000;border-radius:8px;margin:0.5rem 0;">
+        <iframe src="https://www.youtube.com/embed/{video_id}?rel=0{autoplay_str}" 
+                style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" 
+                allowfullscreen loading="lazy"
+                title="{html_mod.escape(title)}"></iframe>
+    </div>"""
+
+
+def youtube_section_html(topic, chapter="", subject=""):
+    """Generate a video section for topic/chapter pages."""
+    results = youtube_search(f"{topic} {chapter} {subject}")
+    cards = ""
+    for r in results:
+        if r.get("videoId"):
+            cards += f"""
+            <div class="video-card" style="background:var(--card-bg);border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:pointer;"
+                 onclick="document.getElementById('video-{r['videoId']}').scrollIntoView({{behavior:'smooth'}})">
+                <div style="padding:0.5rem 0.75rem;">
+                    <div style="font-size:0.85rem;font-weight:600;color:var(--primary);line-height:1.3;">{html_mod.escape(r['title'][:80])}</div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.2rem;">{html_mod.escape(r.get('channel',''))}</div>
+                </div>
+            </div>"""
+        else:
+            cards += f"""
+            <div class="video-card" style="background:var(--card-bg);border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+                <div style="padding:0.75rem;">
+                    <a href="{r.get('searchUrl','#')}" target="_blank" rel="noopener" style="color:var(--accent);font-size:0.85rem;text-decoration:none;">
+                        📺 Watch "{topic}" on YouTube →
+                    </a>
+                </div>
+            </div>"""
+    embed_section = ""
+    for r in results:
+        if r.get("videoId"):
+            embed_section += youtube_video_embed_html(r["videoId"], r["title"])
+    html = f"""
+    <div class="video-section" style="margin:1rem 0;">
+        <h4 style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem;color:var(--primary);">▶️ Video Lessons</h4>
+        <div class="video-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.5rem;margin-bottom:0.75rem;">
+            {cards}
+        </div>
+        <div class="video-embeds">
+            {embed_section}
+        </div>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.25rem;">
+            Powered by Google YouTube Data API v3 · Free Tier
+        </p>
+    </div>"""
+    return html
+
+
+# ─── OpenGrok: Code, Formula & Theorem Search ──────────────────────────────
+
+OPENGROK_URL = os.environ.get("OPENGROK_URL", "")
+
+
+def opengrok_search(query, max_results=5):
+    """Search code/formulas/theorems via OpenGrok API with fallback to local knowledge base."""
+    client = get_client()
+    return client.opengrok_search(query, max_results)
+
+
+def opengrok_results_html(query):
+    """Generate HTML for OpenGrok formula/theorem search results."""
+    results = opengrok_search(query)
+    items = ""
+    for r in results:
+        cat = r.get("category", "General")
+        snippet = r.get("snippet", "")
+        items += f"""
+        <div class="og-result" style="background:var(--card-bg);border-radius:8px;padding:0.6rem 0.8rem;border:1px solid var(--border);margin-bottom:0.4rem;">
+            <div style="font-size:0.88rem;font-weight:600;color:var(--primary);font-family:'Courier New',monospace;">{html_mod.escape(r['title'])}</div>
+            <div style="display:flex;gap:0.5rem;margin-top:0.2rem;font-size:0.72rem;color:var(--text-muted);">
+                <span class="og-category" style="background:#eef2ff;padding:0.05rem 0.4rem;border-radius:4px;">{cat}</span>
+                {f'<span>{html_mod.escape(snippet[:120])}</span>' if snippet else ''}
+            </div>
+        </div>"""
+    if not items:
+        items = f'<p style="color:#888;font-size:0.85rem;">No formula/theorem results for "{html_mod.escape(query)}". Try different keywords.</p>'
+    html = f"""
+    <div class="opengrok-section" style="margin:1rem 0;">
+        <h4 style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem;color:var(--primary);">📐 Formulas & Theorems</h4>
+        <div class="og-results">{items}</div>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.25rem;">
+            {'OpenGrok API · ' if OPENGROK_URL else 'Local Formula Database · '}
+            CBSE Class 10 Mathematics & Science
+        </p>
+    </div>"""
+    return html
