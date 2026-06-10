@@ -115,6 +115,10 @@ def render_math(text):
     text = re.sub(r'√\(([^)]*)\)', r'sqrt(\1)', text)
     return text
 
+def esc_js(s):
+    """Escape string for use inside single-quoted JS string in an HTML onclick attribute."""
+    return s.replace("\\", "\\\\").replace("'", "\\'")
+
 def format_content(text):
     text = re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
     text = re.sub(r'__(.*?)__', r'<u>\1</u>', text)
@@ -122,6 +126,10 @@ def format_content(text):
     text = re.sub(r'\n\n+', '</p><p>', text)
     text = re.sub(r'\n', '<br>', text)
     text = render_math(text)
+    # Wrap tables in .table-wrap for responsive scrolling
+    text = re.sub(r'<p>\s*<div class="table-wrap">', r'<div class="table-wrap">', text)
+    text = re.sub(r'</div>\s*</p>', r'</div>', text)
+    text = re.sub(r'(<table[^>]*>.*?</table>)', r'<div class="table-wrap">\1</div>', text, flags=re.DOTALL)
     return f'<p>{text}</p>'
 
 
@@ -173,14 +181,16 @@ CSS = r"""
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     --nav-height: 48px;
     --gbar-height: 36px;
+    --sticky-top: calc(var(--gbar-height) + var(--nav-height));
+    --bottom-safe: 60px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; font-size: 16px; -webkit-font-smoothing: antialiased; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; line-height: 1.6; font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden; width: 100%; }
 
 /* Mobile-First Base */
-.container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
-@media (min-width: 768px) { .container { padding: 2rem 1.5rem; } }
+.container { max-width: 1200px; margin: 0 auto; padding: 1rem; padding-bottom: calc(1rem + var(--bottom-safe)); }
+@media (min-width: 768px) { .container { padding: 2rem 1.5rem; padding-bottom: calc(2rem + var(--bottom-safe)); } }
 
 /* Header - Compact for mobile */
 header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: #fff; padding: 1.5rem 1rem; text-align: center; }
@@ -188,25 +198,29 @@ header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; }
 header p { font-size: 0.85rem; opacity: 0.8; margin-top: 0.2rem; }
 @media (min-width: 768px) { header { padding: 2.5rem 0; } header h1 { font-size: 2rem; } header p { font-size: 1rem; } }
 
+/* Sticky wrapper for gbar + nav */
+.sticky-wrapper { position: sticky; top: 0; z-index: 100; }
+
 /* Navigation - Scrollable on mobile */
-nav { background: var(--primary); position: sticky; top: 0; z-index: 100; }
+nav { background: var(--primary); }
 nav .inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 0; min-height: var(--nav-height); }
 nav .inner::-webkit-scrollbar { display: none; }
 nav a { color: rgba(255,255,255,0.75); text-decoration: none; padding: 0.6rem 0.75rem; font-size: 0.82rem; font-weight: 500; white-space: nowrap; flex-shrink: 0; transition: all var(--transition); border-bottom: 2px solid transparent; }
 nav a:active, nav a.active { color: #fff; border-bottom-color: #fff; }
 nav .nav-right { margin-left: auto; display: flex; align-items: center; flex-shrink: 0; padding-right: 0.5rem; }
 .search-bar { display: flex; }
-.search-bar input { padding: 0.35rem 0.6rem; border: none; font-size: 0.8rem; width: 120px; background: rgba(255,255,255,0.1); color: #fff; outline: none; border-radius: 6px 0 0 6px; }
-.search-bar input:focus { background: rgba(255,255,255,0.2); width: 140px; }
+.search-bar input { padding: 0.35rem 0.6rem; border: none; font-size: 0.8rem; width: 110px; background: rgba(255,255,255,0.1); color: #fff; outline: none; border-radius: 6px 0 0 6px; }
+.search-bar input:focus { background: rgba(255,255,255,0.2); width: 130px; }
 .search-bar input::placeholder { color: rgba(255,255,255,0.4); }
 .search-bar button { padding: 0.35rem 0.7rem; border: none; background: var(--highlight); color: #fff; cursor: pointer; font-size: 0.78rem; font-weight: 500; border-radius: 0 6px 6px 0; }
 @media (min-width: 768px) { nav a { padding: 0.6rem 1rem; font-size: 0.88rem; } .search-bar input { width: 180px; } }
+@media (max-width: 480px) { nav a { padding: 0.5rem 0.55rem; font-size: 0.75rem; } }
 
 /* Gamification Bar - Compact */
-.gbar { background: linear-gradient(90deg, var(--primary), var(--primary-light)); color: #fff; position: sticky; top: 0; z-index: 101; font-size: 0.78rem; height: var(--gbar-height); display: flex; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+.gbar { background: linear-gradient(90deg, var(--primary), var(--primary-light)); color: #fff; font-size: 0.78rem; height: var(--gbar-height); display: flex; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 .gbar-inner { max-width: 1200px; margin: 0 auto; padding: 0 0.75rem; display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .gbar-left, .gbar-right { display: flex; align-items: center; gap: 0.5rem; }
-.gbar-item { display: flex; align-items: center; gap: 0.15rem; font-weight: 500; }
+.gbar-item { display: flex; align-items: center; gap: 0.15rem; font-weight: 500; white-space: nowrap; }
 .gbar-link { color: #fff; text-decoration: none; opacity: 0.85; font-size: 1rem; padding: 0.2rem; }
 .lives-display { font-size: 0.85rem; }
 
@@ -225,33 +239,36 @@ nav .nav-right { margin-left: auto; display: flex; align-items: center; flex-shr
 .subject-card:active { transform: scale(0.98); }
 .subject-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem; }
 .subject-card h3 { font-size: 1rem; margin-bottom: 0.2rem; color: var(--primary); }
-.subject-card p { color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.subject-card p { color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 .ch-count { display: inline-block; margin-top: 0.5rem; padding: 0.2rem 0.7rem; background: linear-gradient(135deg, #eef2ff, #e0e5ff); color: var(--accent); border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
 @media (min-width: 768px) { .subject-card { padding: 1.5rem; } .subject-card h3 { font-size: 1.1rem; } }
 
 /* Section */
 .section { margin-bottom: 1.5rem; }
 .section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
-.section h2 { font-size: 1.25rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--accent); color: var(--primary); }
+.section h2 { font-size: 1.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--accent); color: var(--primary); margin-top: 0.25rem; word-break: break-word; }
+.chapter-actions { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.chapter-actions .tts-btn { white-space: nowrap; }
+@media (max-width: 480px) { .chapter-actions { gap: 0.35rem; } .chapter-actions .tts-btn { font-size: 0.72rem; padding: 0.35rem 0.5rem; } }
 .section .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-top: -0.3rem; margin-bottom: 1rem; }
 @media (min-width: 768px) { .section h2 { font-size: 1.5rem; } }
 
 /* Book Section / Cards */
 .book-section { background: var(--card-bg); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; box-shadow: var(--shadow); border: 1px solid var(--border); }
-.book-section h3 { font-size: 1rem; color: var(--accent); margin-bottom: 0.6rem; }
+.book-section h3 { font-size: 1rem; color: var(--accent); margin-bottom: 0.6rem; word-break: break-word; }
 @media (min-width: 768px) { .book-section { padding: 1.5rem 1.8rem; } .book-section h3 { font-size: 1.15rem; } }
 
 /* Chapter List */
 .chapter-list { list-style: none; }
-.chapter-list li { padding: 0.6rem 0.8rem; border-left: 3px solid transparent; margin-bottom: 0.25rem; border-radius: var(--radius-sm); cursor: pointer; min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
+.chapter-list li { padding: 0.6rem 0.8rem; border-left: 3px solid transparent; margin-bottom: 0.25rem; border-radius: var(--radius-sm); cursor: pointer; min-height: 44px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
 .chapter-list li:active { background: #f1f5f9; }
 .chapter-list .ch-row { display: flex; align-items: center; gap: 0.4rem; }
 .chapter-list .ch-num { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; background: #eef2ff; color: var(--accent); font-weight: 700; border-radius: 50%; font-size: 0.75rem; flex-shrink: 0; }
-.chapter-list .ch-title { font-size: 0.88rem; font-weight: 500; }
+.chapter-list .ch-title { font-size: 0.88rem; font-weight: 500; word-break: break-word; }
 
 /* Topics */
-.topics { margin-top: 0.3rem; margin-left: 2.2rem; display: flex; flex-wrap: wrap; gap: 0.3rem; }
-.topic-tag { padding: 0.3rem 0.6rem; background: #f8fafc; border-radius: 8px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); min-height: 32px; display: flex; align-items: center; }
+.topics { margin-top: 0.3rem; display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.topic-tag { padding: 0.3rem 0.6rem; background: #f8fafc; border-radius: 8px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); min-height: 32px; display: flex; align-items: center; max-width: 100%; word-break: break-word; }
 .topic-tag:active { background: #eef2ff; border-color: var(--accent); }
 
 /* Badges */
@@ -268,7 +285,7 @@ nav .nav-right { margin-left: auto; display: flex; align-items: center; flex-shr
 /* Chunk Views - Content Display */
 .chunk-view { background: var(--card-bg); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid var(--border); }
 .chunk-view .chunk-title { font-weight: 600; color: var(--primary); margin-bottom: 0.4rem; font-size: 0.95rem; }
-.chunk-view .chunk-content { color: #334155; line-height: 1.7; font-size: 0.88rem; overflow-wrap: break-word; word-wrap: break-word; }
+.chunk-view .chunk-content { color: #334155; line-height: 1.7; font-size: 0.88rem; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; }
 .chunk-view .chunk-content p { margin-bottom: 0.5rem; }
 .chunk-view .chunk-content strong { color: var(--primary); }
 .chunk-view .chunk-type-badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 8px; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.2px; }
@@ -286,6 +303,10 @@ nav .nav-right { margin-left: auto; display: flex; align-items: center; flex-shr
 .topic-nav { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .topic-nav a { padding: 0.35rem 0.8rem; background: var(--card-bg); border-radius: 20px; text-decoration: none; color: var(--text-muted); font-size: 0.78rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border); }
 .topic-nav a:active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* Scroll offset for sticky header anchor targets */
+.book-section { scroll-margin-top: calc(var(--gbar-height) + var(--nav-height) + 8px); }
+[id^="topic-"] { scroll-margin-top: calc(var(--gbar-height) + var(--nav-height) + 8px); }
 
 /* Buttons - 44px min touch target on mobile */
 .tts-btn, .ncert-link, .quiz-option, .exam-question, .search-bar button, nav a, .topic-tag, .chapter-list li { min-height: 36px; }
@@ -323,16 +344,16 @@ mark { background: #fef08a; padding: 0.05rem 0.15rem; border-radius: 2px; }
 .stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
 
 /* AI Chat Panel - Full width on mobile */
-.ai-chat-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 50vh; background: var(--card-bg); border-radius: 16px 16px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; z-index: 999; transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); border: none; }
+.ai-chat-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 45vh; background: var(--card-bg); border-radius: 16px 16px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; z-index: 999; transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); border: none; }
 .ai-chat-panel.collapsed { transform: translateY(calc(100% - 44px)); }
 .ai-chat-header { padding: 0.6rem 1rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-radius: 16px 16px 0 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; min-height: 44px; }
-.ai-chat-messages { flex: 1; overflow-y: auto; padding: 0.75rem; max-height: 35vh; }
-.ai-chat-msg { padding: 0.5rem 0.8rem; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; max-width: 90%; margin-bottom: 0.4rem; }
+.ai-chat-messages { flex: 1; overflow-y: auto; padding: 0.75rem; max-height: 30vh; }
+.ai-chat-msg { padding: 0.5rem 0.8rem; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; max-width: 90%; margin-bottom: 0.4rem; word-wrap: break-word; overflow-wrap: break-word; }
 .ai-chat-msg.user { background: #eef2ff; margin-left: auto; }
 .ai-chat-msg.assistant { background: #f8fafc; margin-right: auto; }
 .ai-chat-input { display: flex; padding: 0.5rem; border-top: 1px solid var(--border); gap: 0.3rem; background: #fafafa; }
-.ai-chat-input input { flex: 1; padding: 0.5rem 0.8rem; border: 1px solid var(--border); border-radius: 24px; font-size: 0.85rem; outline: none; min-height: 44px; }
-.ai-chat-input button { padding: 0.5rem 1rem; background: var(--accent); color: #fff; border: none; border-radius: 24px; cursor: pointer; font-size: 0.85rem; font-weight: 500; min-height: 44px; white-space: nowrap; }
+.ai-chat-input input { flex: 1; padding: 0.5rem 0.8rem; border: 1px solid var(--border); border-radius: 24px; font-size: 0.85rem; outline: none; min-height: 44px; max-width: calc(100% - 70px); }
+.ai-chat-input button { padding: 0.5rem 1rem; background: var(--accent); color: #fff; border: none; border-radius: 24px; cursor: pointer; font-size: 0.85rem; font-weight: 500; min-height: 44px; white-space: nowrap; flex-shrink: 0; }
 @media (min-width: 768px) { .ai-chat-panel { left: auto; right: 1.5rem; width: 360px; max-height: 520px; } }
 
 /* Quiz - Touch friendly */
@@ -386,12 +407,24 @@ mark { background: #fef08a; padding: 0.05rem 0.15rem; border-radius: 2px; }
 .monitor-stat .value { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
 
 /* Exam */
-.exam-paper { max-width: 100%; }
+.exam-paper { max-width: 100%; overflow-x: hidden; }
 @media (min-width: 768px) { .exam-paper { max-width: 900px; margin: 0 auto; } }
 
+/* Responsive images & embedded content */
+img, video, iframe, svg { max-width: 100%; height: auto; }
+.katex, .katex-display { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+.katex-display > .katex { white-space: normal; }
+.math-error { word-break: break-all; }
+
 /* TTS Player */
-.tts-player { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 2px solid var(--accent); padding: 0.4rem 1rem; z-index: 998; }
+.tts-player { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 2px solid var(--accent); padding: 0.4rem 1rem; z-index: 998; display: none; }
 .tts-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; }
+.tts-player:not([style*="display:none"]):not([style*="display: none"]) ~ .ai-chat-panel,
+.tts-player[style*="display: flex"] ~ .ai-chat-panel { bottom: 44px; }
+@media (max-width: 480px) {
+    .tts-player { padding: 0.3rem 0.6rem; }
+    .tts-inner { font-size: 0.78rem; }
+}
 
 /* Result Card */
 .result-card { max-width: 400px; margin: 1.5rem auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); overflow: hidden; }
@@ -424,7 +457,8 @@ mark { background: #fef08a; padding: 0.05rem 0.15rem; border-radius: 2px; }
 .q-explanation { margin-top: 0.4rem; padding: 0.6rem; background: #f8fafc; border-left: 3px solid var(--accent); border-radius: 6px; font-size: 0.82rem; line-height: 1.5; }
 
 /* Table responsive */
-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0.5rem 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: max-content; }
 th { text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); font-size: 0.78rem; color: var(--text-muted); }
 td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
 @media (max-width: 480px) { td, th { padding: 0.35rem 0.4rem; font-size: 0.78rem; } }
@@ -434,6 +468,10 @@ footer { text-align: center; padding: 1.5rem 1rem; color: var(--text-muted); fon
 
 /* Loading */
 .loading { text-align: center; padding: 2rem; color: var(--text-muted); }
+
+/* Prevent text/link overflow */
+a, .chunk-content, .tutor-question-text, .problem-text, .solution-steps, .ai-content { word-break: break-word; overflow-wrap: break-word; }
+code, pre { white-space: pre-wrap; word-break: break-word; max-width: 100%; }
 .loading .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin: 0 auto 0.75rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -1353,7 +1391,7 @@ function skipTutorQuestion(sessionId){{
                     <h3 style="margin:0;font-size:1.1rem;">Periodic Table</h3>
                     <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.3rem;">Interactive element table</p>
                 </a>
-                <a href="/mindmap/" class="book-section" style="display:block;text-align:center;padding:2rem;text-decoration:none;color:inherit;">
+                <a href="/mindmap" class="book-section" style="display:block;text-align:center;padding:2rem;text-decoration:none;color:inherit;">
                     <div style="font-size:3rem;margin-bottom:0.5rem;">🗺️</div>
                     <h3 style="margin:0;font-size:1.1rem;">Mind Maps</h3>
                     <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.3rem;">Visual concept maps</p>
@@ -2604,7 +2642,8 @@ function exportPedagogical() {
                 {chunks_html}
                 {problems_html}
                 <div id="ai-enrich-{topic['id']}" style="display:none;"></div>
-                <button class="tts-btn" onclick="loadAI('{topic['id']}','{topic['title']}','{chapter['title']}','{subject['name'] if subject else ''}')" style="margin-top:0.5rem;font-size:0.85rem;">✨ AI Enhance</button>
+                <div id="ai-enrich-{topic['id']}" style="display:none;"></div>
+                <button class="tts-btn" onclick="loadAI('{topic['id']}','{esc_js(topic['title'])}','{esc_js(chapter['title'])}','{esc_js(subject['name'] if subject else '')}')" style="margin-top:0.5rem;font-size:0.85rem;">✨ AI Enhance</button>
                 <div style="margin-top:0.5rem;">
                     <a class="ncert-link" style="font-size:0.8rem;padding:0.3rem 0.8rem;" href="/topic/{topic['id']}">View Full Topic →</a>
                 </div>
@@ -2621,8 +2660,8 @@ function exportPedagogical() {
         </div>
         <div class="section">
             <h2>Chapter {chapter["num"]}: {chapter["title"]}</h2>
-            <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
-                <button class="tts-btn" onclick="playTTS(document.querySelector('.section h2')?.innerText || '{chapter['title']}','en-IN')">🔊 Listen</button>
+            <div class="chapter-actions">
+                <button class="tts-btn" onclick="playTTS(document.querySelector('.section h2')?.innerText || '{esc_js(chapter['title'])}','en-IN')">🔊 Listen</button>
                 <button class="tts-btn" onclick="recordStudy('{chapter_id}', null)">✅ Mark Studying</button>
                 <a class="tts-btn" href="/notes/{chapter_id}" style="text-decoration:none;">📖 Notes</a>
                 <a class="tts-btn" href="/revision/{chapter_id}" style="text-decoration:none;">⚡ Revision</a>

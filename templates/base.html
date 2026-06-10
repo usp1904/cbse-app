@@ -12,64 +12,66 @@
     {{ extra_css }}
 </head>
 <body class="{{ body_class }}">
-    <div id="gamification-bar" class="gbar">
-        <div class="gbar-inner">
-            <div class="gbar-left">
-                <a href="/profile" class="gbar-link" title="My Profile">👤</a>
-                <span class="gbar-item" id="gbar-streak" title="Learning Streak">🔥 <span id="streak-count">0</span></span>
-                <span class="gbar-item" id="gbar-xp" title="Experience Points">⭐ <span id="xp-count">0</span></span>
-                <span class="gbar-item" id="gbar-level" title="Level">🏆 Lv.<span id="level-num">1</span></span>
-            </div>
-            <div class="gbar-center">
-                <span class="gbar-item lives-display" id="gbar-lives" title="Lives">❤️<span id="lives-count">5</span></span>
-            </div>
-            <div class="gbar-right">
-                <a href="/about" class="gbar-link" title="About">ℹ️</a>
+    <div class="sticky-wrapper">
+        <div id="gamification-bar" class="gbar">
+            <div class="gbar-inner">
+                <div class="gbar-left">
+                    <a href="/profile" class="gbar-link" title="My Profile">👤</a>
+                    <span class="gbar-item" id="gbar-streak" title="Learning Streak">🔥 <span id="streak-count">0</span></span>
+                    <span class="gbar-item" id="gbar-xp" title="Experience Points">⭐ <span id="xp-count">0</span></span>
+                    <span class="gbar-item" id="gbar-level" title="Level">🏆 Lv.<span id="level-num">1</span></span>
+                </div>
+                <div class="gbar-center">
+                    <span class="gbar-item lives-display" id="gbar-lives" title="Lives">❤️<span id="lives-count">5</span></span>
+                </div>
+                <div class="gbar-right">
+                    <a href="/about" class="gbar-link" title="About">ℹ️</a>
+                </div>
             </div>
         </div>
+        <nav>
+            <div class="inner">
+                <a href="/">Home</a>
+                <a href="/board/cbse">CBSE</a>
+                <a href="/board/ap">AP Board</a>
+                <a href="/board/ts">TS Board</a>
+                <a href="/exams">📝 Exams</a>
+                <a href="/challenge">🔥 Challenge</a>
+                <a href="/badges">🎖️ Badges</a>
+                <a href="/competitive">🎯 Competitive</a>
+                <a href="/electives">🌟 Electives</a>
+                <a href="/tools">🛠️ Tools</a>
+                <a href="/ai">🧠 AI Studio</a>
+                <a href="/review">🔁 Review</a>
+                <a href="/tutor">🤖 Tutor</a>
+                <a href="/leaderboard">🏆 Leaderboard</a>
+                <a href="/profile">👤 Profile</a>
+                <a href="/login">🔐 Login</a>
+                <div class="nav-right">
+                    <form class="search-bar" action="/search" method="GET">
+                        <input type="text" name="q" placeholder="Search any topic..." aria-label="Search" id="nav-search">
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
     </div>
     <header>
         <h1>Class X Education Platform</h1>
         <p>CBSE · Andhra Pradesh · Telangana · NEP 2020</p>
     </header>
-    <nav>
-        <div class="inner">
-            <a href="/">Home</a>
-            <a href="/board/cbse">CBSE</a>
-            <a href="/board/ap">AP Board</a>
-            <a href="/board/ts">TS Board</a>
-            <a href="/exams">📝 Exams</a>
-            <a href="/challenge">🔥 Challenge</a>
-            <a href="/badges">🎖️ Badges</a>
-            <a href="/competitive">🎯 Competitive</a>
-            <a href="/electives">🌟 Electives</a>
-            <a href="/tools">🛠️ Tools</a>
-            <a href="/ai">🧠 AI Studio</a>
-            <a href="/review">🔁 Review</a>
-            <a href="/tutor">🧠 Tutor</a>
-            <a href="/leaderboard">🏆 Leaderboard</a>
-            <a href="/profile">👤 Profile</a>
-            <a href="/login">🔐 Login</a>
-            <div class="nav-right">
-                <form class="search-bar" action="/search" method="GET">
-                    <input type="text" name="q" placeholder="Search any topic..." aria-label="Search" id="nav-search">
-                    <button type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-    </nav>
     <div class="container">
         {{ content }}
     </div>
 
     <div class="ai-chat-panel" id="ai-chat">
         <div class="ai-chat-header" onclick="toggleChat()">
-            <span>AI Tutor</span>
+            <span>💬 AI Chat</span>
             <span class="toggle-btn" id="chat-toggle">−</span>
         </div>
         <div class="ai-chat-messages" id="chat-messages">
             <div class="ai-chat-msg assistant">
-                <div class="msg-label">AI Tutor</div>
+                <div class="msg-label">AI Chat</div>
                 Hi! Ask me about any topic. I can explain concepts, solve problems, and help you study better.
             </div>
         </div>
