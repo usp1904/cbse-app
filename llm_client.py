@@ -38,7 +38,8 @@ class LLMClient:
         else:
             detected_url, models = _detect_ollama()
             self.ollama_url = detected_url
-            preferred = self._preferred_ollama_model or os.environ.get("OLLAMA_MODEL", "")
+            self._preferred_ollama_model = ollama_model or os.environ.get("OLLAMA_MODEL", "")
+            preferred = self._preferred_ollama_model
             # Prefer non-thinking models for speed; fallback to available models
             if preferred and preferred in models:
                 self.ollama_model = preferred
@@ -49,8 +50,6 @@ class LLMClient:
         
         self.gemini_api_key = gemini_api_key or os.environ.get("GEMINI_API_KEY", "")
         self.gemini_model = gemini_model or os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
-        # Use mistral-cpu as faster default if available (no thinking mode)
-        self._preferred_ollama_model = ollama_model or os.environ.get("OLLAMA_MODEL", "")
         self.process = None
         self.lock = threading.Lock()
         self._model_priority = self._detect_priority()

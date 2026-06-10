@@ -52,9 +52,9 @@ RATE_LIMIT_MAX = 120
 _rate_limit_store = {}
 _RAW_HTML_VARS = {"board_name", "content", "extra_css", "description", "title"}
 
-DB = get_db()
-RAG = get_engine()
-LLM = get_client()
+DB = None
+RAG = None
+LLM = None
 
 
 # ─── Rate Limiter ───────────────────────────────────────────────────────────
@@ -95,7 +95,7 @@ def _render(title="CBSE Class X", content="", extra_css="", body_class="", board
 
     xp = "0"
     try:
-        if DB.table_exists("learner"):
+        if DB and DB.table_exists("learner"):
             learner = DB.query_one("SELECT xp FROM learner WHERE id=1")
             if learner:
                 xp = str(learner.get("xp", 0))
@@ -222,7 +222,7 @@ def _build_breadcrumb(items):
 
 
 def _get_topics(conn, chapter_id):
-    return conn.query("SELECT * FROM topics WHERE chapter_id = ? ORDER BY seq, title", (chapter_id,))
+    return conn.query("SELECT * FROM topics WHERE chapter_id = ? ORDER BY num, title", (chapter_id,))
 
 
 def _get_chapters(conn, subject_id):
@@ -233,10 +233,21 @@ def _get_chapters(conn, subject_id):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global DB, RAG, LLM
     log.info("FastAPI server starting...")
-    log.info("Database: %s", "PostgreSQL/Neon" if DB.is_postgresql else "SQLite")
-    log.info("LLM: %s (%s)", LLM.backend_name, LLM.model_name)
+    DB = get_db()
+    try:
+        LLM = get_client()
+    except Exception as e:
+        log.warning("LLM init failed (non-fatal): %s", e)
+    try:
+        RAG = get_engine()
+    except Exception as e:
+        log.warning("RAG init failed (non-fatal): %s", e)
     init_db()
+    log.info("Database: %s", "PostgreSQL/Neon" if DB.is_postgresql else "SQLite")
+    log.info("LLM: %s (%s)", getattr(LLM, 'backend_name', 'N/A') if LLM else "N/A",
+             getattr(LLM, 'model_name', 'N/A') if LLM else "N/A")
     yield
     log.info("Server shutting down.")
 
@@ -262,11 +273,16 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=os.environ.get("ALLOWED_
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "db": DB.backend, "llm": LLM.backend_name, "model": LLM.model_name, "boards": len(ALL_BOARDS)}
+    return {"status": "ok", "db": DB.backend if DB else "N/A",
+            "llm": getattr(LLM, 'backend_name', 'N/A') if LLM else "N/A",
+            "model": getattr(LLM, 'model_name', 'N/A') if LLM else "N/A",
+            "boards": len(ALL_BOARDS)}
 
 
 @app.get("/api/ai/status")
 async def ai_status():
+    if not LLM:
+        return {"status": "unavailable", "message": "No LLM backend configured"}
     return LLM.get_status()
 
 
@@ -721,7 +737,9 @@ async def api_ai_enrich(topic: str = Query(...), chapter: str = Query(""), subje
 
 @app.get("/api/search")
 @rate_limit(60)
-async def api_search(q: str = Query(""), board: Optional[str] = None, limit: int = Query(15, le=50)):
+async def api_search(request: Request, q: str = Query(""), board: Optional[str] = None, limit: int = Query(15, le=50)):
+    if not RAG:
+        return {"results": [], "error": "Search engine not available"}
     if not q:
         return {"results": []}
     try:
