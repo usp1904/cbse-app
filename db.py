@@ -160,6 +160,7 @@ class Database:
             return sql
         if self.backend == "postgresql":
             s = sql.strip()
+            orig_upper = sql.strip().upper()
             s = re.sub(r"(?<!')datetime\('now','localtime'(?:,'([^']+)')?\)", lambda m: self._pg_now(m), s)
             s = re.sub(r"(?<!')date\('now','localtime'(?:,'([^']+)')?\)", lambda m: self._pg_now(m, date_only=True), s)
             s = re.sub(r"datetime\('now'(?:,'([^']+)')?\)", lambda m: self._pg_now(m), s)
@@ -169,11 +170,29 @@ class Database:
             s = re.sub(r"strftime\('%w',\s*([^)]+)\)", r"EXTRACT(DOW FROM \1)", s)
             s = re.sub(r"\bRANDOM\(\)", "RANDOM()", s, flags=re.IGNORECASE)
             s = re.sub(r"\brandom\(\)", "RANDOM()", s, flags=re.IGNORECASE)
-            s = re.sub(r"INSERT OR IGNORE INTO", "INSERT INTO", s, flags=re.IGNORECASE)
-            s = re.sub(r"INSERT OR REPLACE INTO", "INSERT INTO", s, flags=re.IGNORECASE)
+
+            # INSERT OR IGNORE → INSERT ... ON CONFLICT DO NOTHING
+            if "INSERT OR IGNORE INTO" in orig_upper:
+                s = re.sub(r"INSERT\s+OR\s+IGNORE\s+INTO", "INSERT INTO", s, flags=re.IGNORECASE)
+                s = s.rstrip(";") + " ON CONFLICT DO NOTHING"
+                if sql.strip().endswith(";"):
+                    s += ";"
+            # INSERT OR REPLACE → proper ON CONFLICT DO UPDATE SET
+            elif "INSERT OR REPLACE INTO" in orig_upper:
+                repl_match = re.match(
+                    r"INSERT\s+OR\s+REPLACE\s+INTO\s+(\w+)\s*\(([^)]+)\)\s*VALUES",
+                    s, re.IGNORECASE
+                )
+                if repl_match:
+                    cols = [c.strip() for c in repl_match.group(2).split(",")]
+                    set_clause = ", ".join(f"{c} = EXCLUDED.{c}" for c in cols)
+                    s = re.sub(r"INSERT\s+OR\s+REPLACE\s+INTO", "INSERT INTO", s, flags=re.IGNORECASE)
+                    s = s.rstrip(";") + f" ON CONFLICT DO UPDATE SET {set_clause};"
+                else:
+                    s = re.sub(r"INSERT OR REPLACE INTO", "INSERT INTO", s, flags=re.IGNORECASE)
+
             s = re.sub(r"last_insert_rowid\(\)", "LASTVAL()", s, flags=re.IGNORECASE)
-            s = re.sub(r"LIKE\s+\?(\s+(?:ESCAPE\s+'(?:\\\)?.)\s*)?(?=WHERE|AND|OR|ORDER|LIMIT|$))",
-                       r"ILIKE %s\1", s, flags=re.IGNORECASE)
+            s = re.sub(r"LIKE\s+\?(\s+ESCAPE\s+'[^']*')?", r"ILIKE %s\1", s, flags=re.IGNORECASE)
             s = re.sub(r"(?<!=)\?(?!=)", "%s", s)
             s = s.replace("AUTOINCREMENT", "SERIAL")
             s = re.sub(r"CHECK\s*\(\s*id\s*=\s*1\s*\)", "", s)
@@ -194,6 +213,34 @@ class Database:
             return base
         return base
 
+    def _split_sql_script(self, script):
+        """Split SQL script into statements, respecting string literals."""
+        statements = []
+        current = []
+        in_string = False
+        string_char = None
+        for ch in script:
+            if in_string:
+                current.append(ch)
+                if ch == string_char and current[-2:-1] != ['\\']:
+                    in_string = False
+                    string_char = None
+            elif ch in ("'", '"'):
+                current.append(ch)
+                in_string = True
+                string_char = ch
+            elif ch == ';':
+                stmt = ''.join(current).strip()
+                if stmt:
+                    statements.append(stmt)
+                current = []
+            else:
+                current.append(ch)
+        remaining = ''.join(current).strip()
+        if remaining:
+            statements.append(remaining)
+        return statements
+
     def _translate_params(self, sql, params):
         if self.backend == "sqlite":
             return sql, params
@@ -203,18 +250,6 @@ class Database:
             if isinstance(params, (list, tuple)):
                 return sql, tuple(params)
             return sql, params
-
-    def _handle_insert_ignore(self, sql, params):
-        if self.backend != "postgresql":
-            return sql, False
-        orig = sql.strip()
-        if orig.upper().startswith("INSERT INTO") and "ON CONFLICT" not in orig.upper():
-            if "INSERT OR IGNORE" in sql or orig == orig:
-                from_clause = orig.upper().find("VALUES")
-                if from_clause > 0:
-                    table_part = orig[11:from_clause].strip().split("(")[0].strip()
-                    sql = orig + " ON CONFLICT DO NOTHING"
-        return sql, False
 
     def execute(self, sql, params=None):
         if params is not None and not isinstance(params, (list, tuple)):
@@ -268,13 +303,15 @@ class Database:
             conn.executescript(script)
             conn.commit()
         else:
-            statements = [s.strip() for s in script.split(";") if s.strip()]
-            for stmt in statements:
-                if stmt.upper().startswith("CREATE TRIGGER"):
+            for stmt in self._split_sql_script(script):
+                if not stmt.strip():
                     continue
-                if "VIRTUAL TABLE" in stmt.upper() or "FTS5" in stmt.upper():
+                upper = stmt.strip().upper()
+                if upper.startswith("CREATE TRIGGER"):
                     continue
-                if stmt.upper().startswith("PRAGMA"):
+                if "VIRTUAL TABLE" in upper or "FTS5" in upper:
+                    continue
+                if upper.startswith("PRAGMA"):
                     continue
                 self.execute(stmt)
 
@@ -380,39 +417,6 @@ class Database:
                 "SELECT table_name FROM information_schema.tables WHERE table_name=%s",
                 (table_name,)
             ))
-
-    def _append_on_conflict_if_needed(self, sql):
-        s = sql.strip().upper()
-        if "ON CONFLICT" in s or "SELECT" in s:
-            return sql
-        if s.startswith("INSERT INTO"):
-            try:
-                table_end = sql.index("(") if "(" in sql else -1
-                if table_end < 0:
-                    return sql
-                table_part = sql[11:table_end].strip()
-                pk_check = self.query_one("""
-                    SELECT kcu.column_name
-                    FROM information_schema.table_constraints tc
-                    JOIN information_schema.key_column_usage kcu
-                        ON tc.constraint_name = kcu.constraint_name
-                    WHERE tc.table_name = %s
-                        AND tc.constraint_type = 'PRIMARY KEY'
-                    LIMIT 1
-                """, (table_part,))
-                if pk_check:
-                    pk_col = pk_check["column_name"]
-                    return re.sub(
-                        r"VALUES\s*\(",
-                        f"VALUES (",
-                        sql,
-                        count=1,
-                        flags=re.IGNORECASE
-                    ) + f" ON CONFLICT ({pk_col}) DO NOTHING"
-            except Exception:
-                pass
-        return sql
-
 
 _db = None
 

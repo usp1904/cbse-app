@@ -5,6 +5,7 @@ Supports:
   - Connection pooling (PostgreSQL/Neon) via db.py
   - CORS, rate limiting, health checks
   - Background task processing
+  - Static file serving
   - Gradually replaces CBSEHandler routes
 
 Usage:
@@ -25,8 +26,8 @@ import urllib.parse
 from typing import Optional
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, Response, Query, HTTPException, Depends, BackgroundTasks
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi import FastAPI, Request, Response, Query, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -77,20 +78,29 @@ def rate_limit(requests_per_min: int = 60):
 
 # ─── Helpers ────────────────────────────────────────────────────────────────
 
-def _render(template_name: str, **kwargs) -> str:
-    """Render an HTML page from template with SEO-friendly structure."""
-    title = kwargs.get("title", "CBSE Class X")
-    content = kwargs.get("content", "")
-    extra_css = kwargs.get("extra_css", "")
-    body_class = kwargs.get("body_class", "")
-    board_name = kwargs.get("board_name", "")
-    meta_desc = kwargs.get("description", "CBSE Class 10 learning platform with AI tutor, quizzes, interactive tools")
+def esc_js(s):
+    if s is None:
+        return ""
+    return str(s).replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "").replace('"', '&quot;')
 
-    seo = f"""<link rel="canonical" href="https://cbse.app/topic/" />
+
+def _render(title="CBSE Class X", content="", extra_css="", body_class="", board_name="", description="") -> str:
+    meta_desc = description or "CBSE Class 10 learning platform with AI tutor, quizzes, interactive tools"
+
+    seo = f"""<link rel="canonical" href="https://cbse.app/" />
 <meta name="description" content="{htmlmod.escape(meta_desc)}" />
 <meta property="og:title" content="{htmlmod.escape(title)}" />
 <meta property="og:description" content="{htmlmod.escape(meta_desc)}" />
 <meta name="twitter:card" content="summary" />"""
+
+    xp = "0"
+    try:
+        if DB.table_exists("learner"):
+            learner = DB.query_one("SELECT xp FROM learner WHERE id=1")
+            if learner:
+                xp = str(learner.get("xp", 0))
+    except Exception:
+        pass
 
     gbar = f"""<div class="gbar">
   <div class="gbar-inner">
@@ -99,13 +109,12 @@ def _render(template_name: str, **kwargs) -> str:
       <a href="/">Home</a>
       <a href="/search">🔍 Search</a>
       <a href="/tutor">🧠 Tutor</a>
-      <a href="/quiz">📝 Quiz</a>
       <a href="/exams">🏆 Exams</a>
       <a href="/profile">👤 Profile</a>
       <a href="/about">ℹ️ About</a>
     </div>
     <div class="gbar-right">
-      <span class="xp-badge">⭐ <span id="xp-display">{kwargs.get("xp", gamification.get_learner()["xp"] if DB.table_exists("learner") else 0)}</span> XP</span>
+      <span class="xp-badge">⭐ <span id="xp-display">{xp}</span> XP</span>
     </div>
   </div>
 </div>"""
@@ -119,6 +128,7 @@ def _render(template_name: str, **kwargs) -> str:
 {seo}
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+<link rel="stylesheet" href="/style.css">
 <style>
 :root {{ --primary: #0f3460; --accent: #4361ee; --bg: #f0f2f5; --card-bg: #fff; --text: #1a1a2e; --text-muted: #666; --border: #e0e0e0; --radius: 12px; --transition: 0.2s; --bottom-safe: env(safe-area-inset-bottom, 0px); }}
 * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -161,46 +171,62 @@ a:hover {{ text-decoration: underline; }}
 
 
 def format_content(text):
-    """Format AI/content text into safe HTML."""
+    """Format AI/content text into safe HTML. Handles markdown-like syntax."""
     if not text:
         return ""
     text = str(text)
+    text = htmlmod.escape(text)
     text = re.sub(r"\$\$(.*?)\$\$", r'<span class="math">\(\1\)</span>', text, flags=re.DOTALL)
     text = re.sub(r"!\[(.*?)\]\((.*?)\)", r'<img src="\2" alt="\1" style="max-width:100%;border-radius:6px;">', text)
     lines = text.split("\n")
     html_parts = []
-    in_list = False
+    in_ol = False
+    in_ul = False
     for line in lines:
         if re.match(r"^\d+[.)]\s", line):
-            if not in_list:
-                html_parts.append("<ol>")
-                in_list = True
-            html_parts.append(f"<li>{htmlmod.escape(re.sub(r'^\d+[.)]\s', '', line))}</li>")
+            if not in_ol:
+                if in_ul: html_parts.append("</ul>"); in_ul = False
+                html_parts.append("<ol>"); in_ol = True
+            html_parts.append(f"<li>{re.sub(r'^\d+[.)]\s', '', line)}</li>")
         elif re.match(r"^[-*]\s", line):
-            if not in_list:
-                html_parts.append("<ul>")
-                in_list = True
-            html_parts.append(f"<li>{htmlmod.escape(re.sub(r'^[-*]\s', '', line))}</li>")
+            if not in_ul:
+                if in_ol: html_parts.append("</ol>"); in_ol = False
+                html_parts.append("<ul>"); in_ul = True
+            html_parts.append(f"<li>{re.sub(r'^[-*]\s', '', line)}</li>")
         elif re.match(r"^#{1,3}\s", line):
-            if in_list:
-                html_parts.append("</ul></ol>" if "ol" in html_parts[-2:] else ("</ul>" if "ul" in "".join(html_parts[-5:]) else ""))
-                in_list = False
-            html_parts.append(f"<h3>{htmlmod.escape(re.sub(r'^#+\s', '', line))}</h3>")
+            if in_ol: html_parts.append("</ol>"); in_ol = False
+            if in_ul: html_parts.append("</ul>"); in_ul = False
+            html_parts.append(f"<h3>{re.sub(r'^#+\s', '', line)}</h3>")
         elif line.strip():
-            if in_list:
-                html_parts.append("</ol>" if "<ol>" in "".join(html_parts[-5:]) else "</ul>")
-                in_list = False
-            html_parts.append(f"<p>{htmlmod.escape(line)}</p>")
+            if in_ol: html_parts.append("</ol>"); in_ol = False
+            if in_ul: html_parts.append("</ul>"); in_ul = False
+            html_parts.append(f"<p>{line}</p>")
         else:
-            if in_list:
-                html_parts.append("</ol>" if "<ol>" in "".join(html_parts[-5:]) else "</ul>")
-                in_list = False
-    if in_list:
-        html_parts.append("</ol>" if "<ol>" in "".join(html_parts[-5:]) else "</ul>")
+            if in_ol: html_parts.append("</ol>"); in_ol = False
+            if in_ul: html_parts.append("</ul>"); in_ul = False
+    if in_ol: html_parts.append("</ol>")
+    if in_ul: html_parts.append("</ul>")
     result = "".join(html_parts)
-    if "<table>" in result:
-        result = result.replace("<table>", '<div class="table-wrap"><table>').replace("</table>", "</table></div>")
     return result
+
+
+def _build_breadcrumb(items):
+    """Build breadcrumb HTML from list of (label, url) tuples."""
+    parts = []
+    for label, url in items:
+        if url:
+            parts.append(f'<a href="{url}">{htmlmod.escape(label)}</a>')
+        else:
+            parts.append(htmlmod.escape(label))
+    return '<span class="sep">›</span>'.join(parts)
+
+
+def _get_topics(conn, chapter_id):
+    return conn.query("SELECT * FROM topics WHERE chapter_id = ? ORDER BY seq, title", (chapter_id,))
+
+
+def _get_chapters(conn, subject_id):
+    return conn.query("SELECT * FROM chapters WHERE subject_id = ? ORDER BY num", (subject_id,))
 
 
 # ─── Lifespan ───────────────────────────────────────────────────────────────
@@ -244,6 +270,16 @@ async def ai_status():
     return LLM.get_status()
 
 
+@app.get("/style.css")
+async def style_css():
+    return FileResponse("style.css") if os.path.exists("style.css") else PlainTextResponse("", status_code=404)
+
+
+@app.get("/manifest.json")
+async def manifest_json():
+    return FileResponse("manifest.json") if os.path.exists("manifest.json") else JSONResponse({})
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # PAGE ROUTES
 # ═══════════════════════════════════════════════════════════════════════════
@@ -251,20 +287,33 @@ async def ai_status():
 @app.get("/", response_class=HTMLResponse)
 async def home():
     conn = DB
-    subs = conn.query("SELECT s.id, s.name, s.board_id FROM subjects s ORDER BY s.board_id, s.name") if DB.table_exists("subjects") else []
-    rows = ""
-    for s in subs:
-        chs = conn.query("SELECT id, num, title FROM chapters WHERE subject_id = ? ORDER BY num", (s["id"],)) if DB.table_exists("chapters") else []
-        ch_links = "".join(f'<a href="/chapter/{ch["id"]}" class="chunk-view"><div class="chunk-title">Ch {ch["num"]}: {ch["title"]}</div></a>' for ch in ch_links)
-        rows += f'<div class="book-section"><h3>{s["name"]}</h3></div>'
+    boards_html = ""
+    if conn.table_exists("subjects"):
+        boards = conn.query("SELECT id, name, board_id FROM subjects ORDER BY board_id, name")
+        current_board = ""
+        for s in boards:
+            if s["board_id"] != current_board:
+                if current_board:
+                    boards_html += "</div>"
+                current_board = s["board_id"]
+                board_name = current_board.upper()
+                boards_html += f'<div class="section"><h2>📘 {board_name} Board</h2>'
+            chs = _get_chapters(conn, s["id"])
+            ch_links = "".join(f'<a href="/chapter/{ch["id"]}" class="chunk-view"><div class="chunk-title">Ch {ch["num"]}: {ch["title"]}</div></a>' for ch in chs)
+            boards_html += f'<h3>{s["name"]}</h3><div style="margin-bottom:0.8rem;">{ch_links}</div>'
+        if current_board:
+            boards_html += "</div>"
+    if not boards_html:
+        boards_html = '<div class="section"><p style="color:#666;">No content available yet.</p></div>'
+
     content = f"""<div class="section"><h2>📚 CBSE Class X</h2>
-<p style="color:#666;margin-bottom:1rem;">Complete learning platform with AI tutor, interactive quizzes, and smart revision.</p>
+<p style="color:#666;margin-bottom:1rem;">Complete learning platform with AI tutor, interactive quizzes, and smart revision. Multiple boards: CBSE, AP (Andhra Pradesh), TS (Telangana).</p>
 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
 <a href="/search" class="tts-btn">🔍 Search Topics</a>
 <a href="/tutor" class="tts-btn">🧠 AI Tutor</a>
 <a href="/exams" class="tts-btn">🏆 Mock Exams</a>
 <a href="/profile" class="tts-btn">👤 Profile</a>
-</div></div>{rows}"""
+</div></div>{boards_html}"""
     return HTMLResponse(_render(title="CBSE Class X - Home", content=content))
 
 
@@ -273,16 +322,19 @@ async def search_page(request: Request):
     q = request.query_params.get("q", "")
     results_html = ""
     if q:
-        engine = RAG
-        results = engine.search(q, limit=20)
+        try:
+            results = RAG.search(q, limit=20)
+        except Exception:
+            results = []
         for r in results:
+            topic_url = f"/topic/{r.get('id','')}"
             results_html += f"""<div class="chunk-view">
-<div class="chunk-title"><a href="/topic/{r.get('chapter_id','')}" style="color:var(--accent);">{htmlmod.escape(r.get('chapter_title',''))} › {htmlmod.escape(r.get('title',''))}</a></div>
+<div class="chunk-title"><a href="{topic_url}" style="color:var(--accent);">{htmlmod.escape(r.get('chapter_title',''))} › {htmlmod.escape(r.get('title',''))}</a></div>
 <div class="chunk-content">{htmlmod.escape(r.get('excerpt','')[:300])}</div>
 </div>"""
         if not results_html:
             results_html = '<p style="color:#666;">No results found.</p>'
-    content = f"""<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> Search</div>
+    content = f"""<div class="breadcrumb">{_build_breadcrumb([("Home", "/"), ("Search", None)])}</div>
 <div class="section">
 <h2>🔍 Search</h2>
 <form method="get" action="/search" style="display:flex;gap:0.5rem;margin:1rem 0;">
@@ -297,15 +349,28 @@ async def search_page(request: Request):
 @app.get("/tutor", response_class=HTMLResponse)
 async def tutor_hub():
     conn = DB
-    subjects = conn.query("SELECT DISTINCT s.id, s.name, s.board_id FROM subjects s JOIN chapters c ON c.subject_id = s.id JOIN topics t ON t.chapter_id = c.id WHERE t.id IS NOT NULL ORDER BY s.board_id, s.name") if DB.table_exists("subjects") else []
     rows = ""
-    for s in subjects:
-        chapters = conn.query("SELECT c.id, c.num, c.title FROM chapters c JOIN topics t ON t.chapter_id = c.id WHERE c.subject_id = ? GROUP BY c.id ORDER BY c.num", (s["id"],)) if DB.table_exists("chapters") else []
-        ch_links = "".join(f'<li><a href="/chapter/{ch["id"]}">Ch {ch["num"]}: {ch["title"]}</a></li>' for ch in chapters)
-        rows += f'<div class="book-section"><h3>{s["name"]}</h3><ul style="columns:2;column-gap:2rem;padding-left:1.2rem;">{ch_links}</ul></div>'
+    if conn.table_exists("subjects"):
+        subjects = conn.query(
+            "SELECT DISTINCT s.id, s.name, s.board_id FROM subjects s "
+            "JOIN chapters c ON c.subject_id = s.id "
+            "JOIN topics t ON t.chapter_id = c.id "
+            "WHERE t.id IS NOT NULL "
+            "ORDER BY s.board_id, s.name"
+        )
+        for s in subjects:
+            chapters = conn.query(
+                "SELECT c.id, c.num, c.title FROM chapters c "
+                "JOIN topics t ON t.chapter_id = c.id "
+                "WHERE c.subject_id = ? GROUP BY c.id ORDER BY c.num",
+                (s["id"],)
+            )
+            ch_links = "".join(f'<li><a href="/chapter/{ch["id"]}">Ch {ch["num"]}: {ch["title"]}</a></li>' for ch in chapters)
+            if ch_links:
+                rows += f'<div class="book-section"><h3>{s["name"]}</h3><ul style="columns:2;column-gap:2rem;padding-left:1.2rem;">{ch_links}</ul></div>'
     if not rows:
         rows = '<p style="text-align:center;padding:2rem;color:#666;">No topics available yet.</p>'
-    content = f"""<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> AI Tutor Hub</div>
+    content = f"""<div class="breadcrumb">{_build_breadcrumb([("Home", "/"), ("AI Tutor Hub", None)])}</div>
 <div class="section"><h2>🧠 AI Tutor Hub</h2><p>Select a chapter to start a question-based learning session.</p>{rows}</div>"""
     return HTMLResponse(_render(title="AI Tutor Hub - CBSE Class X", content=content))
 
@@ -315,20 +380,33 @@ async def tutor_page(topic_id: str):
     conn = DB
     topic = conn.query_one("SELECT * FROM topics WHERE id = ?", (topic_id,))
     if not topic:
-        return HTMLResponse(_render(title="Topic Not Found", content='<div class="section"><h2>Topic Not Found</h2><p><a href="/">Go Home</a></p></div>'), status_code=404)
+        return HTMLResponse(
+            _render(title="Topic Not Found", content='<div class="section"><h2>Topic Not Found</h2><p><a href="/">Go Home</a></p></div>'),
+            status_code=404
+        )
     chapter = conn.query_one("SELECT * FROM chapters WHERE id = ?", (topic["chapter_id"],))
     chunks = conn.query("SELECT * FROM chunks WHERE topic_id = ? ORDER BY seq", (topic_id,))
-    questions = ai_tutor.generate_questions(topic["title"], topic["content"], chunks, 3)
+    questions = ai_tutor.generate_questions(topic["title"], topic.get("content", ""), chunks, 3)
     session_id = ai_tutor.create_tutor_session(topic_id)
-    content = f"""<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/board/{chapter['board_id']}">{chapter['board_id'].upper()}</a> <span class="sep">›</span> <a href="/chapter/{chapter['id']}">Ch {chapter['num']}: {chapter['title']}</a> <span class="sep">›</span> <a href="/topic/{topic_id}">{topic['title']}</a> <span class="sep">›</span> AI Tutor</div>
+
+    questions_json = json.dumps(questions)
+    starter_prompt = random.choice(ai_tutor.STARTER_PROMPTS) if hasattr(ai_tutor, "STARTER_PROMPTS") else "Let's learn!"
+
+    content = f"""<div class="breadcrumb">{_build_breadcrumb([
+        ("Home", "/"),
+        (chapter.get("board_id", "").upper(), f"/board/{chapter['board_id']}"),
+        (f"Ch {chapter['num']}: {chapter['title']}", f"/chapter/{chapter['id']}"),
+        (topic["title"], f"/topic/{topic_id}"),
+        ("AI Tutor", None)
+    ])}</div>
 <div class="section" id="tutor-section">
 <h2>🧠 AI Tutor: {topic['title']}</h2>
 <p style="color:#666;margin-bottom:1rem;">Question-Based Learning</p>
 <div id="tutor-progress" style="margin-bottom:1rem;font-size:0.85rem;color:var(--text-muted);">Question 1 of {len(questions)}</div>
 <div id="tutor-content">
 <div class="tutor-question-card">
-<p class="tutor-prompt">{random.choice(ai_tutor.STARTER_PROMPTS)}</p>
-<p class="tutor-question-text" id="tutor-question">{questions[0]["question"]}</p>
+<p class="tutor-prompt">{starter_prompt}</p>
+<p class="tutor-question-text" id="tutor-question">{questions[0]["question"] if questions else "No questions available."}</p>
 <textarea id="tutor-answer" class="tutor-input" rows="4" placeholder="Type your answer here..."></textarea>
 <div style="display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;">
 <button class="tts-btn" onclick="submitTutorAnswer({session_id})">Submit Answer</button>
@@ -337,7 +415,7 @@ async def tutor_page(topic_id: str):
 <div id="tutor-feedback" style="display:none;"></div></div>
 <div id="tutor-complete" style="display:none;"></div></div>
 <script>
-var tutorQuestions = {json.dumps(questions)};
+var tutorQuestions = {questions_json};
 var tutorSessionId = {session_id};
 var tutorQIndex = 0;
 var topicId = '{topic_id}';
@@ -402,6 +480,144 @@ function skipTutorQuestion(sessionId){{
     return HTMLResponse(_render(title=f"AI Tutor: {topic['title']}", content=content))
 
 
+@app.get("/board/{board_id}", response_class=HTMLResponse)
+async def board_page(board_id: str):
+    conn = DB
+    board_id = board_id.lower()
+    subjects = conn.query("SELECT id, name, board_id FROM subjects WHERE LOWER(board_id) = ? ORDER BY name", (board_id,))
+    if not subjects:
+        return HTMLResponse(
+            _render(title="Board Not Found", content=f'<div class="section"><h2>Board Not Found</h2><p>No board found for "{board_id}". <a href="/">Go Home</a></p></div>'),
+            status_code=404
+        )
+    rows = ""
+    for s in subjects:
+        chs = _get_chapters(conn, s["id"])
+        ch_links = "".join(f'<a href="/chapter/{ch["id"]}" class="chunk-view"><div class="chunk-title">Ch {ch["num"]}: {ch["title"]}</div></a>' for ch in chs)
+        rows += f'<div class="book-section"><h3><a href="/board/{board_id}/{s["name"].lower().replace(" ","-")}" style="color:var(--primary);">{s["name"]}</a></h3><div style="margin-bottom:0.8rem;">{ch_links}</div></div>'
+    content = f"""<div class="breadcrumb">{_build_breadcrumb([("Home", "/"), (board_id.upper(), None)])}</div>
+<div class="section"><h2>📘 {board_id.upper()} Board</h2><p style="color:#666;margin-bottom:1rem;">Select a subject to begin learning.</p>{rows}</div>"""
+    return HTMLResponse(_render(title=f"{board_id.upper()} Board - CBSE Class X", content=content))
+
+
+@app.get("/board/{board_id}/{subject_slug}", response_class=HTMLResponse)
+async def subject_page(board_id: str, subject_slug: str):
+    conn = DB
+    board_id = board_id.lower()
+    subject_name = subject_slug.replace("-", " ").title()
+    subjects = conn.query(
+        "SELECT id, name, board_id FROM subjects WHERE LOWER(board_id) = ? AND LOWER(name) LIKE ? ORDER BY name",
+        (board_id, f"%{subject_name.lower()}%")
+    )
+    if not subjects:
+        subjects = conn.query(
+            "SELECT id, name, board_id FROM subjects WHERE LOWER(board_id) = ? ORDER BY name",
+            (board_id,)
+        )
+        if not subjects:
+            return HTMLResponse(
+                _render(title="Not Found", content='<div class="section"><h2>Not Found</h2><p><a href="/">Go Home</a></p></div>'),
+                status_code=404
+            )
+    rows = ""
+    for s in subjects:
+        chs = _get_chapters(conn, s["id"])
+        ch_links = "".join(f'<a href="/chapter/{ch["id"]}" class="chunk-view"><div class="chunk-title">Ch {ch["num"]}: {ch["title"]}</div></a>' for ch in chs)
+        rows += f'<h3>{s["name"]}</h3><div style="margin-bottom:1.2rem;">{ch_links}</div>'
+    content = f"""<div class="breadcrumb">{_build_breadcrumb([("Home", "/"), (board_id.upper(), f"/board/{board_id}"), (subject_name, None)])}</div>
+<div class="section"><h2>📘 {board_id.upper()} › {subject_name}</h2>{rows}</div>"""
+    return HTMLResponse(_render(title=f"{board_id.upper()} - {subject_name} - CBSE Class X", content=content))
+
+
+@app.get("/chapter/{chapter_id}", response_class=HTMLResponse)
+async def chapter_page(chapter_id: str):
+    conn = DB
+    chapter = conn.query_one("SELECT * FROM chapters WHERE id = ?", (chapter_id,))
+    if not chapter:
+        return HTMLResponse(
+            _render(title="Chapter Not Found", content='<div class="section"><h2>Chapter Not Found</h2><p><a href="/">Go Home</a></p></div>'),
+            status_code=404
+        )
+    subject = conn.query_one("SELECT * FROM subjects WHERE id = ?", (chapter["subject_id"],))
+    topics = _get_topics(conn, chapter_id)
+
+    topics_html = ""
+    for t in topics:
+        chunks = conn.query("SELECT * FROM chunks WHERE topic_id = ? ORDER BY seq", (t["id"],))
+        content_html = format_content(t.get("content", ""))
+        chunks_html = "".join(f'<div class="chunk-view"><div class="chunk-title">{htmlmod.escape(c.get("title",""))}</div><div class="chunk-content">{format_content(c.get("content",""))}</div></div>' for c in chunks)
+        topics_html += f"""<div class="section" id="topic-{t['id']}">
+<h2><a href="/topic/{t['id']}" style="color:var(--primary);">{htmlmod.escape(t['title'])}</a></h2>
+{content_html or chunks_html}
+<div class="chapter-actions">
+<a href="/topic/{t['id']}" class="tts-btn" style="font-size:0.8rem;">📖 Study</a>
+<a href="/tutor/{t['id']}" class="tts-btn" style="font-size:0.8rem;">🧠 AI Tutor</a>
+<a href="/quiz/{chapter_id}" class="tts-btn" style="font-size:0.8rem;">📝 Quiz</a>
+<a href="/interactives/matching/{t['id']}" class="tts-btn" style="font-size:0.8rem;">🔄 Matching</a>
+</div></div>"""
+
+    subj_name = subject["name"] if subject else ""
+    board_id = (subject["board_id"] if subject else "").upper()
+    content = f"""<div class="breadcrumb">{_build_breadcrumb([
+        ("Home", "/"),
+        (board_id, f"/board/{subject['board_id'].lower() if subject else ''}"),
+        (subj_name, None),
+        (f"Ch {chapter['num']}: {chapter['title']}", None)
+    ])}</div>
+<div class="section">
+<h2>📖 Ch {chapter['num']}: {chapter['title']}</h2>
+<p style="color:#666;margin-bottom:1rem;">{subject["name"] if subject else ""}</p>
+<div class="chapter-actions">
+<a href="/notes/{chapter_id}" class="tts-btn" style="font-size:0.8rem;">📝 Notes</a>
+<a href="/revision/{chapter_id}" class="tts-btn" style="font-size:0.8rem;">🔄 Revision</a>
+<a href="/quiz/{chapter_id}" class="tts-btn" style="font-size:0.8rem;">📝 Quiz</a>
+</div>
+</div>{topics_html}"""
+    return HTMLResponse(_render(title=f"Ch {chapter['num']}: {chapter['title']} - CBSE Class X", content=content))
+
+
+@app.get("/topic/{topic_id}", response_class=HTMLResponse)
+async def topic_page(topic_id: str):
+    conn = DB
+    topic = conn.query_one("SELECT * FROM topics WHERE id = ?", (topic_id,))
+    if not topic:
+        return HTMLResponse(
+            _render(title="Topic Not Found", content='<div class="section"><h2>Topic Not Found</h2><p><a href="/">Go Home</a></p></div>'),
+            status_code=404
+        )
+    chapter = conn.query_one("SELECT * FROM chapters WHERE id = ?", (topic["chapter_id"],))
+    subject = conn.query_one("SELECT * FROM subjects WHERE id = ?", (chapter["subject_id"],)) if chapter else None
+    chunks = conn.query("SELECT * FROM chunks WHERE topic_id = ? ORDER BY seq", (topic_id,))
+
+    content_html = format_content(topic.get("content", ""))
+    chunks_html = ""
+    for c in chunks:
+        chunks_html += f"""<div class="section" id="chunk-{c['id']}">
+<h3>{htmlmod.escape(c.get("title",""))}</h3>
+<div class="chunk-content">{format_content(c.get("content",""))}</div>
+</div>"""
+
+    bc_items = [("Home", "/")]
+    if subject:
+        bc_items.append((subject.get("board_id", "").upper(), f"/board/{subject['board_id'].lower()}"))
+        bc_items.append((subject.get("name", ""), None))
+    bc_items.append((f"Ch {chapter['num']}: {chapter['title']}", f"/chapter/{chapter['id']}"))
+    bc_items.append((topic["title"], None))
+
+    content = f"""<div class="breadcrumb">{_build_breadcrumb(bc_items)}</div>
+<div class="section">
+<h2>{htmlmod.escape(topic['title'])}</h2>
+<div class="chapter-actions">
+<a href="/tutor/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🧠 AI Tutor</a>
+<a href="/mindmap/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🗺️ Mind Map</a>
+<a href="/interactives/cards/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🃏 Flashcards</a>
+</div>
+{content_html}
+</div>
+{chunks_html}"""
+    return HTMLResponse(_render(title=f"{topic['title']} - CBSE Class X", content=content))
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # API ROUTES — ASYNC
 # ═══════════════════════════════════════════════════════════════════════════
@@ -418,7 +634,7 @@ async def api_tutor_start(request: Request):
     if not topic:
         return JSONResponse({"error": "Topic not found"}, status_code=404)
     chunks = conn.query("SELECT * FROM chunks WHERE topic_id = ? ORDER BY seq", (topic_id,))
-    questions = ai_tutor.generate_questions(topic["title"], topic["content"], chunks, 3)
+    questions = ai_tutor.generate_questions(topic["title"], topic.get("content", ""), chunks, 3)
     session_id = ai_tutor.create_tutor_session(topic_id)
     return {"session_id": session_id, "questions": questions, "topic_title": topic["title"]}
 
@@ -426,8 +642,8 @@ async def api_tutor_start(request: Request):
 @app.post("/api/tutor/answer")
 @rate_limit(60)
 async def api_tutor_answer(request: Request):
+    data = await request.form()
     try:
-        data = await request.form()
         session_id = int(data.get("session_id", 0))
     except (ValueError, TypeError):
         return JSONResponse({"error": "Invalid session_id"}, status_code=400)
@@ -447,8 +663,8 @@ async def api_tutor_answer(request: Request):
 @app.post("/api/tutor/remedial")
 @rate_limit(30)
 async def api_tutor_remedial(request: Request):
+    data = await request.form()
     try:
-        data = await request.form()
         answer_id = int(data.get("answer_id", 0))
         session_id = int(data.get("session_id", 0))
     except (ValueError, TypeError):
@@ -459,10 +675,21 @@ async def api_tutor_remedial(request: Request):
     ai_tutor.update_answer(answer_id, data.get("student_answer", ""), self_assessment)
     if self_assessment == "correct":
         return {"status": "ok", "remedial_html": ""}
-    answer = DB.query_one("SELECT ta.*, ts.topic_id FROM tutor_answers ta JOIN tutor_sessions ts ON ta.session_id = ts.id WHERE ta.id = ?", (answer_id,))
+    answer = DB.query_one(
+        "SELECT ta.*, ts.topic_id FROM tutor_answers ta "
+        "JOIN tutor_sessions ts ON ta.session_id = ts.id WHERE ta.id = ?",
+        (answer_id,)
+    )
+    if not answer:
+        return {"status": "ok", "remedial_html": ""}
     topic = DB.query_one("SELECT * FROM topics WHERE id = ?", (answer["topic_id"],))
     chunks = DB.query("SELECT * FROM chunks WHERE topic_id = ? ORDER BY seq", (answer["topic_id"],))
-    remedial = ai_tutor.get_remedial_content(topic["content"] if topic else "", chunks, answer["question_type"], answer["question"])
+    remedial = ai_tutor.get_remedial_content(
+        topic["content"] if topic else "",
+        chunks,
+        answer["question_type"],
+        answer["question"]
+    )
     html = f'<div class="tutor-remedial"><h4>📚 Let\'s Review This</h4><div class="tutor-remedial-content">{format_content(remedial)}</div></div>'
     return {"status": "ok", "remedial_html": html}
 
@@ -479,16 +706,15 @@ async def api_tutor_complete(request: Request):
     return {"status": "ok", "xp": xp}
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# AI ENRICH — ASYNC (non-blocking LLM)
-# ═══════════════════════════════════════════════════════════════════════════
-
 @app.get("/api/ai/enrich")
 @rate_limit(20)
 async def api_ai_enrich(topic: str = Query(...), chapter: str = Query(""), subject: str = Query(""), topic_type: str = Query("concept")):
     import asyncio
     loop = asyncio.get_event_loop()
-    enriched = await loop.run_in_executor(None, content_enricher.enrich_topic_content, topic, chapter, subject, "", topic_type)
+    enriched = await loop.run_in_executor(
+        None, content_enricher.enrich_topic_content,
+        topic, chapter, subject, "", topic_type
+    )
     html = content_enricher.format_ai_content(enriched)
     return {"html": html, "cached": bool(enriched.get("explanation"))}
 
@@ -498,28 +724,33 @@ async def api_ai_enrich(topic: str = Query(...), chapter: str = Query(""), subje
 async def api_search(q: str = Query(""), board: Optional[str] = None, limit: int = Query(15, le=50)):
     if not q:
         return {"results": []}
-    engine = RAG
-    results = engine.search(q, board=board, limit=limit)
+    try:
+        results = RAG.search(q, board=board, limit=limit)
+    except Exception:
+        results = []
     return {"results": results}
 
 
 @app.get("/api/gamification")
 async def api_gamification():
-    learner = gamification.get_learner()
-    return {"xp": learner["xp"], "level": learner["level"], "streak": learner["streak"],
-            "lives": learner["lives"], "topics_completed": learner["topics_completed"]}
+    try:
+        learner = gamification.get_learner()
+    except Exception:
+        learner = {"xp": 0, "level": 1, "streak": 0, "lives": 5, "topics_completed": 0}
+    return {
+        "xp": learner.get("xp", 0),
+        "level": learner.get("level", 1),
+        "streak": learner.get("streak", 0),
+        "lives": learner.get("lives", 5),
+        "topics_completed": learner.get("topics_completed", 0)
+    }
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# CATCH-ALL: Legacy HTML pages from app.py
-# ═══════════════════════════════════════════════════════════════════════════
 
 @app.api_route("/{path:path}", methods=["GET", "POST"], response_class=HTMLResponse, include_in_schema=False)
 async def catch_all(request: Request, path: str):
     """Fallback to the original CBSEHandler for unmigrated routes."""
     from app import CBSEHandler
     import io
-    import sys
 
     class FakeWriter:
         def __init__(self):
@@ -550,9 +781,9 @@ async def catch_all(request: Request, path: str):
     handler.send_header = fake_writer.send_header
     handler.end_headers = fake_writer.end_headers
     handler.requestline = f"{request.method} {raw_path} HTTP/1.1"
-    handler.client_address = request.client.host if request.client else ("0.0.0.0", 0)
+    handler.client_address = (request.client.host if request.client else "0.0.0.0", 0)
     handler.close_connection = True
-    handler.version = "HTTP/1.1"
+    handler.server_version = "FastAPI/3.0"
 
     try:
         if request.method == "GET":
@@ -560,15 +791,15 @@ async def catch_all(request: Request, path: str):
         else:
             handler.do_POST()
     except Exception as e:
-        log.error("Legacy handler error: %s", e)
+        log.error("Legacy handler error for %s: %s", raw_path, e)
 
     content_type = fake_writer.headers.get("Content-Type", "text/html; charset=utf-8")
-    return Response(content=fake_writer.body, status_code=fake_writer.status, media_type=content_type.split(";")[0].strip())
+    return Response(
+        content=fake_writer.body,
+        status_code=fake_writer.status,
+        media_type=content_type.split(";")[0].strip()
+    )
 
-
-# ═══════════════════════════════════════════════════════════════════════════
-# ENTRY POINT
-# ═══════════════════════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
     import uvicorn
