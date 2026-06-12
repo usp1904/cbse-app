@@ -1,10 +1,47 @@
 import json
 import re
 import time
+import hashlib
+import logging
 from chunking import search_chunks, get_topic_with_context, get_chapter_tree, get_chunk_ancestors
 
+log = logging.getLogger("cbse.rag")
 
 BOARD_NAMES = {"cbse": "CBSE", "ap": "AP Board", "ts": "TS Board"}
+_CACHE_TTL = 300  # 5 minutes
+_CACHE_MAXSIZE = 500
+
+
+def _get_db_cached(cache_key_tuple):
+    try:
+        from database import get_db
+        db = get_db()
+        key_str = json.dumps(cache_key_tuple, sort_keys=True)
+        hash_key = "rag_" + hashlib.sha256(key_str.encode()).hexdigest()
+        
+        if db.table_exists("ai_content_cache"):
+            row = db.query_one("SELECT result_json FROM ai_content_cache WHERE cache_key = ?", (hash_key,))
+            if row:
+                return json.loads(row["result_json"])
+    except Exception as e:
+        log.debug("RAG DB cache read error: %s", e)
+    return None
+
+
+def _set_db_cached(cache_key_tuple, val):
+    try:
+        from database import get_db
+        db = get_db()
+        key_str = json.dumps(cache_key_tuple, sort_keys=True)
+        hash_key = "rag_" + hashlib.sha256(key_str.encode()).hexdigest()
+        
+        if db.table_exists("ai_content_cache"):
+            if db.is_sqlite:
+                db.execute("INSERT OR REPLACE INTO ai_content_cache (cache_key, result_json) VALUES (?, ?)", (hash_key, json.dumps(val)))
+            else:
+                db.execute("INSERT INTO ai_content_cache (cache_key, result_json) VALUES (%s, %s) ON CONFLICT (cache_key) DO UPDATE SET result_json = EXCLUDED.result_json", (hash_key, json.dumps(val)))
+    except Exception as e:
+        log.debug("RAG DB cache write error: %s", e)
 
 
 class RAGEngine:
@@ -12,10 +49,35 @@ class RAGEngine:
         self.search_cache = {}
         self.hybrid_cache = {}
 
+    def _cache_get(self, cache, key):
+        val = cache.get(key)
+        if val is None:
+            return None
+        entry_time, data = val
+        if time.time() - entry_time > _CACHE_TTL:
+            del cache[key]
+            return None
+        return data
+
+    def _cache_set(self, cache, key, val):
+        if len(cache) >= _CACHE_MAXSIZE:
+            try:
+                oldest = min(cache.keys(), key=lambda k: cache[k][0])
+                del cache[oldest]
+            except (ValueError, KeyError):
+                cache.clear()
+        cache[key] = (time.time(), val)
+
     def search(self, query, board=None, subject=None, limit=15):
         cache_key = (query, board, subject, limit, "fts")
-        if cache_key in self.search_cache:
-            return self.search_cache[cache_key]
+        cached = self._cache_get(self.search_cache, cache_key)
+        if cached is not None:
+            return cached
+
+        cached_db = _get_db_cached(cache_key)
+        if cached_db is not None:
+            self._cache_set(self.search_cache, cache_key, cached_db)
+            return cached_db
 
         results = search_chunks(query, board_id=board, subject_id=subject, limit=limit)
         enriched = []
@@ -41,13 +103,20 @@ class RAGEngine:
             }
             enriched.append(entry)
 
-        self.search_cache[cache_key] = enriched
+        self._cache_set(self.search_cache, cache_key, enriched)
+        _set_db_cached(cache_key, enriched)
         return enriched
 
     def hybrid_search(self, query, board=None, subject=None, limit=15):
         cache_key = (query, board, subject, limit, "hybrid")
-        if cache_key in self.hybrid_cache:
-            return self.hybrid_cache[cache_key]
+        cached = self._cache_get(self.hybrid_cache, cache_key)
+        if cached is not None:
+            return cached
+
+        cached_db = _get_db_cached(cache_key)
+        if cached_db is not None:
+            self._cache_set(self.hybrid_cache, cache_key, cached_db)
+            return cached_db
 
         fts_results = self.search(query, board=board, subject=subject, limit=limit * 2)
 
@@ -65,7 +134,8 @@ class RAGEngine:
         sorted_results = sorted(scored.values(), key=lambda x: -x[1])[:limit]
         results = [r for r, _ in sorted_results]
 
-        self.hybrid_cache[cache_key] = results
+        self._cache_set(self.hybrid_cache, cache_key, results)
+        _set_db_cached(cache_key, results)
         return results
 
     def search_by_board(self, query, board="cbse", limit=10):

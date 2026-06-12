@@ -10,8 +10,6 @@ import urllib.parse
 
 from llm_client import get_client
 
-GEMMA_MODEL = os.environ.get("GEMMA_MODEL", "gemma4:latest")
-
 
 def _llm(prompt, system=None, max_tokens=1024, temp=0.3):
     client = get_client()
@@ -96,6 +94,35 @@ Return only the rewritten text."""
 def quillbot_speak(text, lang="en-IN"):
     """Browser-based TTS (handled client-side). Returns text for JS SpeechSynthesis."""
     return {"success": True, "text": text, "lang": lang, "tts": "browser"}
+
+
+def quillbot_speak_segments(text, lang="en-IN", voice="female"):
+    """Split text into time-coded segments for voiceover-video sync."""
+    sentences = re.split(r'(?<=[.?!])\s+', text.strip())
+    segments = []
+    total_dur = 0
+    for s in sentences:
+        if not s.strip():
+            continue
+        words = len(s.split())
+        duration = max(2.0, words * 0.35)
+        segments.append({
+            "text": s.strip(),
+            "start": round(total_dur, 1),
+            "end": round(total_dur + duration, 1),
+            "duration": round(duration, 1),
+        })
+        total_dur += duration
+    return {
+        "success": True,
+        "text": text,
+        "lang": lang,
+        "voice": voice,
+        "tts": "browser",
+        "segments": segments,
+        "total_duration": round(total_dur, 1),
+        "sync_url": "/api/ai/youtube?topic=" + urllib.parse.quote(text[:60]),
+    }
 
 
 # ─── LLM Research Assistant (replaces Perplexity, zero API key) ───────────
@@ -229,13 +256,12 @@ def browser_music_params(mood="calm study piano"):
 
 def gemma4_query(prompt, system=None, max_tokens=1024, temp=0.3):
     client = get_client()
-    if client.ollama_url:
-        orig_model = client.ollama_model
-        client.ollama_model = GEMMA_MODEL
+    if client.gemini_api_key:
+        orig_model = client.gemini_model
         try:
-            return client.query(prompt, system or "You are a helpful CBSE Class X tutor using Gemma 4.", max_tokens, temp)
+            return client.query(prompt, system or "You are a helpful CBSE Class X tutor using Gemma/Gemini.", max_tokens, temp)
         finally:
-            client.ollama_model = orig_model
+            pass
     return _llm(prompt, system, max_tokens, temp)
 
 
@@ -343,7 +369,8 @@ def _pomelli_graph_linear(params):
 <script>
 function drawLinearGraph() {{
   const canvas = document.getElementById('pomelli-canvas');
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas && canvas.getContext('2d');
+  if (!canvas || !ctx) return;
   const w = canvas.width, h = canvas.height;
   const cx = w/2, cy = h/2, scale = 25;
   const m = parseFloat(document.getElementById('p-slope').value);
@@ -390,7 +417,9 @@ def _pomelli_graph_quadratic(params):
 <script>
 function drawQuadGraph() {{
   const canvas = document.getElementById('pomelli-canvas-q');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas && canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const cx=w/2, cy=h/2, scale=25;
   const a = parseFloat(document.getElementById('p-qa').value);
   const b = parseFloat(document.getElementById('p-qb').value);
@@ -437,7 +466,9 @@ def _pomelli_graph_trig(params):
 <script>
 function drawTrigGraph() {{
   const canvas = document.getElementById('pomelli-canvas-t');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const cx=w/2, cy=h/2, scale=40; const pi=Math.PI;
   const f = document.getElementById('p-trig').value;
   const amp = parseFloat(document.getElementById('p-tamp').value);
@@ -485,7 +516,9 @@ def _pomelli_geometry_transform(params):
 <script>
 function drawGeo() {{
   const canvas = document.getElementById('pomelli-canvas-geo');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const cx=w/2, cy=h/2;
   const shape = document.getElementById('p-shape').value;
   const rot = parseFloat(document.getElementById('p-rotate').value)*Math.PI/180;
@@ -532,7 +565,9 @@ def _pomelli_fractions(params):
 <script>
 function drawFraction() {{
   const canvas = document.getElementById('pomelli-canvas-f');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const n = parseInt(document.getElementById('p-fnum').value);
   const d = parseInt(document.getElementById('p-fden').value);
   document.getElementById('p-fnum-val').textContent=n;
@@ -570,7 +605,9 @@ def _pomelli_pythagoras(params):
 <script>
 function drawPythagoras() {{
   const canvas = document.getElementById('pomelli-canvas-p');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const a = parseFloat(document.getElementById('p-pa').value);
   const b = parseFloat(document.getElementById('p-pb').value);
   const c = Math.sqrt(a*a + b*b);
@@ -623,7 +660,9 @@ def _pomelli_number_line(params):
 <script>
 function drawNumLine() {{
   const canvas = document.getElementById('pomelli-canvas-n');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const op = document.getElementById('p-op').value;
   const a = parseInt(document.getElementById('p-na').value);
   const b = parseInt(document.getElementById('p-nb').value);
@@ -678,7 +717,9 @@ def _pomelli_probability(params):
 let probData = {};
 async function runProb() {
   const canvas = document.getElementById('pomelli-canvas-prob');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const rolls = 1000; const counts = [0,0,0,0,0,0];
   for(let i=0;i<rolls;i++) counts[Math.floor(Math.random()*6)]++;
   ctx.clearRect(0,0,w,h);
@@ -691,7 +732,7 @@ async function runProb() {
     const gradient = ctx.createLinearGradient(x, h-80-barH, x, h-80);
     gradient.addColorStop(0,'#4a90d9'); gradient.addColorStop(1,'#2ecc71');
     ctx.fillStyle = gradient;
-    ctx.beginPath(); ctx.roundRect(x, h-80-barH, barW, barH, [5,5,0,0]); ctx.fill();
+    ctx.fillRect(x, h-80-barH, barW, barH);
     ctx.fillStyle='#333'; ctx.font='14px sans-serif'; ctx.textAlign='center';
     ctx.fillText(i+1, x+barW/2, h-55);
     ctx.fillText(c, x+barW/2, h-90-barH);
@@ -701,7 +742,9 @@ async function runProb() {
 }
 async function runCoin() {
   const canvas = document.getElementById('pomelli-canvas-prob');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const flips = 1000;
   let heads = 0, tails = 0;
   for(let i=0;i<flips;i++) Math.random()<0.5 ? heads++ : tails++;
@@ -713,7 +756,7 @@ async function runCoin() {
     const barH = (c/(flips/2))*200;
     const x = startX + i*(barW+gap);
     ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(x, h-80-barH, barW, barH, [5,5,0,0]); ctx.fill();
+    ctx.fillRect(x, h-80-barH, barW, barH);
     ctx.fillStyle='#333'; ctx.font='bold 16px sans-serif'; ctx.textAlign='center';
     ctx.fillText(label, x+barW/2, h-55);
     ctx.fillText(c, x+barW/2, h-90-barH);
@@ -735,7 +778,9 @@ def _pomelli_statistics(params):
 <script>
 function genData() {
   const canvas = document.getElementById('pomelli-canvas-stats');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const data = Array.from({length:8},()=>Math.floor(Math.random()*50+10));
   const labels = ['A','B','C','D','E','F','G','H'];
   ctx.clearRect(0,0,w,h);
@@ -748,7 +793,7 @@ function genData() {
     const barH = (v/maxVal)*220;
     const x = startX + i*(barW+gap);
     ctx.fillStyle = v >= mean ? '#4a90d9' : '#e74c3c';
-    ctx.beginPath(); ctx.roundRect(x, h-80-barH, barW, barH, [5,5,0,0]); ctx.fill();
+    ctx.fillRect(x, h-80-barH, barW, barH);
     ctx.fillStyle='#333'; ctx.font='14px sans-serif'; ctx.textAlign='center';
     ctx.fillText(labels[i], x+barW/2, h-55);
     ctx.fillText(v, x+barW/2, h-90-barH);
@@ -786,7 +831,9 @@ def _pomelli_area_perimeter(params):
 <script>
 function drawAP() {
   const canvas = document.getElementById('pomelli-canvas-ap');
-  const ctx = canvas.getContext('2d'); const w=canvas.width, h=canvas.height;
+  const ctx = canvas.getContext('2d');
+  if (!canvas || !ctx) return;
+  const w=canvas.width, h=canvas.height;
   const shape = document.getElementById('ap-shape').value;
   const wd = parseInt(document.getElementById('ap-w').value);
   const ht = parseInt(document.getElementById('ap-h').value);
@@ -984,17 +1031,15 @@ This topic connects to other chapters and builds a foundation for advanced study
 # ─── MetaAI: Contextual Learning (Llama 3/3.1 via Ollama) ──────────────────
 
 def metaai_contextual_learn(topic, chapter="", subject="", level="simple"):
-    """Deep contextual learning powered by MetaAI Llama models through Ollama."""
+    """Deep contextual learning powered by Mistral/Gemini."""
     client = get_client()
-    if client.available and client.ollama_url:
+    if client.available:
         response = client.contextual_learn(topic, chapter, subject, level)
-        return {"success": True, "content": response, "backend": "ollama", "model": client.ollama_model}
+        return {"success": True, "content": response, "backend": client.backend_name, "model": client.model_name}
     return {"success": False, "content": "", "backend": "none", "model": ""}
 
 
 # ─── YouTube: Video Integration (Google YouTube Data API v3) ────────────────
-
-YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY", "")
 
 
 def youtube_search(query, max_results=5):
