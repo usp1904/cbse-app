@@ -296,5 +296,76 @@ def run_mcp_server():
             continue
 
 
+def run_http_server(host="0.0.0.0", port=9095):
+    """Run MCP server over HTTP (JSON-RPC 2.0 over POST)."""
+    import http.server
+    import urllib.parse
+
+    class MCPHTTPHandler(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            cl = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(cl) if cl > 0 else b"{}"
+            try:
+                req = json.loads(body)
+                resp = handle_request(req)
+                if resp is None:
+                    resp = {"jsonrpc": "2.0", "id": None, "result": {}}
+                data = json.dumps(resp, ensure_ascii=False).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+            except Exception as e:
+                err = {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": str(e)}}
+                data = json.dumps(err).encode()
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+
+        def do_GET(self):
+            if self.path == "/health":
+                data = b'{"status":"ok","server":"cbse-education-mcp","version":"1.0.0"}'
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+            else:
+                # Serve minimal tool listing at /
+                info = {
+                    "server": "cbse-education-mcp",
+                    "version": "1.0.0",
+                    "tools": len(TOOLS),
+                    "prompts": len(PROMPTS),
+                    "usage": "POST JSON-RPC 2.0 request to /",
+                }
+                data = json.dumps(info, indent=2).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+
+        def log_message(self, fmt, *args):
+            log.info("HTTP %s", fmt % args)
+
+    server = http.server.HTTPServer((host, port), MCPHTTPHandler)
+    log.info("MCP HTTP server listening on http://%s:%s", host, port)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        log.info("MCP HTTP server shutting down")
+        server.server_close()
+
+
 if __name__ == "__main__":
-    run_mcp_server()
+    if "--http" in sys.argv:
+        idx = sys.argv.index("--http")
+        port = int(sys.argv[idx + 1]) if idx + 1 < len(sys.argv) else 9095
+        host = sys.argv[idx + 2] if idx + 2 < len(sys.argv) else "0.0.0.0"
+        run_http_server(host, port)
+    else:
+        run_mcp_server()

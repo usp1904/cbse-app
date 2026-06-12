@@ -649,7 +649,7 @@ async def home():
             </div>
         </div>"""
 
-    medium_opts = '<option value="">All Mediums</option><option value="English">English</option><option value="Hindi">हिन्दी (Hindi)</option><option value="Telugu">తెలుగు (Telugu)</option>'
+    medium_opts = '<option value="">All Mediums</option><option value="English">English</option><option value="Hindi">हिन्दी (Hindi)</option><option value="Telugu">తెలుగు (Telugu)</option><option value="Tamil">தமிழ் (Tamil)</option><option value="Kannada">ಕನ್ನಡ (Kannada)</option><option value="Bengali">বাংলা (Bengali)</option><option value="Marathi">मराठी (Marathi)</option><option value="Gujarati">ગુજરાતી (Gujarati)</option><option value="Malayalam">മലയാളം (Malayalam)</option><option value="Odia">ଓଡ଼ିଆ (Odia)</option><option value="Punjabi">ਪੰਜਾਬੀ (Punjabi)</option><option value="Assamese">অসমীয়া (Assamese)</option><option value="Urdu">اردو (Urdu)</option>'
     subject_opts = '<option value="">All Subjects</option>'
     seen_subjects = set()
     for b in board_tree:
@@ -1169,7 +1169,7 @@ async def api_tutor_complete(request: Request, user: Optional[dict] = Depends(ge
 
 @app.get("/api/ai/enrich")
 @rate_limit(20)
-async def api_ai_enrich(topic: str = Query(...), chapter: str = Query(""), subject: str = Query(""), topic_type: str = Query("concept")):
+async def api_ai_enrich(request: Request, topic: str = Query(...), chapter: str = Query(""), subject: str = Query(""), topic_type: str = Query("concept")):
     loop = asyncio.get_event_loop()
     enriched = await loop.run_in_executor(
         None, content_enricher.enrich_topic_content,
@@ -1191,14 +1191,14 @@ async def _run_in_thread(func, *args):
 
 @app.get("/api/ai/diagram")
 @rate_limit(20)
-async def api_ai_diagram(concept: str = Query(...), type: str = Query("flowchart")):
+async def api_ai_diagram(request: Request, concept: str = Query(...), type: str = Query("flowchart")):
     result = await _run_in_thread(ai_services.napkin_diagram, concept, type)
     return result
 
 
 @app.get("/api/ai/presentation")
 @rate_limit(10)
-async def api_ai_presentation(subject: str = Query(...), chapter: str = Query(...)):
+async def api_ai_presentation(request: Request, subject: str = Query(...), chapter: str = Query(...)):
     idx = get_index()
     topics = idx.get_chapter(chapter) if hasattr(idx, 'get_chapter') else []
     result = await _run_in_thread(ai_services.gamma_presentation, subject, chapter, topics)
@@ -1207,21 +1207,21 @@ async def api_ai_presentation(subject: str = Query(...), chapter: str = Query(..
 
 @app.get("/api/ai/story")
 @rate_limit(20)
-async def api_ai_story(topic: str = Query(...), chapter: str = Query(""), subject: str = Query("CBSE Science")):
+async def api_ai_story(request: Request, topic: str = Query(...), chapter: str = Query(""), subject: str = Query("CBSE Science")):
     result = await _run_in_thread(ai_services.tome_story, topic, chapter, subject)
     return result
 
 
 @app.get("/api/ai/music")
 @rate_limit(20)
-async def api_ai_music(mood: str = Query("calm study piano")):
+async def api_ai_music(request: Request, mood: str = Query("calm study piano")):
     result = await _run_in_thread(ai_services.browser_music_params, mood)
     return result
 
 
 @app.get("/api/ai/pomelli")
 @rate_limit(30)
-async def api_ai_pomelli(template: str = Query(...), a: str = Query(None), b: str = Query(None), c: str = Query(None)):
+async def api_ai_pomelli(request: Request, template: str = Query(...), a: str = Query(None), b: str = Query(None), c: str = Query(None)):
     params = {}
     if a is not None: params["a"] = a
     if b is not None: params["b"] = b
@@ -1234,14 +1234,14 @@ async def api_ai_pomelli(template: str = Query(...), a: str = Query(None), b: st
 
 @app.get("/api/ai/metai")
 @rate_limit(10)
-async def api_ai_metai(concept: str = Query(...), style: str = Query("explainer"), subject: str = Query("Science")):
+async def api_ai_metai(request: Request, concept: str = Query(...), style: str = Query("explainer"), subject: str = Query("Science")):
     result = await _run_in_thread(ai_services.metai_generate, concept, subject, style)
     return result
 
 
 @app.get("/api/ai/opengrok")
 @rate_limit(30)
-async def api_ai_opengrok(query: str = Query(...)):
+async def api_ai_opengrok(request: Request, query: str = Query(...)):
     loop = asyncio.get_event_loop()
     results = await loop.run_in_executor(None, ai_services.opengrok_search, query)
     html = ai_services.opengrok_results_html(query)
@@ -1250,7 +1250,7 @@ async def api_ai_opengrok(query: str = Query(...)):
 
 @app.get("/api/ai/notebooklm")
 @rate_limit(10)
-async def api_ai_notebooklm(subject: str = Query(...), chapter: str = Query(...), topic: str = Query(None)):
+async def api_ai_notebooklm(request: Request, subject: str = Query(...), chapter: str = Query(...), topic: str = Query(None)):
     if topic:
         result = await _run_in_thread(ai_services.notebooklm_pedagogical, subject, chapter, topic)
     else:
@@ -1262,57 +1262,65 @@ async def api_ai_notebooklm(subject: str = Query(...), chapter: str = Query(...)
 
 @app.get("/api/ai/youtube")
 @rate_limit(20)
-async def api_ai_youtube(topic: str = Query(...), chapter: str = Query(""), subject: str = Query("")):
+async def api_ai_youtube(request: Request, topic: str = Query(...), chapter: str = Query(""), subject: str = Query("")):
     html = await _run_in_thread(ai_services.youtube_section_html, topic, chapter, subject)
     results = await _run_in_thread(ai_services.youtube_search, f"{topic} {chapter} {subject}")
     return {"html": html, "results": results}
 
 
+@app.get("/api/ai/youtube/generate")
+@rate_limit(5)
+async def api_ai_youtube_generate(request: Request, topic_id: str = Query(""), chapter_id: str = Query(""), topic_name: str = Query(""), max_clips: int = Query(8)):
+    result = await _run_in_thread(ai_services.youtube_generate_clips,
+                                  topic_id or None, chapter_id or None, topic_name or None, min(max_clips, 20))
+    return result
+
+
 @app.get("/api/ai/research")
 @rate_limit(10)
-async def api_ai_research(query: str = Query(...), subject: str = Query("CBSE")):
+async def api_ai_research(request: Request, query: str = Query(...), subject: str = Query("CBSE")):
     result = await _run_in_thread(ai_services.llm_research, query, subject)
     return result
 
 
 @app.get("/api/ai/literature")
 @rate_limit(10)
-async def api_ai_literature(query: str = Query(...), subject: str = Query("science")):
+async def api_ai_literature(request: Request, query: str = Query(...), subject: str = Query("science")):
     result = await _run_in_thread(ai_services.llm_literature, query, subject)
     return result
 
 
 @app.get("/api/ai/visualize")
 @rate_limit(20)
-async def api_ai_visualize(concept: str = Query(...), style: str = Query("diagram")):
+async def api_ai_visualize(request: Request, concept: str = Query(...), style: str = Query("diagram")):
     result = await _run_in_thread(ai_services.svg_visualize, concept, style)
     return result
 
 
 @app.get("/api/ai/gemma4")
 @rate_limit(10)
-async def api_ai_gemma4(prompt: str = Query(...), system: str = Query(None)):
+async def api_ai_gemma4(request: Request, prompt: str = Query(...), system: str = Query(None)):
     result = await _run_in_thread(ai_services.gemma4_query, prompt, system)
     return {"response": result}
 
 
 @app.get("/api/ai/flash")
 @rate_limit(10)
-async def api_ai_flash(prompt: str = Query(...), system: str = Query(None)):
+async def api_ai_flash(request: Request, prompt: str = Query(...), system: str = Query(None)):
     result = await _run_in_thread(ai_services.google_flash_query, prompt, system)
     return {"response": result}
 
 
 @app.get("/api/ai/quillbot")
 @rate_limit(20)
-async def api_ai_quillbot(text: str = Query(...), mode: str = Query("simpler")):
+async def api_ai_quillbot(request: Request, text: str = Query(...), mode: str = Query("simpler")):
     result = await _run_in_thread(ai_services.quillbot_paraphrase, text, mode)
     return result
 
 
 @app.get("/api/ai/voiceover")
 @rate_limit(30)
-async def api_ai_voiceover(text: str = Query(...), voice: str = Query("female"), lang: str = Query("en-IN")):
+async def api_ai_voiceover(request: Request, text: str = Query(...), voice: str = Query("female"), lang: str = Query("en-IN")):
     result = ai_services.quillbot_speak_segments(text, lang, voice)
     return result
 
@@ -1640,7 +1648,7 @@ async def ai_metai():
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> MetaAI</div>
         <div class="section">
             <h2>🤖 MetaAI Learning</h2>
-            <p class="subtitle">Contextual learning powered by MetaAI (Llama) — explanations, storyboards, and learning guides</p>
+            <p class="subtitle">Contextual learning powered by MetaAI — explanations, storyboards, and learning guides</p>
             <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
                 <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Concept</label>
                 <input type="text" id="metai-concept" value="Photosynthesis" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
@@ -1722,7 +1730,7 @@ async def about_page():
             <div class="book-section"><h3>🤖 AI-Powered Tools</h3><p>Mistral AI & Gemini: diagram generation, presentations, voiceovers, research, and more.</p></div>
             <div class="book-section"><h3>🎯 Interactive Learning</h3><p>Quizzes, mind maps, interactive cards, matching games for every topic.</p></div>
             <div class="book-section"><h3>🏆 Gamification</h3><p>XP, levels, streaks, and achievements to keep you motivated.</p></div>
-            <div class="book-section"><h3>🌐 Multi-Lingual</h3><p>English · हिन्दी · తెలుగు — learn in your preferred medium.</p></div>
+            <div class="book-section"><h3>🌐 Multi-Lingual</h3><p>English · हिन्दी · తెలుగు · தமிழ் · ಕನ್ನಡ · বাংলা · മലയാളം — learn in your preferred medium.</p></div>
             <div class="book-section"><h3>📊 Progress Tracking</h3><p>Personalized learning paths, revision notes, and mock exams.</p></div>
         </div>
     </div>"""))
@@ -1782,6 +1790,20 @@ async def ai_youtube_page():
             <div id="yt-output" style="margin-top:1rem;"></div>
         </div>
     </div>
+    <div class="section">
+        <h2>🎬 Iterative Short-Clip Generator</h2>
+        <p class="subtitle">Split a long topic into short clips with voiceover sync</p>
+        <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
+            <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Topic Name or Topic ID</label>
+            <input type="text" id="yt-clip-topic" value="Quadratic Equations" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;">
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <input type="text" id="yt-clip-chapter" placeholder="Chapter ID (optional)" style="flex:1;min-width:120px;padding:0.7rem;border:1px solid var(--border);border-radius:8px;">
+                <input type="number" id="yt-clip-count" value="5" min="2" max="20" style="width:80px;padding:0.7rem;border:1px solid var(--border);border-radius:8px;">
+                <button onclick="generateClips()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">🎬 Generate Clips</button>
+            </div>
+            <div id="yt-clip-output" style="margin-top:1rem;"></div>
+        </div>
+    </div>
     <script>
     async function searchYouTube() {
         const topic = document.getElementById('yt-topic').value;
@@ -1791,6 +1813,44 @@ async def ai_youtube_page():
             const resp = await fetch('/api/ai/youtube?topic='+encodeURIComponent(topic));
             const data = await resp.json();
             out.innerHTML = data.html || '<em>No videos found</em>';
+        } catch(e) {
+            out.innerHTML = '<em>Error: ' + e.message + '</em>';
+        }
+    }
+    async function generateClips() {
+        const topic = document.getElementById('yt-clip-topic').value;
+        const chapter = document.getElementById('yt-clip-chapter').value;
+        const max = document.getElementById('yt-clip-count').value || 5;
+        const out = document.getElementById('yt-clip-output');
+        out.innerHTML = '<em>Generating clip playlist...</em>';
+        try {
+            let url = '/api/ai/youtube/generate?topic_name='+encodeURIComponent(topic)+'&max_clips='+max;
+            if (chapter) url += '&chapter_id='+encodeURIComponent(chapter);
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (!data.success) { out.innerHTML = '<em>Generation failed</em>'; return; }
+            let h = '<div style="margin-top:0.5rem;"><h4 style="color:var(--accent);margin-bottom:0.3rem;">🎬 Playlist: '+data.topic+'</h4>';
+            h += '<p style="font-size:0.8rem;color:#666;">'+data.total_clips+' clips &middot; ~'+data.total_duration+'s total</p>';
+            h += '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;">';
+            for (const c of data.clips) {
+                h += '<div class="book-section" style="padding:0.75rem;border-left:3px solid var(--accent);">';
+                h += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">';
+                h += '<strong>#'+c.index+' '+c.segment_title+'</strong>';
+                h += '<span style="font-size:0.75rem;color:#666;">~'+c.duration_sec+'s</span>';
+                h += '</div>';
+                if (c.videoId) {
+                    h += '<div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;background:#000;border-radius:6px;margin:0.4rem 0;">';
+                    h += '<iframe src="https://www.youtube.com/embed/'+c.videoId+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen loading="lazy"></iframe></div>';
+                } else {
+                    h += '<p style="font-size:0.78rem;color:#888;margin:0.3rem 0;"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(c.query)+'" target="_blank" rel="noopener" style="color:var(--accent);">Search YouTube for "'+c.segment_title+'" →</a></p>';
+                }
+                if (c.voiceover && c.voiceover.segments) {
+                    h += '<div style="font-size:0.75rem;color:#666;margin-top:0.2rem;">🔊 '+c.voiceover.segments.length+' speech segments &middot; ~'+c.voiceover.total_duration+'s</div>';
+                }
+                h += '</div>';
+            }
+            h += '</div></div>';
+            out.innerHTML = h;
         } catch(e) {
             out.innerHTML = '<em>Error: ' + e.message + '</em>';
         }

@@ -1028,7 +1028,7 @@ This topic connects to other chapters and builds a foundation for advanced study
     return {"success": True, "markdown": result, "title": f"Pedagogical Guide: {topic}"}
 
 
-# ─── MetaAI: Contextual Learning (Llama 3/3.1 via Ollama) ──────────────────
+# ─── MetaAI: Contextual Learning (powered by Mistral AI) ──────────────────
 
 def metaai_contextual_learn(topic, chapter="", subject="", level="simple"):
     """Deep contextual learning powered by Mistral/Gemini."""
@@ -1104,6 +1104,95 @@ def youtube_section_html(topic, chapter="", subject=""):
         </p>
     </div>"""
     return html
+
+
+def youtube_generate_clips(topic_id=None, chapter_id=None, topic_name=None, max_clips=8):
+    """Iterative short-clip video generation — splits long content into time-coded segments,
+    finds relevant YouTube videos for each, and returns a voiceover-synced playlist."""
+    content_segments = []
+    conn = None
+    try:
+        from database import get_db as _get_db
+        conn = _get_db()
+    except Exception:
+        pass
+
+    if topic_id and conn and conn.table_exists("topics"):
+        topic = conn.query_one("SELECT * FROM topics WHERE id = ?", (topic_id,))
+        if topic:
+            topic_name = topic_name or topic["title"]
+            if conn.table_exists("chunks"):
+                chunks = conn.query("SELECT * FROM chunks WHERE topic_id = ? ORDER BY seq", (topic_id,))
+                for c in chunks:
+                    t = c.get("title", "").strip() or topic["title"]
+                    ct = (c.get("content", "") or "")[:500]
+                    if ct:
+                        content_segments.append({"title": t, "text": ct})
+            if not content_segments and topic.get("content"):
+                content_segments.append({"title": topic["title"], "text": topic["content"][:500]})
+
+    if not content_segments and chapter_id and conn and conn.table_exists("topics"):
+        topics = conn.query("SELECT * FROM topics WHERE chapter_id = ? ORDER BY num, title", (chapter_id,))
+        for t in topics:
+            t_text = (t.get("content", "") or "")[:300]
+            content_segments.append({"title": t["title"], "text": t_text or f"Learn about {t['title']}"})
+
+    if not content_segments and topic_name:
+        content_segments.append({"title": topic_name, "text": topic_name})
+
+    expanded = []
+    for seg in content_segments[:max_clips * 2]:
+        paragraphs = [p.strip() for p in seg["text"].split("\n\n") if p.strip()]
+        if len(paragraphs) > 1:
+            for i, p in enumerate(paragraphs):
+                expanded.append({"title": f"{seg['title']} (Part {i+1})", "text": p[:400]})
+        else:
+            words = seg["text"].split()
+            if len(words) > 60:
+                sentences = re.split(r'(?<=[.?!])\s+', seg["text"])
+                clip = {"title": seg["title"], "text": "", "words": 0}
+                for s in sentences:
+                    sw = len(s.split())
+                    if clip["words"] + sw > 60 and clip["text"]:
+                        expanded.append(clip)
+                        clip = {"title": seg["title"], "text": s.strip(), "words": sw}
+                    else:
+                        clip["text"] = (clip["text"] + " " + s).strip() if clip["text"] else s.strip()
+                        clip["words"] += sw
+                if clip["text"]:
+                    expanded.append(clip)
+            else:
+                expanded.append(seg)
+
+    content_segments = expanded[:max_clips]
+
+    clips = []
+    for i, seg in enumerate(content_segments):
+        query = f"{seg['title']} CBSE Class 10"
+        results = youtube_search(query, max_results=1)
+        vid = results[0] if results else {}
+        clip_dur = max(30.0, len(seg["text"].split()) * 0.5)
+        clip_vo = quillbot_speak_segments(seg["text"])
+        clips.append({
+            "index": i + 1,
+            "segment_title": seg["title"],
+            "text": seg["text"],
+            "query": query,
+            "videoId": vid.get("videoId", ""),
+            "video_title": vid.get("title", seg["title"]),
+            "channel": vid.get("channel", ""),
+            "thumb": vid.get("thumb", ""),
+            "duration_sec": round(clip_dur, 0),
+            "voiceover": clip_vo,
+        })
+
+    return {
+        "success": True,
+        "topic": topic_name or "CBSE Topic",
+        "total_clips": len(clips),
+        "total_duration": sum(c["duration_sec"] for c in clips),
+        "clips": clips,
+    }
 
 
 # ─── OpenGrok: Code, Formula & Theorem Search ──────────────────────────────

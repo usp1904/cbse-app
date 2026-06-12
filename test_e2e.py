@@ -259,6 +259,7 @@ def run_tests():
     test_api("/health", expected_key="status")
     test_api("/api/gamification", expected_key="xp")
     test_api("/api/search?q=quadratic+equation", expected_key="results")
+    test_api("/api/ai/youtube/generate?topic_name=Photosynthesis&max_clips=3", expected_key="clips")
 
     # Tutor API (suggest serves HTML page, not JSON)
     test("/api/tutor/suggest")
