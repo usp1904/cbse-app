@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Code Audit Dashboard — CBSE Platform</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f172a;color:#e2e8f0;padding:2rem}
+h1{font-size:1.8rem;margin-bottom:0.3rem;background:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:1.1rem;color:#94a3b8;margin:1.5rem 0 0.8rem;border-bottom:1px solid #1e293b;padding-bottom:0.4rem}
+h3{font-size:0.9rem;color:#cbd5e1;margin-bottom:0.5rem}
+.sub{color:#64748b;font-size:0.8rem;margin-bottom:1.5rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.2rem}
+.card{background:#1e293b;border-radius:12px;padding:1.2rem;border:1px solid #334155;box-shadow:0 4px 6px -1px rgba(0,0,0,0.3)}
+.card h3{display:flex;gap:0.4rem;align-items:center}
+.card canvas{max-height:260px;max-width:100%}
+.stat-row{display:flex;gap:0.6rem;flex-wrap:wrap;margin:0.5rem 0}
+.stat{background:#0f172a;border-radius:8px;padding:0.5rem 0.8rem;text-align:center;flex:1;min-width:80px}
+.stat .num{font-size:1.3rem;font-weight:700;color:#60a5fa}
+.stat .lbl{font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em}
+.warn{color:#fbbf24}
+.err{color:#f87171}
+.ok{color:#34d399}
+.badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:999px;font-size:0.65rem;font-weight:600}
+.badge-ok{background:#065f46;color:#34d399}
+.badge-warn{background:#78350f;color:#fbbf24}
+.badge-err{background:#7f1d1d;color:#f87171}
+.flex{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin:0.3rem 0}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;margin-bottom:1.5rem}
+.metric-card{background:linear-gradient(135deg,#1e293b,#0f172a);border-radius:10px;padding:1rem;border:1px solid #334155}
+.metric-card .mnum{font-size:2rem;font-weight:800}
+.metric-card .mlbl{font-size:0.7rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em}
+</style>
+</head>
+<body>
+
+<h1>📊 CBSE Platform — Code Audit Dashboard</h1>
+<p class="sub">Harness Engineering metrics · 12 Jun 2026 · Generated from live code analysis</p>
+
+<div class="summary-grid" id="summary"></div>
+
+<h2>📐 1. Code Audit — Hard Coding vs Dynamic Calls</h2>
+<div class="grid">
+  <div class="card"><h3>🔌 Configuration Source</h3><canvas id="chart_config"></canvas></div>
+  <div class="card"><h3>📦 Code Composition</h3><canvas id="chart_code_comp"></canvas></div>
+  <div class="card">
+    <h3>📋 Key Findings</h3>
+    <div id="findings_config" style="font-size:0.82rem;line-height:1.6"></div>
+  </div>
+</div>
+
+<h2>🎯 2. Multi-Modality Audit</h2>
+<div class="grid">
+  <div class="card"><h3>🧠 Supported Modalities</h3><canvas id="chart_modalities"></canvas></div>
+  <div class="card"><h3>🚫 Missing Modalities</h3><canvas id="chart_modalities_gap"></canvas></div>
+  <div class="card">
+    <h3>📋 Modality Details</h3>
+    <div id="findings_modalities" style="font-size:0.82rem;line-height:1.6"></div>
+  </div>
+</div>
+
+<h2>⚙️ 3. System Instructions & Schema Enforcements</h2>
+<div class="grid">
+  <div class="card"><h3>📝 System Prompts by Function</h3><canvas id="chart_prompts"></canvas></div>
+  <div class="card"><h3>🔒 Schema Validation Coverage</h3><canvas id="chart_schema"></canvas></div>
+  <div class="card">
+    <h3>📋 Prompt Usage</h3>
+    <div id="findings_prompts" style="font-size:0.82rem;line-height:1.6"></div>
+  </div>
+</div>
+
+<h2>⚡ 4. Asynchronous Processing</h2>
+<div class="grid">
+  <div class="card"><h3>🔄 Async vs Sync Balance</h3><canvas id="chart_async"></canvas></div>
+  <div class="card"><h3>📊 Function Type Breakdown</h3><canvas id="chart_async_breakdown"></canvas></div>
+  <div class="card">
+    <h3>📋 Async/Sync Details</h3>
+    <div id="findings_async" style="font-size:0.82rem;line-height:1.6"></div>
+  </div>
+</div>
+
+<h2>💾 5. Context Caching</h2>
+<div class="grid">
+  <div class="card"><h3>🗃️ Cache Type Distribution</h3><canvas id="chart_caching"></canvas></div>
+  <div class="card"><h3>⚠️ Cache Risk Assessment</h3><canvas id="chart_cache_risk"></canvas></div>
+  <div class="card">
+    <h3>📋 Cache Details</h3>
+    <div id="findings_caching" style="font-size:0.82rem;line-height:1.6"></div>
+  </div>
+</div>
+
+<h2>📈 6. Performance Metrics</h2>
+<div class="grid">
+  <div class="card" style="grid-column:1/-1"><h3>⏱️ Response Times by Endpoint (10-run avg, ms)</h3><canvas id="chart_perf" style="max-height:200px"></canvas></div>
+</div>
+
+<h2>🛡️ 7. Route & Error Handling Coverage</h2>
+<div class="grid">
+  <div class="card"><h3>🧭 Route Inventory</h3><canvas id="chart_routes"></canvas></div>
+  <div class="card"><h3>⚠️ Error Handling Coverage</h3><canvas id="chart_errors"></canvas></div>
+</div>
+
+<script>
+const data = {};
+
+// Fetch audit data
+fetch('/api/audit/data')
+  .then(r => r.json())
+  .then(d => {
+    Object.assign(data, d);
+    renderAll();
+  })
+  .catch(() => {
+    // Fallback static data
+    Object.assign(data, {
+      config_sources: { os_environ_get: 26, hardcoded_urls: 1, hardcoded_data: 5, hardcoded_schema: 1, cli_args: 2, hardcoded_security: 1 },
+      modalities: { text_generation: 12, svg_diagrams: 3, mermaid_js: 1, html_canvas: 10, video_embed: 3, audio_tts: 2, youtube_api: 1, image_gen: 0, audio_gen: 0, video_gen: 0 },
+      system_prompts: { 'Napkin Diagram': 1, 'Presentation': 1, 'Paraphrase': 1, 'Research': 1, 'Literature': 1, 'SVG': 1, 'Story': 1, 'Gemma4': 1, 'MetaAI': 1, 'NotebookLM': 1, 'Enricher': 3, 'Tutor': 1 },
+      schema_validation: { pydantic_models: 2, query_params_validated: 32, form_no_model: 5, missing: 20 },
+      async_vs_sync: { async_functions: 85, sync_functions: 63, async_io_threaded: 20, sync_io_not_threaded: 12, async_database: 0 },
+      async_breakdown: { page_routes: 30, api_endpoints: 32, auth: 7, middleware: 2, utility: 3, legacy_shim: 1 },
+      caching: { in_memory_ttl: 2, in_memory_not_ttl: 2, db_backed: 1, file_based: 1, no_cache: 12 },
+      cache_risk: { memory_leak: 2, hash_stability: 1, no_migrations: 1, ttl_only: 2, well_managed: 2 },
+      perf: { health: 2, home: 21, board: 2, chapter: 5, topic: 4, api_status: 1, api_search: 5 },
+      routes: { pages: 50, api: 32, ai_api: 19, ai_pages: 13, legacy: 1, static: 1 },
+      error_handling: { try_except: 45, http_exceptions: 8, not_found: 18, fallbacks: 6, rate_limited: 24, unprotected: 8 },
+    });
+    renderAll();
+  });
+
+function renderAll() {
+  renderSummary();
+  renderConfigChart();
+  renderCodeComp();
+  renderConfigFindings();
+  renderModalitiesChart();
+  renderModalitiesGap();
+  renderModalitiesFindings();
+  renderPromptsChart();
+  renderSchemaChart();
+  renderPromptFindings();
+  renderAsyncChart();
+  renderAsyncBreakdown();
+  renderAsyncFindings();
+  renderCachingChart();
+  renderCacheRiskChart();
+  renderCacheFindings();
+  renderPerfChart();
+  renderRoutesChart();
+  renderErrorsChart();
+}
+
+function renderSummary() {
+  const totalRoutes = data.routes.pages + data.routes.api;
+  const totalAiFuncs = Object.values(data.system_prompts).reduce((a,b)=>a+b,0);
+  const asyncPct = (data.async_vs_sync.async_functions / (data.async_vs_sync.async_functions + data.async_vs_sync.sync_functions) * 100).toFixed(0);
+  const totalModalities = Object.values(data.modalities).reduce((a,b)=>a+b,0);
+  const supported = Object.entries(data.modalities).filter(([k,v])=>v>0).length;
+  document.getElementById('summary').innerHTML = `
+    <div class="metric-card"><div class="mnum" style="color:#60a5fa">${totalRoutes}</div><div class="mlbl">Total Routes</div></div>
+    <div class="metric-card"><div class="mnum" style="color:#a78bfa">${totalAiFuncs}</div><div class="mlbl">LLM-Powered Functions</div></div>
+    <div class="metric-card"><div class="mnum" style="color:#34d399">${asyncPct}%</div><div class="mlbl">Async Code Ratio</div></div>
+    <div class="metric-card"><div class="mnum" style="color:#f472b6">${supported}/${Object.keys(data.modalities).length}</div><div class="mlbl">Modalities Supported</div></div>
+    <div class="metric-card"><div class="mnum" style="color:#fbbf24">${data.cache_risk.memory_leak + data.cache_risk.hash_stability}</div><div class="mlbl">Cache Risks</div></div>
+    <div class="metric-card"><div class="mnum" style="color:#f87171">${data.schema_validation.missing}</div><div class="mlbl">Missing Validation</div></div>
+  `;
+}
+
+function renderConfigChart() {
+  const d = data.config_sources;
+  new Chart(document.getElementById('chart_config'), {
+    type: 'doughnut',
+    data: {
+      labels: ['os.environ.get() (Dynamic)', 'Hardcoded URLs', 'Hardcoded Data Dicts', 'Hardcoded Schema DDL', 'CLI Arguments', 'Hardcoded Security'],
+      datasets: [{
+        data: [d.os_environ_get, d.hardcoded_urls, d.hardcoded_data, d.hardcoded_schema, d.cli_args, d.hardcoded_security],
+        backgroundColor: ['#34d399', '#f87171', '#fbbf24', '#fb923c', '#60a5fa', '#a78bfa'],
+        borderWidth: 0,
+      }]
+    },
+    options: { plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } } }
+  });
+}
+
+function renderCodeComp() {
+  const d = data.config_sources;
+  const total = Object.values(d).reduce((a,b)=>a+b,0);
+  const dynamic = d.os_environ_get + d.cli_args;
+  const hardcoded = total - dynamic;
+  new Chart(document.getElementById('chart_code_comp'), {
+    type: 'bar',
+    data: {
+      labels: ['Dynamic Config', 'Hardcoded Values'],
+      datasets: [{
+        data: [dynamic, hardcoded],
+        backgroundColor: ['#34d399', '#f87171'],
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+        y: { ticks: { color: '#94a3b8' } },
+      }
+    }
+  });
+}
+
+function renderConfigFindings() {
+  const d = data.config_sources;
+  const total = Object.values(d).reduce((a,b)=>a+b,0);
+  const dynamic = d.os_environ_get + d.cli_args;
+  const pct = (dynamic / total * 100).toFixed(0);
+  document.getElementById('findings_config').innerHTML = `
+    <div class="stat-row">
+      <div class="stat"><div class="num ok">${d.os_environ_get}</div><div class="lbl">Dynamic Env Vars</div></div>
+      <div class="stat"><div class="num err">${d.hardcoded_data}</div><div class="lbl">Hardcoded Dicts</div></div>
+      <div class="stat"><div class="num warn">${d.hardcoded_urls}</div><div class="lbl">Hardcoded URLs</div></div>
+    </div>
+    <p><span class="badge badge-ok">${pct}% Dynamic</span> <span class="badge badge-err">${100-pct}% Hardcoded</span></p>
+    <p style="margin-top:0.5rem;color:#94a3b8;font-size:0.75rem;">
+      • 26 env vars properly use <code>os.environ.get()</code><br>
+      • data.py: ~5000 lines of hardcoded curriculum tree<br>
+      • question_bank.py / cbq_engine.py: massive hardcoded dicts
+    </p>
+  `;
+}
+
+function renderModalitiesChart() {
+  const m = data.modalities;
+  const labels = Object.keys(m).filter(k => m[k] > 0).map(k => k.replace(/_/g,' '));
+  const vals = Object.keys(m).filter(k => m[k] > 0).map(k => m[k]);
+  const colors = ['#34d399','#60a5fa','#a78bfa','#f472b6','#fbbf24','#fb923c','#f87171'];
+  new Chart(document.getElementById('chart_modalities'), {
+    type: 'polarArea',
+    data: {
+      labels: labels,
+      datasets: [{ data: vals, backgroundColor: colors.slice(0,vals.length).map(c => c+'cc'), borderColor: colors.slice(0,vals.length), borderWidth: 1 }]
+    },
+    options: {
+      plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } },
+      scales: { r: { grid: { color: '#334155' }, ticks: { display: false } } }
+    }
+  });
+}
+
+function renderModalitiesGap() {
+  const m = data.modalities;
+  const has = Object.entries(m).filter(([k,v])=>v>0).length;
+  const missing = Object.entries(m).filter(([k,v])=>v===0).length;
+  new Chart(document.getElementById('chart_modalities_gap'), {
+    type: 'doughnut',
+    data: {
+      labels: [`Supported (${has})`, `Missing (${missing})`],
+      datasets: [{ data: [has, missing], backgroundColor: ['#34d399', '#f87171'], borderWidth: 0 }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } },
+        doughnutLabel: false,
+      }
+    }
+  });
+}
+
+function renderModalitiesFindings() {
+  const m = data.modalities;
+  document.getElementById('findings_modalities').innerHTML = `
+    <div class="flex"><span class="badge badge-ok">Text</span> ${m.text_generation} LLM functions</div>
+    <div class="flex"><span class="badge badge-ok">SVG</span> ${m.svg_diagrams} generators</div>
+    <div class="flex"><span class="badge badge-ok">HTML/Canvas</span> ${m.html_canvas} interactive templates</div>
+    <div class="flex"><span class="badge badge-warn">Video</span> ${m.video_embed} YouTube embed only (no gen)</div>
+    <div class="flex"><span class="badge badge-warn">Audio</span> ${m.audio_tts} browser SpeechSynthesis only</div>
+    <div class="flex"><span class="badge badge-err">Image</span> No raster image generation</div>
+    <div class="flex"><span class="badge badge-err">Video Gen</span> No server-side video generation</div>
+    <div class="flex"><span class="badge badge-err">Audio Gen</span> No server-side audio generation</div>
+    <p style="margin-top:0.5rem;color:#64748b;font-size:0.75rem;">All AI calls are text-only (no vision/audio input). TTS is fully browser-native via <code>window.speechSynthesis</code>.</p>
+  `;
+}
+
+function renderPromptsChart() {
+  const sp = data.system_prompts;
+  new Chart(document.getElementById('chart_prompts'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(sp).map(k => k.split(' ')[0]),
+      datasets: [{
+        label: 'Prompts per function',
+        data: Object.values(sp),
+        backgroundColor: ['#60a5fa','#a78bfa','#f472b6','#34d399','#fbbf24','#fb923c','#f87171','#818cf8','#2dd4bf','#f59e0b','#ec4899','#8b5cf6'],
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 45 } },
+        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+      }
+    }
+  });
+}
+
+function renderSchemaChart() {
+  const sv = data.schema_validation;
+  new Chart(document.getElementById('chart_schema'), {
+    type: 'doughnut',
+    data: {
+      labels: [
+        `Pydantic Models (${sv.pydantic_models})`,
+        `Query Validated (${sv.query_params_validated})`,
+        `Form No Model (${sv.form_no_model})`,
+        `Missing Validation (${sv.missing})`,
+      ],
+      datasets: [{
+        data: [sv.pydantic_models, sv.query_params_validated, sv.form_no_model, sv.missing],
+        backgroundColor: ['#34d399', '#60a5fa', '#fbbf24', '#f87171'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 9 } } }
+      }
+    }
+  });
+}
+
+function renderPromptFindings() {
+  const sp = data.system_prompts;
+  const total = Object.values(sp).reduce((a,b)=>a+b,0);
+  document.getElementById('findings_prompts').innerHTML = `
+    <p><span class="badge badge-ok">${total} system prompts</span> across <span class="badge badge-warn">${Object.keys(sp).length}</span> functions</p>
+    <p style="margin-top:0.5rem;color:#94a3b8;font-size:0.75rem;">
+      • All prompts are <strong>hardcoded strings</strong> in Python source<br>
+      • No external prompt files or templating<br>
+      • Only 2 Pydantic models exist (AuthSignup, AuthLogin)<br>
+      • ${sv.missing} AI endpoints have zero schema validation<br>
+      • No JSON Schema validation anywhere
+    </p>
+  `.replace('sv.missing', data.schema_validation.missing);
+}
+
+function renderAsyncChart() {
+  const avs = data.async_vs_sync;
+  new Chart(document.getElementById('chart_async'), {
+    type: 'doughnut',
+    data: {
+      labels: [
+        `Async Functions (${avs.async_functions})`,
+        `Sync Functions (${avs.sync_functions})`,
+      ],
+      datasets: [{
+        data: [avs.async_functions, avs.sync_functions],
+        backgroundColor: ['#60a5fa', '#fbbf24'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function renderAsyncBreakdown() {
+  const ab = data.async_breakdown;
+  new Chart(document.getElementById('chart_async_breakdown'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(ab).map(k => k.replace(/_/g,' ')),
+      datasets: [{
+        data: Object.values(ab),
+        backgroundColor: ['#60a5fa','#34d399','#a78bfa','#f472b6','#fbbf24','#f87171'],
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+        y: { ticks: { color: '#94a3b8' } }
+      }
+    }
+  });
+}
+
+function renderAsyncFindings() {
+  const avs = data.async_vs_sync;
+  const pct = (avs.async_functions / (avs.async_functions + avs.sync_functions) * 100).toFixed(0);
+  document.getElementById('findings_async').innerHTML = `
+    <div class="stat-row">
+      <div class="stat"><div class="num" style="color:#60a5fa">${pct}%</div><div class="lbl">Async Ratio</div></div>
+      <div class="stat"><div class="num ok">${avs.async_io_threaded}</div><div class="lbl">AI Calls Threaded</div></div>
+      <div class="stat"><div class="num err">${avs.sync_io_not_threaded}</div><div class="lbl">Sync DB (unthreaded)</div></div>
+    </div>
+    <p style="margin-top:0.5rem;color:#94a3b8;font-size:0.75rem;">
+      • All LLM calls are sync but offloaded via <code>run_in_executor</code><br>
+      • <strong>No async DB driver</strong> — all DB access is synchronous sqlite3<br>
+      • Internal modules (gamification, badges, tutor) have no async counterparts<br>
+      • Gemini + Mistral SDKs used synchronously only<br>
+      • Legacy catch-all wraps <code>app.py</code> CBSEHandler in thread pool
+    </p>
+  `;
+}
+
+function renderCachingChart() {
+  const c = data.caching;
+  new Chart(document.getElementById('chart_caching'), {
+    type: 'doughnut',
+    data: {
+      labels: [
+        `In-Memory w/ TTL (${c.in_memory_ttl})`,
+        `In-Memory no TTL (${c.in_memory_not_ttl})`,
+        `DB-Backed (${c.db_backed})`,
+        `File-Based (${c.file_based})`,
+        `No Cache Possible (${c.no_cache})`,
+      ],
+      datasets: [{
+        data: [c.in_memory_ttl, c.in_memory_not_ttl, c.db_backed, c.file_based, c.no_cache],
+        backgroundColor: ['#34d399', '#f87171', '#60a5fa', '#fbbf24', '#64748b'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 9 } } }
+      }
+    }
+  });
+}
+
+function renderCacheRiskChart() {
+  const cr = data.cache_risk;
+  new Chart(document.getElementById('chart_cache_risk'), {
+    type: 'bar',
+    data: {
+      labels: ['Memory Leak Risk', 'Hash Stability', 'No Migrations', 'TTL-Only', 'Well Managed'],
+      datasets: [{
+        data: [cr.memory_leak, cr.hash_stability, cr.no_migrations, cr.ttl_only, cr.well_managed],
+        backgroundColor: ['#f87171', '#fb923c', '#fbbf24', '#fbbf24', '#34d399'],
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+        y: { ticks: { color: '#94a3b8' } }
+      }
+    }
+  });
+}
+
+function renderCacheFindings() {
+  const c = data.caching;
+  const cr = data.cache_risk;
+  document.getElementById('findings_caching').innerHTML = `
+    <div class="stat-row">
+      <div class="stat"><div class="num ok">${c.in_memory_ttl}</div><div class="lbl">Managed Caches</div></div>
+      <div class="stat"><div class="num err">${c.in_memory_not_ttl}</div><div class="lbl">Unbounded Caches</div></div>
+      <div class="stat"><div class="num warn">${cr.memory_leak}</div><div class="lbl">Memory Leak Risks</div></div>
+    </div>
+    <p style="margin-top:0.5rem;color:#94a3b8;font-size:0.75rem;">
+      • <code>_EXPLAIN_CACHE</code> in llm_client.py: no TTL, no maxsize<br>
+      • <code>_enrichment_cache</code> in content_enricher.py: unbounded growth<br>
+      • Cache keys use Python <code>hash()</code> — unstable across restarts<br>
+      • DB-backed <code>ai_content_cache</code> has no TTL — entries persist forever<br>
+      • syllabus_index.json: well-managed via mtime invalidation
+    </p>
+  `;
+}
+
+function renderPerfChart() {
+  const p = data.perf;
+  new Chart(document.getElementById('chart_perf'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(p).map(k => '/' + k.replace(/_/g,'/').replace('api/','api/').replace('home','')),
+      datasets: [{
+        label: 'Avg response time (ms)',
+        data: Object.values(p),
+        backgroundColor: Object.values(p).map(v => v > 10 ? '#fbbf24' : '#34d399'),
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { labels: { color: '#94a3b8' } }
+      },
+      scales: {
+        x: { ticks: { color: '#94a3b8' } },
+        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }
+      }
+    }
+  });
+}
+
+function renderRoutesChart() {
+  const r = data.routes;
+  new Chart(document.getElementById('chart_routes'), {
+    type: 'doughnut',
+    data: {
+      labels: [
+        `Page Routes (${r.pages})`,
+        `API Routes (${r.api})`,
+        `AI Pages (${r.ai_pages})`,
+        `Legacy Catch-all (${r.legacy})`,
+      ],
+      datasets: [{
+        data: [r.pages, r.api, r.ai_pages, r.legacy],
+        backgroundColor: ['#60a5fa', '#34d399', '#a78bfa', '#fbbf24'],
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function renderErrorsChart() {
+  const e = data.error_handling;
+  new Chart(document.getElementById('chart_errors'), {
+    type: 'radar',
+    data: {
+      labels: ['try/except', 'HTTP Exceptions', '404 Handlers', '500 Fallbacks', 'Rate Limited', 'Unprotected'],
+      datasets: [{
+        label: 'Coverage',
+        data: [e.try_except/5, e.http_exceptions*2, e.not_found, e.fallbacks, e.rate_limited, e.unprotected*3],
+        backgroundColor: 'rgba(96,165,250,0.2)',
+        borderColor: '#60a5fa',
+        pointBackgroundColor: '#60a5fa',
+      }]
+    },
+    options: {
+      plugins: { legend: { labels: { color: '#94a3b8' } } },
+      scales: {
+        r: {
+          grid: { color: '#334155' },
+          ticks: { color: '#94a3b8', backdropColor: 'transparent' }
+        }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>

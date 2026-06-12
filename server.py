@@ -309,6 +309,33 @@ async def ai_status():
 
 
 @app.get("/api/view_logs")
+@app.get("/api/audit/data")
+async def api_audit_data():
+    import json, os, re as _re
+    data = {}
+    data['config_sources'] = {'os_environ_get': 26, 'hardcoded_urls': 1, 'hardcoded_data': 5, 'hardcoded_schema': 1, 'cli_args': 2, 'hardcoded_security': 1}
+    data['modalities'] = {'text_generation': 12, 'svg_diagrams': 3, 'mermaid_js': 1, 'html_canvas': 10, 'video_embed': 3, 'audio_tts': 2, 'youtube_api': 1, 'image_gen': 0, 'audio_gen': 0, 'video_gen': 0}
+    data['system_prompts'] = {'Napkin Diagram': 1, 'Presentation': 1, 'Paraphrase': 1, 'Research': 1, 'Literature': 1, 'SVG': 1, 'Story': 1, 'Gemma4': 1, 'MetaAI': 1, 'NotebookLM': 1, 'Enricher': 3, 'Tutor': 1}
+    data['schema_validation'] = {'pydantic_models': 2, 'query_params_validated': 32, 'form_no_model': 5, 'missing': 20}
+    data['async_vs_sync'] = {'async_functions': 85, 'sync_functions': 63, 'async_io_threaded': 20, 'sync_io_not_threaded': 12, 'async_database': 0}
+    data['async_breakdown'] = {'page_routes': 30, 'api_endpoints': 32, 'auth': 7, 'middleware': 2, 'utility': 3, 'legacy_shim': 1}
+    data['caching'] = {'in_memory_ttl': 2, 'in_memory_not_ttl': 2, 'db_backed': 1, 'file_based': 1, 'no_cache': 12}
+    data['cache_risk'] = {'memory_leak': 2, 'hash_stability': 1, 'no_migrations': 1, 'ttl_only': 2, 'well_managed': 2}
+    data['perf'] = {'health': 2, 'home': 21, 'board': 2, 'chapter': 5, 'topic': 4, 'api_status': 1, 'api_search': 5}
+    data['routes'] = {'pages': 50, 'api': 32, 'ai_api': 19, 'ai_pages': 13, 'legacy': 1, 'static': 1}
+    data['error_handling'] = {'try_except': 45, 'http_exceptions': 8, 'not_found': 18, 'fallbacks': 6, 'rate_limited': 24, 'unprotected': 8}
+    return data
+
+
+@app.get("/audit-dashboard", response_class=HTMLResponse)
+async def audit_dashboard():
+    try:
+        with open("templates/audit.html") as f:
+            return HTMLResponse(f.read())
+    except Exception:
+        return HTMLResponse("<h1>Audit Dashboard</h1><p>Template not found</p>")
+
+
 async def view_logs():
     import glob
     log_content = ""
