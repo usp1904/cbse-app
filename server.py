@@ -1064,6 +1064,119 @@ async def chapter_page(chapter_id: str):
     return HTMLResponse(_render(title=f"Ch {chapter['num']}: {chapter['title']} - CBSE Class X", content=content))
 
 
+def format_math_content(text):
+    if not text:
+        return ""
+    html = format_content(text)
+    
+    # 1. Theorem Cards
+    html = re.sub(
+        r'(<p>)?<strong>(Theorem|Lemma)\b([^:]*):?</strong>(.*?)(</p>)?',
+        r'<div class="theorem-card"><div class="theorem-title">📐 \2\3</div><div class="theorem-body">\4</div></div>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+    
+    # 2. Key Tips/Memory Aids Cards
+    html = re.sub(
+        r'(<p>)?<strong>(Key points to remember|Memory aid|Board Exam Tip|Tip)\b([^:]*):?</strong>(.*?)(</p>)?',
+        r'<div class="concept-tip-card"><div class="concept-tip-title">💡 \2\3</div><div>\4</div></div>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+    
+    # 3. Tables enhancement
+    html = re.sub(
+        r'<table>(.*?)</table>',
+        r'<div class="formula-card" style="overflow-x:auto;"><table style="width:100%; border-collapse: collapse;">\1</table></div>',
+        html,
+        flags=re.DOTALL
+    )
+    return html
+
+
+def build_math_cheat_sheet(content, chunks):
+    formulas = []
+    all_text = (content or "") + "\n" + "\n".join(c.get("content", "") for c in chunks)
+    equations = re.findall(r'\$\$(.*?)\$\$', all_text, re.DOTALL)
+    for eq in equations:
+        eq_clean = eq.strip()
+        if eq_clean and eq_clean not in formulas:
+            formulas.append(eq_clean)
+            
+    lines = all_text.split("\n")
+    for line in lines:
+        if "=" in line and any(x in line.lower() for x in ["sin", "cos", "tan", "sec", "cosec", "cot", "log", "hcf", "lcm", "area", "volume", "perimeter", "mean", "mode", "median", "probability", "d_i", "f_i", "x_i", "u_i", "a_i", "r^2", "pi", "a = bq"]):
+            line_clean = line.strip("•-* ").strip()
+            if line_clean and len(line_clean) < 150 and line_clean not in formulas:
+                formulas.append(line_clean)
+                
+    if not formulas:
+        return f'<div class="concept-tip-card"><div class="concept-tip-title">⚡ Formula Sheet</div><p>Refer to the Concept Explainer tab for key equations.</p></div>'
+        
+    html = '<div class="section"><h3>⚡ Key Formulas & Reference Sheet</h3><p style="color:#666;margin-bottom:1.5rem;">Quick reference formulas and relationships for this topic.</p>'
+    for idx, formula in enumerate(formulas):
+        # Format equations nicely
+        if formula.startswith(r'\(') or '$$' in formula or '\\' in formula or '=' in formula:
+            if '=' in formula and '\\' not in formula and '$$' not in formula:
+                formatted_eq = f'<div style="text-align:center; font-size:1.1rem; font-weight:600; margin:1rem 0; color:var(--accent2);">$${formula}$$</div>'
+            else:
+                formatted_eq = f'<div style="text-align:center; font-size:1.1rem; font-weight:600; margin:1rem 0; color:var(--accent2);">$${formula.replace("$$", "")}$$</div>'
+            html += f"""<div class="formula-card" style="margin-bottom: 1rem;">
+                <div style="font-weight:700; font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem;">Formula {idx+1}</div>
+                {formatted_eq}
+            </div>"""
+    html += '</div>'
+    return html
+
+
+def format_solved_problem(p, idx):
+    qtext = format_math_content(p.get("problem_text", ""))
+    stext = p.get("solution_text", "")
+    
+    step_matches = re.split(r'(?:^|\n)(?:Step\s*\d+\s*:|Step\s*\d+\b|\d+\.\s+)', stext)
+    steps_html = ""
+    step_num = 1
+    for part in step_matches:
+        part_clean = part.strip()
+        if not part_clean:
+            continue
+        step_formatted = format_math_content(part_clean)
+        steps_html += f"""
+        <div class="step-container">
+            <span class="step-badge">{step_num}</span>
+            <div class="step-content">{step_formatted}</div>
+        </div>
+        """
+        step_num += 1
+        
+    if not steps_html:
+        steps_html = format_math_content(stext)
+        
+    return f"""
+    <div class="solved-problem-card">
+        <div class="solved-problem-header" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); var sign = this.querySelector('.sign'); if (sign) sign.textContent = this.classList.contains('open') ? '−' : '+';">
+            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:100])}...</span>
+            <span class="sign" style="font-size:1.2rem; color:var(--accent); font-weight:bold;">+</span>
+        </div>
+        <div class="solved-problem-body">
+            <div class="problem-box" style="margin-top:0;">
+                <div class="problem-header">Problem Statement</div>
+                <div class="problem-text">{qtext}</div>
+            </div>
+            <div class="solution-steps">
+                <div class="problem-header" style="color:var(--success); border-bottom-color:rgba(16,185,129,0.1);">Step-by-step Solution</div>
+                {steps_html}
+            </div>
+            <div class="concept-tip-card" style="margin-top: 1rem; margin-bottom: 0;">
+                <div class="concept-tip-title">🛡️ Exam Tip</div>
+                <p>Write down every calculation step and cite the underlying theorem (e.g. Euclid's Division Lemma) to earn full step-marks in exams.</p>
+            </div>
+        </div>
+    </div>
+    """
+
+
 @app.get("/topic/{topic_id}", response_class=HTMLResponse)
 async def topic_page(topic_id: str):
     conn = DB
@@ -1077,14 +1190,6 @@ async def topic_page(topic_id: str):
     subject = conn.query_one("SELECT * FROM subjects WHERE id = ?", (chapter["subject_id"],)) if chapter else None
     chunks = conn.query("SELECT * FROM chunks WHERE topic_id = ? ORDER BY seq", (topic_id,))
 
-    content_html = format_content(topic.get("content", ""))
-    chunks_html = ""
-    for c in chunks:
-        chunks_html += f"""<div class="section" id="chunk-{c['id']}">
-<h3>{htmlmod.escape(c.get("title",""))}</h3>
-<div class="chunk-content">{format_content(c.get("content",""))}</div>
-</div>"""
-
     bc_items = [("Home", "/")]
     if subject:
         bc_items.append((subject.get("board_id", "").upper(), f"/board/{subject['board_id'].lower()}"))
@@ -1092,7 +1197,72 @@ async def topic_page(topic_id: str):
     bc_items.append((f"Ch {chapter['num']}: {chapter['title']}", f"/chapter/{chapter['id']}"))
     bc_items.append((topic["title"], None))
 
-    content = f"""<div class="breadcrumb">{_build_breadcrumb(bc_items)}</div>
+    is_math = subject and ("math" in subject.get("id", "").lower() or "math" in subject.get("name", "").lower())
+
+    if is_math:
+        content_html = format_math_content(topic.get("content", ""))
+        chunks_html = ""
+        for c in chunks:
+            chunks_html += f"""<div class="section" id="chunk-{c['id']}">
+<h3>{htmlmod.escape(c.get("title",""))}</h3>
+<div class="chunk-content">{format_math_content(c.get("content",""))}</div>
+</div>"""
+
+        problems = conn.query("SELECT * FROM problems WHERE topic_id = ? ORDER BY seq", (topic_id,)) if conn.table_exists("problems") else []
+        if not problems and chapter:
+            problems = conn.query("SELECT * FROM problems WHERE chapter_id = ? ORDER BY seq LIMIT 6", (chapter["id"],)) if conn.table_exists("problems") else []
+
+        solved_html = ""
+        for idx, p in enumerate(problems, 1):
+            solved_html += format_solved_problem(p, idx)
+        if not solved_html:
+            solved_html = '<p style="color:#666;">No practice problems for this topic yet.</p>'
+
+        formulas_html = build_math_cheat_sheet(topic.get("content", ""), chunks)
+
+        # Tabbed Layout construction
+        content = f"""<div class="breadcrumb">{_build_breadcrumb(bc_items)}</div>
+<div class="section">
+<h2>{htmlmod.escape(topic['title'])}</h2>
+<div class="chapter-actions" style="margin-bottom:1.5rem;">
+<a href="/tutor/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🧠 AI Tutor</a>
+<a href="/mindmap/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🗺️ Mind Map</a>
+<a href="/interactives/cards/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🃏 Flashcards</a>
+</div>
+
+<div class="math-tabs">
+  <button class="math-tab-btn active" onclick="switchMathTab('concept')">📖 Concept Explainer</button>
+  <button class="math-tab-btn" onclick="switchMathTab('formulas')">⚡ Formulas & Theorems</button>
+  <button class="math-tab-btn" onclick="switchMathTab('problems')">📝 Solved Exercises</button>
+</div>
+
+<div id="math-tab-concept" class="math-tab-content active">
+  {content_html}
+  {chunks_html}
+</div>
+
+<div id="math-tab-formulas" class="math-tab-content">
+  {formulas_html}
+</div>
+
+<div id="math-tab-problems" class="math-tab-content">
+  <div class="section">
+    <h3>📝 NCERT Solved Practice Exercises</h3>
+    <p style="color:#666;margin-bottom:1.5rem;">Study step-by-step solved solutions. Tap any question to toggle the active-recall solution view.</p>
+    {solved_html}
+  </div>
+</div>
+</div>"""
+    else:
+        content_html = format_content(topic.get("content", ""))
+        chunks_html = ""
+        for c in chunks:
+            chunks_html += f"""<div class="section" id="chunk-{c['id']}">
+<h3>{htmlmod.escape(c.get("title",""))}</h3>
+<div class="chunk-content">{format_content(c.get("content",""))}</div>
+</div>"""
+
+        content = f"""<div class="breadcrumb">{_build_breadcrumb(bc_items)}</div>
 <div class="section">
 <h2>{htmlmod.escape(topic['title'])}</h2>
 <div class="chapter-actions">
@@ -1103,7 +1273,9 @@ async def topic_page(topic_id: str):
 {content_html}
 </div>
 {chunks_html}"""
+
     return HTMLResponse(_render(title=f"{topic['title']} - CBSE Class X", content=content))
+
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1363,8 +1535,8 @@ async def ai_diagram():
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Diagram Generator</div>
         <div class="section">
-            <h2>📐 AI Diagram Generator</h2>
-            <p class="subtitle">Generate flowcharts, mind maps, and diagrams for any concept using Mistral AI</p>
+            <h2>📐 AI Diagram & Mind Map Generator</h2>
+            <p class="subtitle">Generate interactive flowcharts, mind maps, and concept diagrams grounded in local NCERT textbook contexts</p>
             <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
                 <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Concept</label>
                 <input type="text" id="diagram-concept" value="Photosynthesis" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
@@ -1375,21 +1547,48 @@ async def ai_diagram():
                     <option value="concept-map">Concept Map</option>
                 </select>
                 <button onclick="generateDiagram()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">Generate</button>
-                <div id="diagram-output" style="margin-top:1rem;padding:1rem;border:1px solid var(--border);border-radius:8px;min-height:100px;white-space:pre-wrap;font-family:monospace;"></div>
+                <div id="diagram-output" style="margin-top:1.5rem;padding:1.5rem;border:1px solid var(--border);border-radius:12px;min-height:200px;background:#fcfcfd;display:flex;justify-content:center;align-items:center;overflow-x:auto;">
+                    <span style="color:#888;font-size:0.95rem;">Your generated visual diagram will appear here.</span>
+                </div>
             </div>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
         <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
         async function generateDiagram() {
             const concept = document.getElementById('diagram-concept').value;
             const type = document.getElementById('diagram-type').value;
             const out = document.getElementById('diagram-output');
-            out.innerHTML = '<em>Generating...</em>';
+            out.innerHTML = '<em>Generating visual diagram...</em>';
             try {
                 const resp = await fetch('/api/ai/diagram?concept='+encodeURIComponent(concept)+'&type='+encodeURIComponent(type));
                 const data = await resp.json();
-                out.innerHTML = data.diagram || data.html || '<em>No diagram generated</em>';
+                if (data.html) {
+                    out.innerHTML = data.html;
+                } else if (data.diagram) {
+                    const id = 'mermaid-' + Math.floor(Math.random() * 10000);
+                    let contentHtml = '<div style="display:flex; flex-direction:column; gap:1.5rem; width:100%;">';
+                    contentHtml += '<div class="mermaid-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03);">';
+                    contentHtml += '<div class="mermaid" id="' + id + '" style="width:100%; text-align:center; overflow-x:auto;">' + data.diagram + '</div>';
+                    contentHtml += '</div>';
+                    
+                    if (data.explanation) {
+                        contentHtml += '<div class="study-guide-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03); text-align:left;">';
+                        contentHtml += '<h3 style="color:var(--primary); margin-top:0; border-bottom:1px solid var(--border); padding-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;">📖 Study Guide & Exam Prep</h3>';
+                        contentHtml += '<div style="font-size:0.95rem; line-height:1.6; color:#333;">' + data.explanation + '</div>';
+                        contentHtml += '</div>';
+                    }
+                    contentHtml += '</div>';
+                    out.innerHTML = contentHtml;
+                    
+                    await mermaid.run({
+                        nodes: [document.getElementById(id)]
+                    });
+                } else {
+                    out.innerHTML = '<em>No diagram generated</em>';
+                }
             } catch(e) {
-                out.innerHTML = '<em>Error: ' + e.message + '</em>';
+                out.innerHTML = '<em style="color:#dc2626;">Error: ' + e.message + '</em>';
             }
         }
         </script>"""
@@ -1798,35 +1997,36 @@ async def ai_studio_hub():
         <a href="/ai/visualize" class="book-section" style="text-decoration:none;display:block;"><h3>👁️ SVG Visualizer</h3><p style="font-size:0.85rem;color:#666;">Concept → SVG diagrams</p></a>
         <a href="/ai/pomelli" class="book-section" style="text-decoration:none;display:block;"><h3>📐 Pomelli Math</h3><p style="font-size:0.85rem;color:#666;">Interactive math visualizations</p></a>
         <a href="/ai/metai" class="book-section" style="text-decoration:none;display:block;"><h3>🤖 MetaAI Learning</h3><p style="font-size:0.85rem;color:#666;">Storyboards & learning guides</p></a>
-        <a href="/ai/youtube" class="book-section" style="text-decoration:none;display:block;"><h3>▶️ YouTube Videos</h3><p style="font-size:0.85rem;color:#666;">Search & embed CBSE videos</p></a>
+        <a href="/ai/metai" class="book-section" style="text-decoration:none;display:block;"><h3>🤖 MetaAI Learning</h3><p style="font-size:0.85rem;color:#666;">Storyboards & learning guides</p></a>
+        <a href="/ai/youtube" class="book-section" style="text-decoration:none;display:block;"><h3>🎬 Concept Storyboards</h3><p style="font-size:0.85rem;color:#666;">Offline animated visual lessons</p></a>
         <a href="/ai/opengrok" class="book-section" style="text-decoration:none;display:block;"><h3>📐 Formulas & Theorems</h3><p style="font-size:0.85rem;color:#666;">Math & science formula search</p></a>
     </div></div>"""))
 
 
 @app.get("/ai/youtube", response_class=HTMLResponse)
 async def ai_youtube_page():
-    return HTMLResponse(_render(title="AI YouTube Videos — CBSE Class X", content="""
-    <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> YouTube Videos</div>
+    return HTMLResponse(_render(title="AI Concept Storyboard Studio — CBSE Class X", content="""
+    <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Concept Storyboards</div>
     <div class="section">
-        <h2>▶️ AI YouTube Video Search</h2>
-        <p class="subtitle">Search CBSE educational videos — powered by Google YouTube Data API v3</p>
+        <h2>🎬 AI Concept Storyboard Studio</h2>
+        <p class="subtitle">Search and generate offline-first concept storyboards grounded in local textbook databases</p>
         <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-            <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Topic</label>
-            <input type="text" id="yt-topic" value="Photosynthesis CBSE Class 10" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-            <button onclick="searchYouTube()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">🔍 Search Videos</button>
+            <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Concept Topic</label>
+            <input type="text" id="yt-topic" value="Photosynthesis" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
+            <button onclick="searchYouTube()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">🎬 Generate Storyboards</button>
             <div id="yt-output" style="margin-top:1rem;"></div>
         </div>
     </div>
     <div class="section">
-        <h2>🎬 Iterative Short-Clip Generator</h2>
-        <p class="subtitle">Split a long topic into short clips with voiceover sync</p>
+        <h2>🎞️ Iterative Short-Clip Visual Script Generator</h2>
+        <p class="subtitle">Convert a long topic into sequential short scenes with narration and layout scripts</p>
         <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-            <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Topic Name or Topic ID</label>
+            <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Topic Name</label>
             <input type="text" id="yt-clip-topic" value="Quadratic Equations" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;">
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <input type="text" id="yt-clip-chapter" placeholder="Chapter ID (optional)" style="flex:1;min-width:120px;padding:0.7rem;border:1px solid var(--border);border-radius:8px;">
                 <input type="number" id="yt-clip-count" value="5" min="2" max="20" style="width:80px;padding:0.7rem;border:1px solid var(--border);border-radius:8px;">
-                <button onclick="generateClips()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">🎬 Generate Clips</button>
+                <button onclick="generateClips()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">🎬 Generate Scene Playlist</button>
             </div>
             <div id="yt-clip-output" style="margin-top:1rem;"></div>
         </div>
@@ -1835,11 +2035,11 @@ async def ai_youtube_page():
     async function searchYouTube() {
         const topic = document.getElementById('yt-topic').value;
         const out = document.getElementById('yt-output');
-        out.innerHTML = '<em>Searching YouTube...</em>';
+        out.innerHTML = '<em>Generating concept storyboards...</em>';
         try {
             const resp = await fetch('/api/ai/youtube?topic='+encodeURIComponent(topic));
             const data = await resp.json();
-            out.innerHTML = data.html || '<em>No videos found</em>';
+            out.innerHTML = data.html || '<em>No storyboards found</em>';
         } catch(e) {
             out.innerHTML = '<em>Error: ' + e.message + '</em>';
         }
@@ -1849,31 +2049,36 @@ async def ai_youtube_page():
         const chapter = document.getElementById('yt-clip-chapter').value;
         const max = document.getElementById('yt-clip-count').value || 5;
         const out = document.getElementById('yt-clip-output');
-        out.innerHTML = '<em>Generating clip playlist...</em>';
+        out.innerHTML = '<em>Generating visual scenes and scripts...</em>';
         try {
             let url = '/api/ai/youtube/generate?topic_name='+encodeURIComponent(topic)+'&max_clips='+max;
             if (chapter) url += '&chapter_id='+encodeURIComponent(chapter);
             const resp = await fetch(url);
             const data = await resp.json();
             if (!data.success) { out.innerHTML = '<em>Generation failed</em>'; return; }
-            let h = '<div style="margin-top:0.5rem;"><h4 style="color:var(--accent);margin-bottom:0.3rem;">🎬 Playlist: '+data.topic+'</h4>';
-            h += '<p style="font-size:0.8rem;color:#666;">'+data.total_clips+' clips &middot; ~'+data.total_duration+'s total</p>';
-            h += '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;">';
+            let h = '<div style="margin-top:0.5rem;"><h4 style="color:var(--accent);margin-bottom:0.3rem;">🎬 Internal Video Script: '+data.topic+'</h4>';
+            h += '<p style="font-size:0.8rem;color:#666;">'+data.total_clips+' scenes &middot; ~'+data.total_duration+'s total duration</p>';
+            h += '<div style="display:flex;flex-direction:column;gap:1.2rem;margin-top:1rem;">';
             for (const c of data.clips) {
-                h += '<div class="book-section" style="padding:0.75rem;border-left:3px solid var(--accent);">';
-                h += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">';
-                h += '<strong>#'+c.index+' '+c.segment_title+'</strong>';
-                h += '<span style="font-size:0.75rem;color:#666;">~'+c.duration_sec+'s</span>';
+                h += '<div class="book-section" style="padding:1.2rem;border-left:4px solid '+c.color+';">';
+                h += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:0.8rem;">';
+                h += '<strong style="font-size:1.1rem;">'+c.icon+' Scene '+c.index+': '+c.segment_title+'</strong>';
+                h += '<span style="font-size:0.85rem;background:#f1f5f9;padding:0.2rem 0.6rem;border-radius:20px;color:#666;">~'+c.duration_sec+'s</span>';
                 h += '</div>';
-                if (c.videoId) {
-                    h += '<div class="video-container" style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;background:#000;border-radius:6px;margin:0.4rem 0;">';
-                    h += '<iframe src="https://www.youtube.com/embed/'+c.videoId+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen loading="lazy"></iframe></div>';
-                } else {
-                    h += '<p style="font-size:0.78rem;color:#888;margin:0.3rem 0;"><a href="https://www.youtube.com/results?search_query='+encodeURIComponent(c.query)+'" target="_blank" rel="noopener" style="color:var(--accent);">Search YouTube for "'+c.segment_title+'" →</a></p>';
+                h += '<div style="margin-bottom:0.8rem;padding:0.8rem;background:#fafafa;border-radius:6px;border:1px dashed #ddd;">';
+                h += '<span style="font-size:0.75rem;text-transform:uppercase;color:#888;font-weight:700;display:block;margin-bottom:0.3rem;">Visual Layout Description</span>';
+                h += '<p style="margin:0;font-size:0.9rem;color:#333;">'+c.visual_description+'</p>';
+                h += '</div>';
+                h += '<div style="margin-bottom:0.8rem;">';
+                h += '<span style="font-size:0.75rem;text-transform:uppercase;color:#888;font-weight:700;display:block;margin-bottom:0.3rem;">Voiceover Script</span>';
+                h += '<p style="margin:0;font-size:0.95rem;line-height:1.5;color:#111;">'+c.text+'</p>';
+                h += '</div>';
+                if (c.key_formula_or_term) {
+                    h += '<div style="font-size:0.85rem;color:var(--primary);margin-top:0.5rem;font-weight:600;">🔑 Focus Formula/Term: <code style="background:#eef2ff;padding:0.1rem 0.4rem;border-radius:4px;">'+c.key_formula_or_term+'</code></div>';
                 }
-                if (c.voiceover && c.voiceover.segments) {
-                    h += '<div style="font-size:0.75rem;color:#666;margin-top:0.2rem;">🔊 '+c.voiceover.segments.length+' speech segments &middot; ~'+c.voiceover.total_duration+'s</div>';
-                }
+                h += '<div style="margin-top:1rem;display:flex;gap:0.5rem;">';
+                h += '<button onclick="speakTextLocally(\''+c.text.replace(/'/g, "\\'")+'\')" style="padding:0.4rem 1rem;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:0.8rem;cursor:pointer;font-weight:600;">🔊 Play Voiceover</button>';
+                h += '</div>';
                 h += '</div>';
             }
             h += '</div></div>';
@@ -1881,6 +2086,15 @@ async def ai_youtube_page():
         } catch(e) {
             out.innerHTML = '<em>Error: ' + e.message + '</em>';
         }
+    }
+    function speakTextLocally(text) {
+        if (!('speechSynthesis' in window)) { alert('Text-to-speech not supported in this browser.'); return; }
+        window.speechSynthesis.cancel();
+        var utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-IN';
+        utter.pitch = 1.0;
+        utter.rate = 1.0;
+        window.speechSynthesis.speak(utter);
     }
     </script>"""))
 
@@ -2065,12 +2279,26 @@ async def revision_page(chapter_id: str):
     <div class="section"><h2>🔄 Quick Revision: {chapter['title']}</h2><ul style="line-height:1.8;">{points}</ul></div>"""))
 
 
-@app.get("/quiz/{chapter_id}", response_class=HTMLResponse)
-async def quiz_page(chapter_id: str):
+@app.get("/quiz/{entity_id}", response_class=HTMLResponse)
+async def quiz_page(entity_id: str):
     conn = DB
-    chapter = conn.query_one("SELECT * FROM chapters WHERE id = ?", (chapter_id,)) if conn and conn.table_exists("chapters") else None
+    # Try as chapter_id first
+    chapter = conn.query_one("SELECT * FROM chapters WHERE id = ?", (entity_id,)) if conn and conn.table_exists("chapters") else None
     if not chapter:
+        # Try as subject_id — list all chapter quizzes
+        subject = conn.query_one("SELECT * FROM subjects WHERE id = ?", (entity_id,)) if conn and conn.table_exists("subjects") else None
+        if subject:
+            chapters = conn.query("SELECT * FROM chapters WHERE subject_id = ? ORDER BY num", (entity_id,))
+            quiz_links = ""
+            for ch in chapters:
+                quiz_links += f'<div class="book-section" style="margin-bottom:0.5rem;"><a href="/quiz/{ch["id"]}" style="text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>Ch {ch["num"]}: {ch["title"]}</span><span style="font-size:0.8rem;color:var(--accent);">📝 Quiz →</span></a></div>'
+            if not quiz_links:
+                quiz_links = '<p style="color:#666;">No chapters available for quizzes yet.</p>'
+            return HTMLResponse(_render(title=f"Quizzes: {subject['name']}", content=f"""
+            <div class="breadcrumb">{_build_breadcrumb([("Home", "/"), (f"{subject['name']}", f"/board/{subject['board_id']}/{entity_id}"), ("Quizzes", None)])}</div>
+            <div class="section"><h2>📝 Practice Quizzes: {subject['name']}</h2><p style="color:#666;margin-bottom:1rem;">Select a chapter to practice.</p>{quiz_links}</div>"""))
         return HTMLResponse(_render(title="Quiz — Not Found", content='<div class="section"><h2>Quiz Not Found</h2><p><a href="/">Go Home</a></p></div>'), status_code=404)
+    chapter_id = entity_id
     problems = conn.query("SELECT * FROM problems WHERE chapter_id = ? LIMIT 20", (chapter_id,)) if conn.table_exists("problems") else []
     cards = ""
     for p in problems:
@@ -2090,14 +2318,12 @@ async def mindmap_page(topic_id: str):
     topic = conn.query_one("SELECT * FROM topics WHERE id = ?", (topic_id,)) if conn and conn.table_exists("topics") else None
     if not topic:
         return HTMLResponse(_render(title="Mind Map — Not Found", content='<div class="section"><h2>Mind Map Not Found</h2><p><a href="/">Go Home</a></p></div>'), status_code=404)
-    chunks = conn.query("SELECT * FROM chunks WHERE topic_id = ? ORDER BY seq", (topic_id,))
-    nodes = [topic.get("title", "Topic")]
-    for c in chunks:
-        nodes.append(c.get("title", "") or c.get("content", "")[:40])
-    mindmap_svg = _pomelli_mindmap_svg(nodes)
+    res = await _run_in_thread(ai_services.napkin_diagram, topic["title"], "mindmap")
+    content_html = res.get("html", "")
     return HTMLResponse(_render(title=f"Mind Map: {topic['title']}", content=f"""
     <div class="breadcrumb">{_build_breadcrumb([("Home", "/"), (topic['title'], f"/topic/{topic_id}"), ("Mind Map", None)])}</div>
-    <div class="section"><h2>🧠 Mind Map: {topic['title']}</h2>{mindmap_svg}</div>"""))
+    <div class="section"><h2>🧠 Mind Map & Study Guide: {topic['title']}</h2>
+    <div style="margin-top:1.5rem;">{content_html}</div></div>"""))
 
 
 @app.get("/interactives/cards/{topic_id}", response_class=HTMLResponse)
