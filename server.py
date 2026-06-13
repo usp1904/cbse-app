@@ -1030,10 +1030,25 @@ async def chapter_page(chapter_id: str):
             chunks_by_topic.setdefault(c["topic_id"], []).append(c)
 
     topics_html = ""
+    is_math = subject and ("math" in subject.get("id", "").lower() or "math" in subject.get("name", "").lower())
+    is_science = subject and ("science" in subject.get("id", "").lower() or "science" in subject.get("name", "").lower())
+    is_social = subject and any(x in subject.get("id", "").lower() or x in subject.get("name", "").lower() for x in ["social", "history", "geography", "civics", "political", "economics", "democrat"])
+
     for t in topics:
         chunks = chunks_by_topic.get(t["id"], [])
-        content_html = format_content(t.get("content", ""))
-        chunks_html = "".join(f'<div class="chunk-view"><div class="chunk-title">{htmlmod.escape(c.get("title",""))}</div><div class="chunk-content">{format_content(c.get("content",""))}</div></div>' for c in chunks)
+        if is_math:
+            content_html = format_math_content(t.get("content", ""))
+            chunks_html = "".join(f'<div class="chunk-view"><div class="chunk-title">{htmlmod.escape(c.get("title",""))}</div><div class="chunk-content">{format_math_content(c.get("content",""))}</div></div>' for c in chunks)
+        elif is_science:
+            content_html = format_science_content(t.get("content", ""))
+            chunks_html = "".join(f'<div class="chunk-view"><div class="chunk-title">{htmlmod.escape(c.get("title",""))}</div><div class="chunk-content">{format_science_content(c.get("content",""))}</div></div>' for c in chunks)
+        elif is_social:
+            content_html = format_social_content(t.get("content", ""))
+            chunks_html = "".join(f'<div class="chunk-view"><div class="chunk-title">{htmlmod.escape(c.get("title",""))}</div><div class="chunk-content">{format_social_content(c.get("content",""))}</div></div>' for c in chunks)
+        else:
+            content_html = format_general_content(t.get("content", ""))
+            chunks_html = "".join(f'<div class="chunk-view"><div class="chunk-title">{htmlmod.escape(c.get("title",""))}</div><div class="chunk-content">{format_general_content(c.get("content",""))}</div></div>' for c in chunks)
+
         topics_html += f"""<div class="section" id="topic-{t['id']}">
 <h2><a href="/topic/{t['id']}" style="color:var(--primary);">{htmlmod.escape(t['title'])}</a></h2>
 {content_html or chunks_html}
@@ -1043,6 +1058,7 @@ async def chapter_page(chapter_id: str):
 <a href="/quiz/{chapter_id}" class="tts-btn" style="font-size:0.8rem;">📝 Quiz</a>
 <a href="/interactives/matching/{t['id']}" class="tts-btn" style="font-size:0.8rem;">🔄 Matching</a>
 </div></div>"""
+
 
     subj_name = subject["name"] if subject else ""
     board_id = (subject["board_id"] if subject else "").upper()
@@ -1381,6 +1397,104 @@ def format_social_solved_problem(p, idx):
     """
 
 
+
+def format_general_content(text):
+    if not text:
+        return ""
+    html = format_content(text)
+    
+    # 1. Key Vocabulary / Terms
+    html = re.sub(
+        r'(<p>)?<strong>(Vocabulary|Meaning|Definition|Grammar Rule|Character)\b([^:]*):?</strong>(.*?)(</p>)?',
+        r'<div class="social-term-card" style="border-left-color:var(--accent);"><div class="term-title" style="color:var(--primary-light);">🏷️ <span class="term-badge" style="background:#e0f2fe; color:#0369a1;">\2\3</span></div><div>\4</div></div>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+    
+    # 2. General Board exam tips
+    html = re.sub(
+        r'(<p>)?<strong>(Key points|Summary|Board Exam Tip|Tip)\b([^:]*):?</strong>(.*?)(</p>)?',
+        r'<div class="concept-tip-card" style="border-left-color:var(--accent2);"><div class="concept-tip-title" style="color:var(--primary);">💡 \2\3</div><div>\4</div></div>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+    return html
+
+
+def build_general_glossary(content, chunks):
+    all_text = (content or "") + "\n" + "\n".join(c.get("content", "") for c in chunks)
+    terms = []
+    lines = all_text.split("\n")
+    for line in lines:
+        if ":" in line and "**" in line:
+            match = re.match(r'^\s*[-*•]?\s*\*\*(.*?)\*\*:\s*(.*)', line)
+            if match:
+                term, val = match.groups()
+                if len(term) < 50 and len(val) > 5 and len(val) < 200:
+                    terms.append((term, val))
+                    
+    if not terms:
+        return '<div class="concept-tip-card" style="border-left-color:var(--accent2);"><div class="concept-tip-title">📚 Glossary & Terms</div><p>Refer to the Concept Explainer tab for core definitions and summaries.</p></div>'
+        
+    html = '<div class="section"><h3>📚 Glossary & Key Reference Words</h3><p style="color:#666;margin-bottom:1.5rem;">Study key glossary words and reference terms to master comprehension and writing skills.</p>'
+    for term, val in terms:
+        html += f"""
+        <div class="social-term-card" style="border-left-color:var(--accent);">
+            <div class="term-title">🏷️ <span class="term-badge" style="background:#e0f2fe; color:#0369a1;">{htmlmod.escape(term)}</span></div>
+            <p>{format_general_content(val)}</p>
+        </div>
+        """
+    html += '</div>'
+    return html
+
+
+def format_general_solved_problem(p, idx):
+    qtext = format_general_content(p.get("problem_text", ""))
+    stext = p.get("solution_text", "")
+    
+    step_matches = re.split(r'(?:^|\n)(?:Step\s*\d+\s*:|Step\s*\d+\b|\d+\.\s+)', stext)
+    steps_html = ""
+    step_num = 1
+    for part in step_matches:
+        part_clean = part.strip()
+        if not part_clean:
+            continue
+        step_formatted = format_general_content(part_clean)
+        steps_html += f"""
+        <div class="step-container">
+            <span class="step-badge" style="background:var(--accent);">{step_num}</span>
+            <div class="step-content">{step_formatted}</div>
+        </div>
+        """
+        step_num += 1
+        
+    if not steps_html:
+        steps_html = format_general_content(stext)
+        
+    return f"""
+    <div class="solved-problem-card" style="border-color:var(--border);">
+        <div class="solved-problem-header" style="background:#fafafa;" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); var sign = this.querySelector('.sign'); if (sign) sign.textContent = this.classList.contains('open') ? '−' : '+';">
+            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:100])}...</span>
+            <span class="sign" style="font-size:1.2rem; color:var(--accent); font-weight:bold;">+</span>
+        </div>
+        <div class="solved-problem-body">
+            <div class="problem-box" style="margin-top:0; border-color:var(--border); background:#fcfcfc;">
+                <div class="problem-header" style="color:var(--primary); border-bottom-color:var(--border);">Problem Statement</div>
+                <div class="problem-text">{qtext}</div>
+            </div>
+            <div class="solution-steps" style="border-color:var(--border); background:#fcfcfc;">
+                <div class="problem-header" style="color:var(--success); border-bottom-color:rgba(16,185,129,0.1);">Detailed Solution</div>
+                {steps_html}
+            </div>
+            <div class="concept-tip-card" style="margin-top: 1rem; margin-bottom: 0; border-left-color:var(--accent);">
+                <div class="concept-tip-title" style="color:var(--primary-light);">🛡️ Exam Tip</div>
+                <p>Provide contextual explanations, structured points, and reference correct spelling and terms to secure high marks in exams.</p>
+            </div>
+        </div>
+    </div>
+    """
+
+
 @app.get("/topic/{topic_id}", response_class=HTMLResponse)
 async def topic_page(topic_id: str):
     conn = DB
@@ -1569,25 +1683,60 @@ async def topic_page(topic_id: str):
 </div>"""
 
     else:
-        content_html = format_content(topic.get("content", ""))
+        content_html = format_general_content(topic.get("content", ""))
         chunks_html = ""
         for c in chunks:
             chunks_html += f"""<div class="section" id="chunk-{c['id']}">
 <h3>{htmlmod.escape(c.get("title",""))}</h3>
-<div class="chunk-content">{format_content(c.get("content",""))}</div>
+<div class="chunk-content">{format_general_content(c.get("content",""))}</div>
 </div>"""
 
+        problems = conn.query("SELECT * FROM problems WHERE topic_id = ? ORDER BY seq", (topic_id,)) if conn.table_exists("problems") else []
+        if not problems and chapter:
+            problems = conn.query("SELECT * FROM problems WHERE chapter_id = ? ORDER BY seq LIMIT 6", (chapter["id"],)) if conn.table_exists("problems") else []
+
+        solved_html = ""
+        for idx, p in enumerate(problems, 1):
+            solved_html += format_general_solved_problem(p, idx)
+        if not solved_html:
+            solved_html = '<p style="color:#666;">No practice problems for this topic yet.</p>'
+
+        glossary_html = build_general_glossary(topic.get("content", ""), chunks)
+
+        # Tabbed Layout construction
         content = f"""<div class="breadcrumb">{_build_breadcrumb(bc_items)}</div>
 <div class="section">
 <h2>{htmlmod.escape(topic['title'])}</h2>
-<div class="chapter-actions">
+<div class="chapter-actions" style="margin-bottom:1.5rem;">
 <a href="/tutor/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🧠 AI Tutor</a>
 <a href="/mindmap/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🗺️ Mind Map</a>
 <a href="/interactives/cards/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🃏 Flashcards</a>
 </div>
-{content_html}
+
+<div class="math-tabs">
+  <button class="math-tab-btn active" onclick="switchMathTab('concept')">📖 Concept Explainer</button>
+  <button class="math-tab-btn" onclick="switchMathTab('formulas')">📚 Vocabulary & Reference</button>
+  <button class="math-tab-btn" onclick="switchMathTab('problems')">📝 Solved Exercises</button>
 </div>
-{chunks_html}"""
+
+<div id="math-tab-concept" class="math-tab-content active">
+  {content_html}
+  {chunks_html}
+</div>
+
+<div id="math-tab-formulas" class="math-tab-content">
+  {glossary_html}
+</div>
+
+<div id="math-tab-problems" class="math-tab-content">
+  <div class="section">
+    <h3>📝 NCERT Solved Practice Exercises</h3>
+    <p style="color:#666;margin-bottom:1.5rem;">Study step-by-step solved solutions. Tap any question to toggle the active-recall solution view.</p>
+    {solved_html}
+  </div>
+</div>
+</div>"""
+
 
 
     return HTMLResponse(_render(title=f"{topic['title']} - CBSE Class X", content=content))
