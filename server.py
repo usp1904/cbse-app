@@ -1177,6 +1177,210 @@ def format_solved_problem(p, idx):
     """
 
 
+
+def format_science_content(text):
+    if not text:
+        return ""
+    html = format_content(text)
+    
+    # 1. Chemical states formatting
+    html = re.sub(
+        r'\(([slg]|aq)\)',
+        r'<span class="reaction-state-badge">(\1)</span>',
+        html
+    )
+    
+    # 2. Activity / Experiment boxes
+    html = re.sub(
+        r'(<p>)?<strong>(Activity\s*\d+\.\d+|Experiment\s*\d+\.\d+)\b([^:]*):?</strong>(.*?)(</p>)?',
+        r'<div class="science-activity-card"><div class="activity-title">🧪 \2\3</div><div class="activity-section-content">\4</div></div>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+    
+    # 3. Science tips and safety alerts
+    html = re.sub(
+        r'(<p>)?<strong>(Key points to remember|Safety Precautions|Observation|Inference|Conclusion|Tip)\b([^:]*):?</strong>(.*?)(</p>)?',
+        r'<div class="concept-tip-card" style="border-left-color:#0d9488;"><div class="concept-tip-title" style="color:#0f766e;">💡 \2\3</div><div>\4</div></div>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+    return html
+
+
+def build_science_experiment_lab(content, chunks):
+    all_text = (content or "") + "\n" + "\n".join(c.get("content", "") for c in chunks)
+    activities = re.findall(r'(Activity\s*\d+\.\d+|Experiment\s*\d+\.\d+)(.*?)(?=(?:Activity\s*\d+\.\d+|Experiment\s*\d+\.\d+)|$)', all_text, re.DOTALL | re.IGNORECASE)
+    
+    if not activities:
+        return '<div class="concept-tip-card" style="border-left-color:#0d9488;"><div class="concept-tip-title" style="color:#0f766e;">🧪 Experiment Lab</div><p>No laboratory activities or experiments are listed for this specific topic.</p></div>'
+        
+    html = '<div class="section"><h3>🧪 Experiment & Practical Activity Lab</h3><p style="color:#666;margin-bottom:1.5rem;">Study the key practical activities from your textbook. Focus on procedures, observations, and chemical equations.</p>'
+    for title, body in activities:
+        body_html = format_science_content(body)
+        html += f"""
+        <div class="science-activity-card">
+            <div class="activity-title">🧪 {title.strip()}</div>
+            <div class="activity-section-content">{body_html}</div>
+        </div>
+        """
+    html += '</div>'
+    return html
+
+
+def format_science_solved_problem(p, idx):
+    qtext = format_science_content(p.get("problem_text", ""))
+    stext = p.get("solution_text", "")
+    
+    step_matches = re.split(r'(?:^|\n)(?:Step\s*\d+\s*:|Step\s*\d+\b|\d+\.\s+)', stext)
+    steps_html = ""
+    step_num = 1
+    for part in step_matches:
+        part_clean = part.strip()
+        if not part_clean:
+            continue
+        step_formatted = format_science_content(part_clean)
+        steps_html += f"""
+        <div class="step-container">
+            <span class="step-badge" style="background:#0d9488;">{step_num}</span>
+            <div class="step-content">{step_formatted}</div>
+        </div>
+        """
+        step_num += 1
+        
+    if not steps_html:
+        steps_html = format_science_content(stext)
+        
+    return f"""
+    <div class="solved-problem-card" style="border-color:rgba(13,148,136,0.15);">
+        <div class="solved-problem-header" style="background:#fafdfd;" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); var sign = this.querySelector('.sign'); if (sign) sign.textContent = this.classList.contains('open') ? '−' : '+';">
+            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:100])}...</span>
+            <span class="sign" style="font-size:1.2rem; color:#0d9488; font-weight:bold;">+</span>
+        </div>
+        <div class="solved-problem-body">
+            <div class="problem-box" style="margin-top:0; border-color:rgba(13,148,136,0.15); background:#fcfdfd;">
+                <div class="problem-header" style="color:#0d9488; border-bottom-color:rgba(13,148,136,0.15);">Problem Statement</div>
+                <div class="problem-text">{qtext}</div>
+            </div>
+            <div class="solution-steps" style="border-color:rgba(13,148,136,0.15); background:#fcfcfc;">
+                <div class="problem-header" style="color:var(--success); border-bottom-color:rgba(16,185,129,0.1);">Step-by-step Solution</div>
+                {steps_html}
+            </div>
+            <div class="concept-tip-card" style="margin-top: 1rem; margin-bottom: 0; border-left-color:#0d9488;">
+                <div class="concept-tip-title" style="color:#0f766e;">🛡️ Exam Tip</div>
+                <p>Include physical states of reactants and products (like s, l, g, aq) and mention details like the catalyst or heating symbol (Δ) above the arrow to get full marks.</p>
+            </div>
+        </div>
+    </div>
+    """
+
+
+
+def format_social_content(text):
+    if not text:
+        return ""
+    html = format_content(text)
+    
+    # 1. Key Historical Terms formatting
+    html = re.sub(
+        r'(<p>)?<strong>(Satyagraha|Rowlatt Act|Khilafat|Boycott|Purna Swaraj|Harijan|Civil Disobedience|Hartal|Nation-state|Alluri Sitarama Raju|Baba Ramchandra)\b([^:]*):?</strong>(.*?)(</p>)?',
+        r'<div class="social-term-card"><div class="term-title">🏷️ <span class="term-badge">\2\3</span></div><div>\4</div></div>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+    
+    # 2. Tips & Chronology alerts
+    html = re.sub(
+        r'(<p>)?<strong>(Key points to remember|Chronology|Map work|Board Exam Tip|Tip)\b([^:]*):?</strong>(.*?)(</p>)?',
+        r'<div class="concept-tip-card" style="border-left-color:#d97706;"><div class="concept-tip-title" style="color:#92400e;">💡 \2\3</div><div>\4</div></div>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE
+    )
+    return html
+
+
+def build_social_timeline(content, chunks):
+    all_text = (content or "") + "\n" + "\n".join(c.get("content", "") for c in chunks)
+    events = []
+    lines = all_text.split("\n")
+    for line in lines:
+        match = re.search(r'\b(1[789]\d{2}|20\d{2})\b', line)
+        if match:
+            year = match.group(1)
+            event_text = line.replace(year, "").strip("•-* :").strip()
+            if event_text and len(event_text) > 10 and len(event_text) < 300:
+                events.append((int(year), event_text))
+                
+    events = sorted(list(set(events)), key=lambda x: x[0])
+    
+    if not events:
+        return '<div class="concept-tip-card" style="border-left-color:#d97706;"><div class="concept-tip-title" style="color:#92400e;">📅 Chronology & Timeline</div><p>No historical milestones or chronological dates are listed for this specific topic.</p></div>'
+        
+    html = '<div class="section"><h3>📅 Chronology & Historical Timeline</h3><p style="color:#666;margin-bottom:1.5rem;">Study the sequential milestone events for this topic. Chronology is crucial for matching and board exam essay questions.</p><div class="social-timeline-container">'
+    for year, text in events:
+        words = text.split()
+        title = " ".join(words[:5]) + "..." if len(words) > 5 else text
+        html += f"""
+        <div class="timeline-item">
+            <span class="timeline-marker"></span>
+            <span class="timeline-year">{year}</span>
+            <div class="timeline-content">
+                <h4>{htmlmod.escape(title)}</h4>
+                <p>{format_social_content(text)}</p>
+            </div>
+        </div>
+        """
+    html += '</div></div>'
+    return html
+
+
+def format_social_solved_problem(p, idx):
+    qtext = format_social_content(p.get("problem_text", ""))
+    stext = p.get("solution_text", "")
+    
+    step_matches = re.split(r'(?:^|\n)(?:Step\s*\d+\s*:|Step\s*\d+\b|\d+\.\s+)', stext)
+    steps_html = ""
+    step_num = 1
+    for part in step_matches:
+        part_clean = part.strip()
+        if not part_clean:
+            continue
+        step_formatted = format_social_content(part_clean)
+        steps_html += f"""
+        <div class="step-container">
+            <span class="step-badge" style="background:#d97706;">{step_num}</span>
+            <div class="step-content">{step_formatted}</div>
+        </div>
+        """
+        step_num += 1
+        
+    if not steps_html:
+        steps_html = format_social_content(stext)
+        
+    return f"""
+    <div class="solved-problem-card" style="border-color:rgba(217,119,6,0.15);">
+        <div class="solved-problem-header" style="background:#fffdfa;" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); var sign = this.querySelector('.sign'); if (sign) sign.textContent = this.classList.contains('open') ? '−' : '+';">
+            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:100])}...</span>
+            <span class="sign" style="font-size:1.2rem; color:#d97706; font-weight:bold;">+</span>
+        </div>
+        <div class="solved-problem-body">
+            <div class="problem-box" style="margin-top:0; border-color:rgba(217,119,6,0.15); background:#fcfcf9;">
+                <div class="problem-header" style="color:#d97706; border-bottom-color:rgba(217,119,6,0.15);">Problem Statement</div>
+                <div class="problem-text">{qtext}</div>
+            </div>
+            <div class="solution-steps" style="border-color:rgba(217,119,6,0.15); background:#fcfcfc;">
+                <div class="problem-header" style="color:var(--success); border-bottom-color:rgba(16,185,129,0.1);">Detailed Answer Points</div>
+                {steps_html}
+            </div>
+            <div class="concept-tip-card" style="margin-top: 1rem; margin-bottom: 0; border-left-color:#d97706;">
+                <div class="concept-tip-title" style="color:#92400e;">🛡️ Exam Tip</div>
+                <p>Present social science answers in bulleted points rather than long paragraphs. Underline key keywords, historical names, and dates to capture the evaluator's attention.</p>
+            </div>
+        </div>
+    </div>
+    """
+
+
 @app.get("/topic/{topic_id}", response_class=HTMLResponse)
 async def topic_page(topic_id: str):
     conn = DB
@@ -1198,6 +1402,8 @@ async def topic_page(topic_id: str):
     bc_items.append((topic["title"], None))
 
     is_math = subject and ("math" in subject.get("id", "").lower() or "math" in subject.get("name", "").lower())
+    is_science = subject and ("science" in subject.get("id", "").lower() or "science" in subject.get("name", "").lower())
+    is_social = subject and any(x in subject.get("id", "").lower() or x in subject.get("name", "").lower() for x in ["social", "history", "geography", "civics", "political", "economics", "democrat"])
 
     if is_math:
         content_html = format_math_content(topic.get("content", ""))
@@ -1253,6 +1459,115 @@ async def topic_page(topic_id: str):
   </div>
 </div>
 </div>"""
+    elif is_science:
+        content_html = format_science_content(topic.get("content", ""))
+        chunks_html = ""
+        for c in chunks:
+            chunks_html += f"""<div class="section" id="chunk-{c['id']}">
+<h3>{htmlmod.escape(c.get("title",""))}</h3>
+<div class="chunk-content">{format_science_content(c.get("content",""))}</div>
+</div>"""
+
+        problems = conn.query("SELECT * FROM problems WHERE topic_id = ? ORDER BY seq", (topic_id,)) if conn.table_exists("problems") else []
+        if not problems and chapter:
+            problems = conn.query("SELECT * FROM problems WHERE chapter_id = ? ORDER BY seq LIMIT 6", (chapter["id"],)) if conn.table_exists("problems") else []
+
+        solved_html = ""
+        for idx, p in enumerate(problems, 1):
+            solved_html += format_science_solved_problem(p, idx)
+        if not solved_html:
+            solved_html = '<p style="color:#666;">No practice problems for this topic yet.</p>'
+
+        experiments_html = build_science_experiment_lab(topic.get("content", ""), chunks)
+
+        # Tabbed Layout construction
+        content = f"""<div class="breadcrumb">{_build_breadcrumb(bc_items)}</div>
+<div class="section">
+<h2>{htmlmod.escape(topic['title'])}</h2>
+<div class="chapter-actions" style="margin-bottom:1.5rem;">
+<a href="/tutor/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🧠 AI Tutor</a>
+<a href="/mindmap/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🗺️ Mind Map</a>
+<a href="/interactives/cards/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🃏 Flashcards</a>
+</div>
+
+<div class="math-tabs">
+  <button class="math-tab-btn active" onclick="switchMathTab('concept')">📖 Concept Explainer</button>
+  <button class="math-tab-btn" onclick="switchMathTab('formulas')">🧪 Experiment Lab</button>
+  <button class="math-tab-btn" onclick="switchMathTab('problems')">📝 Solved Exercises</button>
+</div>
+
+<div id="math-tab-concept" class="math-tab-content active">
+  {content_html}
+  {chunks_html}
+</div>
+
+<div id="math-tab-formulas" class="math-tab-content">
+  {experiments_html}
+</div>
+
+<div id="math-tab-problems" class="math-tab-content">
+  <div class="section">
+    <h3>📝 NCERT Solved Practice Exercises</h3>
+    <p style="color:#666;margin-bottom:1.5rem;">Study step-by-step solved solutions. Tap any question to toggle the active-recall solution view.</p>
+    {solved_html}
+  </div>
+</div>
+</div>"""
+    elif is_social:
+        content_html = format_social_content(topic.get("content", ""))
+        chunks_html = ""
+        for c in chunks:
+            chunks_html += f"""<div class="section" id="chunk-{c['id']}">
+<h3>{htmlmod.escape(c.get("title",""))}</h3>
+<div class="chunk-content">{format_social_content(c.get("content",""))}</div>
+</div>"""
+
+        problems = conn.query("SELECT * FROM problems WHERE topic_id = ? ORDER BY seq", (topic_id,)) if conn.table_exists("problems") else []
+        if not problems and chapter:
+            problems = conn.query("SELECT * FROM problems WHERE chapter_id = ? ORDER BY seq LIMIT 6", (chapter["id"],)) if conn.table_exists("problems") else []
+
+        solved_html = ""
+        for idx, p in enumerate(problems, 1):
+            solved_html += format_social_solved_problem(p, idx)
+        if not solved_html:
+            solved_html = '<p style="color:#666;">No practice problems for this topic yet.</p>'
+
+        timeline_html = build_social_timeline(topic.get("content", ""), chunks)
+
+        # Tabbed Layout construction
+        content = f"""<div class="breadcrumb">{_build_breadcrumb(bc_items)}</div>
+<div class="section">
+<h2>{htmlmod.escape(topic['title'])}</h2>
+<div class="chapter-actions" style="margin-bottom:1.5rem;">
+<a href="/tutor/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🧠 AI Tutor</a>
+<a href="/mindmap/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🗺️ Mind Map</a>
+<a href="/interactives/cards/{topic_id}" class="tts-btn" style="font-size:0.8rem;">🃏 Flashcards</a>
+</div>
+
+<div class="math-tabs">
+  <button class="math-tab-btn active" onclick="switchMathTab('concept')">📖 Concept Explainer</button>
+  <button class="math-tab-btn" onclick="switchMathTab('formulas')">📅 Timeline & Events</button>
+  <button class="math-tab-btn" onclick="switchMathTab('problems')">📝 Solved Exercises</button>
+</div>
+
+<div id="math-tab-concept" class="math-tab-content active">
+  {content_html}
+  {chunks_html}
+</div>
+
+<div id="math-tab-formulas" class="math-tab-content">
+  {timeline_html}
+</div>
+
+<div id="math-tab-problems" class="math-tab-content">
+  <div class="section">
+    <h3>📝 NCERT Solved Practice Exercises</h3>
+    <p style="color:#666;margin-bottom:1.5rem;">Study step-by-step solved solutions. Tap any question to toggle the active-recall solution view.</p>
+    {solved_html}
+  </div>
+</div>
+</div>"""
+
     else:
         content_html = format_content(topic.get("content", ""))
         chunks_html = ""
@@ -1273,6 +1588,7 @@ async def topic_page(topic_id: str):
 {content_html}
 </div>
 {chunks_html}"""
+
 
     return HTMLResponse(_render(title=f"{topic['title']} - CBSE Class X", content=content))
 

@@ -491,3 +491,138 @@ footer { text-align: center; padding: 2rem 1.5rem; color: var(--text-muted); fon
     flex: 1;
     line-height: 1.7;
 }
+
+/* Science Experiment & Laboratory Activity Styles */
+.science-activity-card {
+    background: linear-gradient(to right, #f0fdfa, #f2fcfb);
+    border-left: 5px solid #0d9488;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 14px rgba(13, 148, 136, 0.05);
+    border: 1px solid rgba(13, 148, 136, 0.15);
+    border-left-width: 5px;
+}
+.activity-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #0f766e;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.activity-section {
+    margin-top: 0.75rem;
+}
+.activity-section-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #115e59;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+.activity-section-content {
+    color: var(--text);
+    line-height: 1.6;
+}
+
+/* Chemical Equation Box & States Styling */
+.chemical-equation-box {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    overflow-x: auto;
+}
+.reaction-state-badge {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+    vertical-align: sub;
+    margin: 0 0.15rem;
+}
+
+/* Social Science Timelines and Humanities Styling */
+.social-timeline-container {
+    position: relative;
+    padding-left: 2rem;
+    margin: 1.5rem 0;
+    border-left: 3px solid var(--accent);
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+.timeline-marker {
+    position: absolute;
+    left: calc(-2rem - 9px);
+    top: 4px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--accent2);
+    border: 3px solid var(--card-bg);
+    box-shadow: 0 0 0 3px var(--accent);
+}
+.timeline-year {
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--accent2);
+    margin-bottom: 0.25rem;
+    display: inline-block;
+    background: #f3f4f6;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+}
+.timeline-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+.timeline-content h4 {
+    margin: 0 0 0.5rem;
+    font-size: 1.05rem;
+    color: var(--primary);
+}
+
+.social-term-card {
+    background: linear-gradient(to right, #fffbeb, #fffbeb);
+    border-left: 5px solid #d97706;
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    margin: 1rem 0;
+    border: 1px solid rgba(217, 119, 6, 0.15);
+    border-left-width: 5px;
+}
+.term-title {
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.term-badge {
+    background: #fef3c7;
+    color: #b45309;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
