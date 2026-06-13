@@ -1,6 +1,9 @@
 import math
+import logging
 from datetime import datetime, date
 from database import get_conn
+
+log = logging.getLogger("cbse.gamification")
 
 LEVEL_THRESHOLDS = [0, 100, 280, 520, 840, 1260, 1820, 2560, 3520, 4760]
 LIFE_REFILL_MINUTES = 20
@@ -28,8 +31,11 @@ def add_xp(amount, reason, detail="", chapter_id="", topic_id=""):
         "INSERT INTO xp_events (xp, reason, detail, chapter_id, topic_id) VALUES (?, ?, ?, ?, ?)",
         (amount, reason, detail, chapter_id, topic_id),
     )
-    conn.execute("UPDATE learner SET xp = xp + ?, total_xp_earned = total_xp_earned + ? WHERE id = 1",
-                 (amount, amount))
+    if amount > 0:
+        conn.execute("UPDATE learner SET xp = xp + ?, total_xp_earned = total_xp_earned + ? WHERE id = 1",
+                     (amount, amount))
+    else:
+        conn.execute("UPDATE learner SET xp = xp + ? WHERE id = 1", (amount,))
     learner = conn.execute("SELECT xp FROM learner WHERE id = 1").fetchone()
     new_level = calculate_level(learner["xp"])
     conn.execute("UPDATE learner SET level = ? WHERE id = 1", (new_level,))

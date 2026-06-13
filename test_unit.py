@@ -16,7 +16,7 @@ _fake_mods = {}
 for _mod_name in ['fastapi', 'fastapi.responses', 'fastapi.middleware',
                   'fastapi.middleware.cors', 'fastapi.middleware.gzip',
                   'fastapi.middleware.trustedhost', 'pydantic',
-                  'rag_engine', 'llm_client', 'chunking', 'data',
+                   'json_index', 'llm_client', 'chunking', 'data',
                   'ai_services', 'content_enricher', 'gamification',
                   'interactives', 'ai_tutor', 'database']:
     if _mod_name not in sys.modules:
@@ -170,26 +170,27 @@ class TestDbTranslation(unittest.TestCase):
 def _extract_from_server(func_names):
     """Extract pure functions from server.py without importing its non-standard deps."""
     import ast, types
-    src = open("/home/windows/cbse-app/server.py", "r").read()
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    src = open(os.path.join(base_dir, "server.py"), "r", encoding="utf-8").read()
     tree = ast.parse(src)
+    # Build a shared namespace for all functions so they can reference each other
+    ns = {
+        're': __import__('re'),
+        'htmlmod': __import__('html'),
+        'random': __import__('random'),
+        'json': __import__('json'),
+        'hashlib': __import__('hashlib'),
+        'os': __import__('os'),
+        'time': __import__('time'),
+    }
     fns = {}
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name in func_names:
-            # Build a minimal namespace with required imports
-            ns = {
-                're': __import__('re'),
-                'htmlmod': __import__('html'),
-                'random': __import__('random'),
-                'json': __import__('json'),
-                'hashlib': __import__('hashlib'),
-                'os': __import__('os'),
-                'time': __import__('time'),
-            }
             exec(compile(ast.Module([node], type_ignores=[]), "<ast>", "exec"), ns)
             fns[node.name] = ns[node.name]
     return fns
 
-_server_fns = _extract_from_server({'format_content', 'esc_js', '_build_breadcrumb'})
+_server_fns = _extract_from_server({'format_content', '_safe_img_src', 'esc_js', '_build_breadcrumb'})
 
 class TestServerFormatContent(unittest.TestCase):
     """Test the format_content function from server.py."""
@@ -215,7 +216,9 @@ class TestServerFormatContent(unittest.TestCase):
 
     def test_image_markdown(self):
         result = self.fmt("![alt](img.png)")
-        self.assertIn('<img src="img.png"', result)
+        self.assertIn('rel="nofollow"', result)  # non-http images rendered as links (XSS safety)
+        result_http = self.fmt("![alt](https://example.com/img.png)")
+        self.assertIn('<img src="https://example.com/img.png"', result_http)
 
     def test_ordered_list(self):
         result = self.fmt("1. First\n2. Second")

@@ -32,12 +32,18 @@ def insert_board(board_id, name, description="", ncert_url=""):
     conn.commit()
 
 
-def insert_subject(subject_id, board_id, name, code="", description="", ncert_url=""):
+def insert_subject(subject_id, board_id, name, code="", description="", ncert_url="", class_name="X"):
     conn = get_conn()
-    conn.execute(
-        "INSERT OR REPLACE INTO subjects (id, board_id, name, code, description, ncert_url) VALUES (?, ?, ?, ?, ?, ?)",
-        (subject_id, board_id, name, code, description, ncert_url),
-    )
+    try:
+        conn.execute(
+            "INSERT OR REPLACE INTO subjects (id, board_id, name, code, description, ncert_url, class) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (subject_id, board_id, name, code, description, ncert_url, class_name),
+        )
+    except Exception:
+        conn.execute(
+            "INSERT OR REPLACE INTO subjects (id, board_id, name, code, description, ncert_url) VALUES (?, ?, ?, ?, ?, ?)",
+            (subject_id, board_id, name, code, description, ncert_url),
+        )
     conn.commit()
 
 

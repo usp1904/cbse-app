@@ -1,101 +1,83 @@
-import subprocess
 import json
 import os
 import threading
 import urllib.request
 import re
+import logging
 
-_AVAILABLE_MODELS_CACHE = None
+log = logging.getLogger("cbse.llm")
 
-def _detect_ollama(url="http://localhost:11434"):
-    try:
-        req = urllib.request.Request(url.rstrip("/") + "/api/tags")
-        with urllib.request.urlopen(req, timeout=3) as resp:
-            data = json.loads(resp.read())
-            models = [m["name"] for m in data.get("models", [])]
-            return url, models
-    except Exception:
-        return "", []
+_EXPLAIN_CACHE = {}
 
-def _detect_gemini(api_key):
-    return bool(api_key)
-
-def _detect_claude(api_key):
-    return bool(api_key)
 
 class LLMClient:
-    def __init__(self, model_path=None, server_url=None, claude_api_key=None, claude_model=None,
-                 ollama_url=None, ollama_model=None, gemini_api_key=None, gemini_model=None):
-        self.model_path = model_path or os.environ.get("LLAMA_MODEL_PATH", "")
-        self.server_url = server_url or os.environ.get("LLAMA_SERVER_URL", "")
-        self.claude_api_key = claude_api_key or os.environ.get("ANTHROPIC_API_KEY", "")
-        self.claude_model = claude_model or os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-20250514")
-        
-        ollama_url_env = ollama_url or os.environ.get("OLLAMA_URL", "")
-        if ollama_url_env:
-            self.ollama_url = ollama_url_env
-            self.ollama_model = ollama_model or os.environ.get("OLLAMA_MODEL", "qwen3:latest")
-        else:
-            detected_url, models = _detect_ollama()
-            self.ollama_url = detected_url
-            self._preferred_ollama_model = ollama_model or os.environ.get("OLLAMA_MODEL", "")
-            preferred = self._preferred_ollama_model
-            # Prefer non-thinking models for speed; fallback to available models
-            if preferred and preferred in models:
-                self.ollama_model = preferred
-            else:
-                # MetaAI (Llama 3/3.1) preferred for contextual learning; fallback to fast models
-                priority = ["llama3.1:latest", "llama3:latest", "llama3", "mistral-cpu:latest", "qwen3:4b", "deepseek-r1:1.5b", "qwen3:latest"]
-                self.ollama_model = next((m for p in priority for m in models if p in m), models[0] if models else "")
-        
-        self.gemini_api_key = gemini_api_key or os.environ.get("GEMINI_API_KEY", "")
+    def __init__(self, gemini_api_key=None, gemini_model=None,
+                 mistral_api_key=None, mistral_model=None):
+        self._gemini_api_key = gemini_api_key or os.environ.get("GEMINI_API_KEY", "")
         self.gemini_model = gemini_model or os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+        self._mistral_api_key = mistral_api_key or os.environ.get("MISTRAL_API_KEY", "")
+        self.mistral_model = mistral_model or os.environ.get("MISTRAL_MODEL", "mistral-large-latest")
         self.process = None
         self.lock = threading.Lock()
-        self._model_priority = self._detect_priority()
+        self._warmup()
 
-    def _detect_priority(self):
-        if self.gemini_api_key:
-            return "gemini"
-        if self.claude_api_key:
-            return "claude"
-        if self.ollama_url:
-            return "ollama"
-        if self.server_url or (self.model_path and os.path.exists(self.model_path)):
-            return "local"
-        return "none"
+    def __repr__(self):
+        return f"<LLMClient backend={self.backend_name} model={self.model_name}>"
+
+    @property
+    def gemini_api_key(self):
+        return self._gemini_api_key
+
+    @property
+    def mistral_api_key(self):
+        return self._mistral_api_key
+
+    def _warmup(self):
+        pass
 
     @property
     def available(self):
-        return self._model_priority != "none"
+        return bool(self._gemini_api_key or self._mistral_api_key)
 
     @property
     def backend_name(self):
-        return self._model_priority
+        if self._mistral_api_key:
+            return "mistral"
+        if self._gemini_api_key:
+            return "gemini"
+        return "none"
 
     @property
     def model_name(self):
-        return {
-            "gemini": self.gemini_model,
-            "claude": self.claude_model,
-            "ollama": self.ollama_model,
-            "local": self.model_path,
-        }.get(self._model_priority, "none")
+        if self._mistral_api_key:
+            return self.mistral_model
+        if self._gemini_api_key:
+            return self.gemini_model
+        return "none"
 
     def query(self, prompt, system_prompt=None, max_tokens=4096, temperature=0.3):
-        if self.gemini_api_key:
+        if self._mistral_api_key:
+            return self._query_mistral(prompt, system_prompt, max_tokens, temperature)
+        if self._gemini_api_key:
             return self._query_gemini(prompt, system_prompt, max_tokens, temperature)
-        if self.claude_api_key:
-            return self._query_claude(prompt, system_prompt, max_tokens, temperature)
-        if self.ollama_url:
-            return self._query_ollama(prompt, system_prompt, max_tokens, temperature)
-        if not self.available:
-            return self._fallback_response(prompt)
-        if self.server_url:
-            return self._query_server(prompt, system_prompt, max_tokens, temperature)
-        return self._query_local(prompt, system_prompt, max_tokens, temperature)
+        return self._fallback_response(prompt)
 
     def explain_topic(self, topic_name, chapter_name, context_text, level="simple"):
+        clean_topic = re.sub(r'[^\w\s]', '', topic_name.lower()).strip()
+        greetings = {"hi", "hello", "hey", "namaste", "yo", "sup", "greetings", "good morning", "good afternoon", "good evening"}
+        is_greet = clean_topic in greetings
+        if not is_greet:
+            words = clean_topic.split()
+            if words and words[0] in greetings and len(words) <= 4:
+                is_greet = True
+
+        if is_greet:
+            return "Namaste! I'm your AI Tutor powered by Mistral AI. Ask me any questions about CBSE Class X concepts, math formulas, science topics, or help with your studies. How can I help you learn today?"
+
+        cache_key = (topic_name.strip().lower(), level)
+        if cache_key in _EXPLAIN_CACHE:
+            return _EXPLAIN_CACHE[cache_key]
+
         level_instruction = {
             "simple": "Explain in very simple terms suitable for a Class X student. Use everyday examples.",
             "detailed": "Provide a thorough, textbook-quality explanation with all important details.",
@@ -114,14 +96,20 @@ Provide a clear, structured explanation covering:
 2. Key points to remember
 3. Step-by-step breakdown
 4. Real-life application or example"""
-        return self.query(prompt, max_tokens=4096, temperature=0.3)
+        res = self.query(prompt, max_tokens=4096, temperature=0.3)
+        _EXPLAIN_CACHE[cache_key] = res
+        return res
 
     def solve_problem(self, problem_text, topic_name, context_text=""):
         prompt = f"""Problem: {problem_text}
 Topic: {topic_name}
 Context: {context_text[:2000]}
 
-Solve this step-by-step. Show all working, formulas used, and the final answer clearly."""
+Please solve this problem following these strict educational guidelines:
+1. **Detailed Step-by-Step Solution**: Solve the problem in detail step-by-step like a complex problem. Neatly explain each step with the proper usage of correct formulas.
+2. **Shortcut Solution**: Solve the exact same problem using a fast shortcut method or alternative trick.
+3. **Formula & Trick Explanation**: Explain the shortcut formula, rules, or core trick in detail.
+"""
         return self.query(prompt, max_tokens=4096, temperature=0.2)
 
     def contextual_learn(self, topic, chapter, subject, level="simple"):
@@ -130,7 +118,7 @@ Solve this step-by-step. Show all working, formulas used, and the final answer c
             "detailed": "Provide a thorough, textbook-quality explanation with all important details.",
             "advanced": "Provide an in-depth explanation including derivations, proofs, and connections.",
         }.get(level, "Explain clearly for a Class X student.")
-        prompt = f"""You are MetaAI (Llama) — an expert CBSE Class X tutor.
+        prompt = f"""You are a helpful CBSE Class X tutor.
 
 Topic: {topic}
 Chapter: {chapter}
@@ -147,10 +135,9 @@ Provide a comprehensive contextual learning response covering:
 6. Practice questions with answers
 
 Use Markdown formatting for clarity."""
-        return self.query(prompt, system_prompt="You are MetaAI (Llama 3), a helpful CBSE Class X tutor. Respond in clear Markdown.", max_tokens=4096, temperature=0.3)
+        return self.query(prompt, system_prompt="You are a helpful CBSE Class X tutor. Respond in clear Markdown.", max_tokens=4096, temperature=0.3)
 
     def youtube_search(self, query, max_results=5):
-        """YouTube Data API v3 search — returns embedded video HTML."""
         api_key = os.environ.get("YOUTUBE_API_KEY", "")
         if api_key and len(api_key) > 8:
             import urllib.parse
@@ -168,7 +155,9 @@ Use Markdown formatting for clarity."""
                         thumb = item["snippet"]["thumbnails"].get("medium", {}).get("url", "")
                         items.append({"videoId": vid, "title": title, "channel": channel, "thumb": thumb})
                     return items
-            except Exception:
+            except Exception as e:
+                err = str(e).replace(api_key, "[REDACTED]") if api_key else str(e)
+                log.warning("YouTube API error (key redacted): %s", err[:200])
                 return self._youtube_fallback(query)
         return self._youtube_fallback(query)
 
@@ -178,7 +167,6 @@ Use Markdown formatting for clarity."""
                  "searchUrl": f"https://www.youtube.com/results?search_query={'+'.join(query.split())}+CBSE+Class+10"}]
 
     def opengrok_search(self, query, max_results=5):
-        """OpenGrok API for code/formulas/theorems — with fallback to local knowledge base."""
         import urllib.parse
         og_url = os.environ.get("OPENGROK_URL", "")
         if og_url:
@@ -195,7 +183,6 @@ Use Markdown formatting for clarity."""
         return self._opengrok_fallback(query)
 
     def _opengrok_fallback(self, query):
-        import random
         formulas = {
             "quadratic": [
                 {"title": "Quadratic Formula: x = (-b ± √(b² - 4ac)) / 2a", "category": "Algebra"},
@@ -226,38 +213,42 @@ Use Markdown formatting for clarity."""
         return [{"title": f"Theorem/Formula Search: {query}", "category": "Mathematics",
                  "snippet": "Results from CBSE Class 10 formula database. Install OpenGrok for full text search."}]
 
-    def _query_claude(self, prompt, system_prompt, max_tokens, temperature):
+    def _query_mistral(self, prompt, system_prompt, max_tokens, temperature):
+        url = "https://api.mistral.ai/v1/chat/completions"
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
         body = json.dumps({
-            "model": self.claude_model,
+            "model": self.mistral_model,
+            "messages": messages,
             "max_tokens": max_tokens,
-            "system": system_prompt or "You are a helpful CBSE Class X tutor.",
-            "messages": [{"role": "user", "content": prompt}],
             "temperature": temperature,
         }).encode()
         try:
             req = urllib.request.Request(
-                "https://api.anthropic.com/v1/messages",
+                url,
                 data=body,
                 headers={
                     "Content-Type": "application/json",
-                    "x-api-key": self.claude_api_key,
-                    "anthropic-version": "2023-06-01",
+                    "Authorization": f"Bearer {self._mistral_api_key}",
                 },
             )
             with urllib.request.urlopen(req, timeout=30) as resp:
                 result = json.loads(resp.read())
-                text = ""
-                for block in result.get("content", []):
-                    if block.get("type") == "text":
-                        text += block["text"]
-                if text:
-                    return text
-                return self._fallback_response(prompt, error="Empty response from Claude")
+                choices = result.get("choices", [])
+                if choices:
+                    text = choices[0].get("message", {}).get("content", "")
+                    if text:
+                        return text
+                return self._fallback_response(prompt, error="Empty response from Mistral")
         except Exception as e:
-            return self._fallback_response(prompt, error=f"Claude API error: {e}")
+            err = str(e).replace(self._mistral_api_key, "[REDACTED]") if self._mistral_api_key else str(e)
+            log.warning("Mistral API error (key redacted): %s", err[:200])
+            return self._fallback_response(prompt, error=f"Mistral API error: [REDACTED]")
 
     def _query_gemini(self, prompt, system_prompt, max_tokens, temperature):
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.gemini_model}:generateContent?key={self.gemini_api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.gemini_model}:generateContent?key={self._gemini_api_key}"
         contents = []
         if system_prompt:
             contents.append({"role": "user", "parts": [{"text": system_prompt + "\n\n" + prompt}]})
@@ -283,91 +274,9 @@ Use Markdown formatting for clarity."""
                         return text
                 return self._fallback_response(prompt, error="Empty response from Gemini")
         except Exception as e:
-            return self._fallback_response(prompt, error=f"Gemini error: {e}")
-
-    def _query_ollama(self, prompt, system_prompt, max_tokens, temperature):
-        url = self.ollama_url.rstrip("/") + "/api/generate"
-        body = json.dumps({
-            "model": self.ollama_model,
-            "prompt": prompt,
-            "system": system_prompt or "You are a helpful CBSE Class X tutor.",
-            "options": {
-                "num_predict": max_tokens,
-                "temperature": temperature,
-            },
-            "stream": False,
-        }).encode()
-        try:
-            req = urllib.request.Request(
-                url, data=body, headers={"Content-Type": "application/json"},
-            )
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                result = json.loads(resp.read())
-                text = result.get("response", "")
-                if text:
-                    return text
-                return self._fallback_response(prompt, error="Empty response from Ollama")
-        except Exception as e:
-            return self._fallback_response(prompt, error=f"Ollama error: {e}")
-
-    def _query_server(self, prompt, system_prompt, max_tokens, temperature):
-        payloads = [
-            {
-                "prompt": prompt,
-                "system_prompt": system_prompt or "You are a helpful CBSE Class X tutor.",
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-                "n_predict": max_tokens,
-            },
-            {
-                "model": "default",
-                "messages": [
-                    {"role": "system", "content": system_prompt or "You are a helpful CBSE Class X tutor."},
-                    {"role": "user", "content": prompt},
-                ],
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-                "stream": False,
-            },
-        ]
-        endpoints = ["/completions", "/v1/completions", "/v1/chat/completions", "/api/generate"]
-        last_error = ""
-        for base_url in [self.server_url.rstrip("/")]:
-            for ep in endpoints:
-                url = base_url + ep
-                for payload in payloads:
-                    try:
-                        req = urllib.request.Request(
-                            url,
-                            data=json.dumps(payload).encode(),
-                            headers={"Content-Type": "application/json"},
-                        )
-                        with urllib.request.urlopen(req, timeout=15) as resp:
-                            result = json.loads(resp.read())
-                            text = (result.get("content") or result.get("text")
-                                    or result.get("response") or "")
-                            if not text and "choices" in result:
-                                text = result["choices"][0].get("message", {}).get("content", "")
-                            if not text and "choices" in result:
-                                text = result["choices"][0].get("text", "")
-                            if text:
-                                return text
-                    except Exception as e:
-                        last_error = str(e)
-                        continue
-        return self._fallback_response(prompt, error=last_error)
-
-    def _query_local(self, prompt, system_prompt, max_tokens, temperature):
-        full_prompt = system_prompt or "You are a helpful CBSE Class X tutor."
-        full_prompt += "\n\n" + prompt
-        try:
-            result = subprocess.run(
-                [self.model_path, "--prompt", full_prompt, "-n", str(max_tokens)],
-                capture_output=True, text=True, timeout=30,
-            )
-            return result.stdout.strip() or self._fallback_response(prompt)
-        except Exception as e:
-            return self._fallback_response(prompt, error=str(e))
+            err = str(e).replace(self._gemini_api_key, "[REDACTED]") if self._gemini_api_key else str(e)
+            log.warning("Gemini API error (key redacted): %s", err[:200])
+            return self._fallback_response(prompt, error=f"Gemini error: [REDACTED]")
 
     def _fallback_response(self, prompt, error=""):
         topic_match = re.search(r"Topic: (.+)", prompt)
@@ -377,11 +286,10 @@ Use Markdown formatting for clarity."""
 **{topic}** — Detailed Explanation
 
 To enable AI-powered explanations:
-1. (Local) Set OLLAMA_URL=http://localhost:11434 for Ollama with MetaAI (Llama 3/3.1)
-2. (Cloud) Set ANTHROPIC_API_KEY for Claude AI or GEMINI_API_KEY for Gemini
-3. Install llama.cpp from https://github.com/ggerganov/llama.cpp
-4. Set YOUTUBE_API_KEY for video search integration
-5. Set OPENGROK_URL for code/formula/theorem search
+1. (Primary) Set MISTRAL_API_KEY for Mistral AI
+2. (Fallback) Set GEMINI_API_KEY for Google Gemini
+3. Set YOUTUBE_API_KEY for video search integration
+4. Set OPENGROK_URL for code/formula/theorem search
 
 **Key Concepts:**
 • This topic covers fundamental concepts important for board exams
@@ -399,23 +307,25 @@ To enable AI-powered explanations:
             "available": self.available,
             "backend": self.backend_name,
             "model": self.model_name,
-            "gemini_configured": bool(self.gemini_api_key),
-            "claude_configured": bool(self.claude_api_key),
-            "ollama_configured": bool(self.ollama_url),
+            "mistral_configured": bool(self._mistral_api_key),
+            "mistral_model": self.mistral_model,
+            "gemini_configured": bool(self._gemini_api_key),
+            "gemini_model": self.gemini_model,
             "youtube_configured": bool(os.environ.get("YOUTUBE_API_KEY", "")),
             "opengrok_configured": bool(os.environ.get("OPENGROK_URL", "")),
             "context_window": 4096,
-            "metaai_ready": self.ollama_url and ("llama" in self.ollama_model.lower() or self.available),
         }
 
 
 _client = None
+
 
 def get_client():
     global _client
     if _client is None:
         _client = LLMClient()
     return _client
+
 
 def reset_client():
     global _client

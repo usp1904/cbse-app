@@ -5,7 +5,8 @@ pydantic>=2.0,<3.0
 
 # Database
 # Dev: SQLite (built-in)
-# Production: PostgreSQL via psycopg2 or asyncpg
+# Production: PostgreSQL via psycopg2 or asyncpg, or Supabase
+sqlalchemy>=2.0,<3.0
 psycopg2-binary>=2.9,<3.0
 asyncpg>=0.30,<1.0  # for pure async PostgreSQL
 
@@ -20,6 +21,9 @@ sse-starlette>=2.0   # Server-Sent Events for streaming AI
 
 # Search fallback
 # pip install pg_trgm  # PostgreSQL trigram extension for fuzzy text search
+
+# Auth
+supabase>=2.0,<3.0
 
 # Middleware
 python-multipart>=0.0.18

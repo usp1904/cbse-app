@@ -150,36 +150,53 @@ function ixDrop(e) { e.preventDefault();
     var target = e.target.closest('.ix-def');
     if(target) { target.dataset.match = id; target.style.background = '#eef2ff'; }
 }
+function ixFindTerm(container, id) {
+    var terms = container.querySelectorAll('.ix-term');
+    for (var i = 0; i < terms.length; i++) {
+        if (terms[i].dataset.id === id) return terms[i];
+    }
+    return null;
+}
 function ixCheckMatch(containerId) {
     var container = document.getElementById(containerId);
+    if (!container) return;
     var defs = container.querySelectorAll('.ix-def');
     var correct = 0, total = defs.length;
     defs.forEach(function(d) {
         var expected = d.dataset.match;
-        var termId = expected;
-        var termEl = container.querySelector('.ix-term[data-id="'+termId+'"]');
+        var termEl = ixFindTerm(container, expected);
         d.style.border = (termEl && termEl.closest('.ix-match-col').nextElementSibling === d.parentElement) ? '2px solid #22c55e' : '2px solid #ef4444';
         if(termEl && termEl.closest('.ix-match-col').nextElementSibling === d.parentElement) correct++;
     });
-    document.getElementById(containerId.replace('ix-match-','ix-match-result-')).innerHTML = '<p>'+correct+'/'+total+' correct</p>';
+    var res = document.getElementById(containerId.replace('ix-match-','ix-match-result-'));
+    if (res) res.innerHTML = '<p>'+correct+'/'+total+' correct</p>';
 }
 function ixSeqDrop(e) { e.preventDefault();
     var id = e.dataTransfer.getData('text');
-    var item = document.querySelector('.ix-seq-item[data-seq="'+id+'"]');
-    if(item) e.target.closest('.ix-seq-list').insertBefore(item, e.target.closest('.ix-seq-item') ? e.target.closest('.ix-seq-item').nextElementSibling : null);
+    var items = document.querySelectorAll('.ix-seq-item');
+    var item = null;
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].dataset.seq === id) { item = items[i]; break; }
+    }
+    var list = e.target.closest('.ix-seq-list');
+    var target = e.target.closest('.ix-seq-item');
+    if(item && list) list.insertBefore(item, target ? target.nextElementSibling : null);
 }
 function ixCheckSeq(containerId) {
-    var items = document.querySelectorAll('#'+containerId+' .ix-seq-item');
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    var items = container.querySelectorAll('.ix-seq-item');
     var correct = 0, total = items.length;
-    var seqNums = document.querySelectorAll('#'+containerId+' .ix-seq-num');
+    var seqNums = container.querySelectorAll('.ix-seq-num');
     items.forEach(function(item, i) {
         var expected = i;
         var actual = parseInt(item.dataset.seq);
         item.style.border = (actual === expected) ? '2px solid #22c55e' : '2px solid #ef4444';
-        seqNums[i].textContent = (actual === expected) ? (i+1) : '✗';
+        if (seqNums[i]) seqNums[i].textContent = (actual === expected) ? (i+1) : '✗';
         if(actual === expected) correct++;
     });
-    document.getElementById(containerId.replace('ix-seq-','ix-seq-result-')).innerHTML = '<p>'+correct+'/'+total+' correct</p>';
+    var res = document.getElementById(containerId.replace('ix-seq-','ix-seq-result-'));
+    if (res) res.innerHTML = '<p>'+correct+'/'+total+' correct</p>';
 }
 function ixFlip(card) { card.classList.toggle('ix-flipped'); }
 """

@@ -14,7 +14,7 @@ import traceback
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from database import get_conn, init_db
 from data import ALL_BOARDS, SUBJECTS
-from rag_engine import get_engine
+from json_index import get_index
 from llm_client import get_client
 from chunking import (
     get_chapter_tree, get_topic_with_context, search_chunks
@@ -46,23 +46,7 @@ log = logging.getLogger("cbse")
 HOST = "0.0.0.0"
 PORT = int(os.environ.get("PORT", 9090))
 
-# Auto-detect local Ollama if not explicitly configured
-if not os.environ.get("OLLAMA_URL") and not os.environ.get("ANTHROPIC_API_KEY") and not os.environ.get("GEMINI_API_KEY"):
-    import urllib.request as _ur
-    try:
-        _req = _ur.Request("http://localhost:11434/api/tags")
-        with _ur.urlopen(_req, timeout=2) as _resp:
-            _data = json.loads(_resp.read())
-            if _data.get("models"):
-                os.environ["OLLAMA_URL"] = "http://localhost:11434"
-                # Prefer mistral-cpu or smallest thinking-free model
-                models = [m["name"] for m in _data["models"]]
-                for pref in ["mistral-cpu", "qwen3:4b", "deepseek-r1:1.5b", "qwen3:latest"]:
-                    if any(pref in m for m in models):
-                        os.environ["OLLAMA_MODEL"] = pref
-                        break
-    except Exception:
-        pass
+# Google-only AI: Gemini / Gemma 4 / NotebookLM / YouTube
 
 init_db()
 ai_tutor.init_tutor_tables()
@@ -81,19 +65,27 @@ def render_template(template_name, **context):
 _RAW_HTML_VARS = frozenset({"content", "extra_css"})
 
 def _render_string(s, context):
-    """Safe template renderer — {{ var }} only. HTML-escapes values except _RAW_HTML_VARS."""
-    def replacer(m):
-        expr = m.group(1).strip()
-        try:
-            val = context.get(expr, "")
-            if val is None:
+    """Template renderer supporting Jinja2 syntax with a robust regex fallback."""
+    try:
+        import jinja2
+        # Use Jinja2 Template rendering for full compatibility
+        return jinja2.Template(s).render(**context)
+    except Exception as e:
+        # Fallback regex replacer if jinja2 is not available
+        def replacer(m):
+            expr = m.group(1).strip()
+            expr_clean = expr.split('|')[0].strip()
+            try:
+                val = context.get(expr_clean, "")
+                if val is None:
+                    return ""
+                if expr_clean in _RAW_HTML_VARS or "safe" in expr:
+                    return str(val)
+                return htmlmod.escape(str(val))
+            except Exception:
                 return ""
-            if expr in _RAW_HTML_VARS:
-                return str(val)
-            return htmlmod.escape(str(val))
-        except Exception:
-            return ""
-    return re.sub(r"\{\{\s*(\w+(?:\.\w+)?)\s*\}\}", replacer, s)
+        s_clean = re.sub(r"\{%.*?%\}", "", s)
+        return re.sub(r"\{\{\s*(.*?)\s*\}\}", replacer, s_clean)
 
 
 def render_math(text):
@@ -141,18 +133,43 @@ def build_subject_card(subject, board_id="cbse"):
     ).fetchone()
     if row:
         sid = row["id"]
+        sname = row["name"]
     else:
         sid = f"{board_id}_{subject['id']}" if board_id != "cbse" else subject["id"]
+        sname = subject["name"]
 
     if "books" in subject:
         ch_count = sum(len(b.get("chapters", [])) for b in subject["books"])
     else:
         ch_count = len(subject.get("chapters", []))
 
+    # Helper for filtering
+    name_lower = sname.lower()
+    id_lower = sid.lower()
+    if "math" in name_lower or "math" in id_lower:
+        subj_type = "mathematics"
+    elif "social" in name_lower or "history" in name_lower or "geography" in name_lower or "political" in name_lower or "civics" in name_lower or "economics" in name_lower or "studies" in name_lower:
+        subj_type = "social"
+    elif "science" in name_lower or "physics" in name_lower or "biology" in name_lower or "chem" in name_lower:
+        subj_type = "science"
+    elif "english" in name_lower or "hindi" in name_lower or "sanskrit" in name_lower or "french" in name_lower:
+        subj_type = "languages"
+    else:
+        subj_type = "electives"
+
+    if "hindi" in name_lower or "hindi" in id_lower:
+        medium = "hindi"
+    elif "sanskrit" in name_lower or "sanskrit" in id_lower:
+        medium = "sanskrit"
+    elif "telugu" in name_lower or "telugu" in id_lower:
+        medium = "telugu"
+    else:
+        medium = "english"
+
     return f"""
-    <div class="subject-card" onclick="location.href='/board/{board_id}/{sid}'">
-        <div class="subject-icon">{subject["name"][0]}</div>
-        <h3>{subject["name"]}</h3>
+    <div class="subject-card" onclick="location.href='/board/{board_id}/{sid}'" data-board="{board_id}" data-subject-type="{subj_type}" data-medium="{medium}">
+        <div class="subject-icon">{sname[0]}</div>
+        <h3>{sname}</h3>
         <p>{subject.get("description", "")}</p>
         <span class="ch-count">{ch_count} chapters</span>
     </div>"""
@@ -168,349 +185,348 @@ CSS = r"""
     --highlight: #f43f5e;
     --bg: #f1f5f9;
     --card-bg: #ffffff;
-    --glass-bg: rgba(255,255,255,0.7);
+    --glass-bg: rgba(255, 255, 255, 0.75);
     --text: #0f172a;
     --text-muted: #64748b;
     --border: #e2e8f0;
-    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-    --shadow-hover: 0 10px 40px rgba(99,102,241,0.12);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
+    --shadow-hover: 0 12px 24px -10px rgba(99, 102, 241, 0.2);
     --radius: 12px;
     --radius-sm: 8px;
     --radius-lg: 20px;
-    --transition: 0.2s ease;
-    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    --nav-height: 48px;
-    --gbar-height: 36px;
-    --sticky-top: calc(var(--gbar-height) + var(--nav-height));
-    --bottom-safe: 60px;
+    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --font: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --gbar-height: 56px;
+    --bottom-safe: env(safe-area-inset-bottom, 0px);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; min-height: 100dvh; line-height: 1.6; font-size: 16px; -webkit-font-smoothing: antialiased; overflow-x: hidden; width: 100%; }
 
-/* Mobile-First Base */
-.container { max-width: 1200px; margin: 0 auto; padding: 1rem; padding-bottom: calc(1rem + var(--bottom-safe)); }
-@media (min-width: 768px) { .container { padding: 2rem 1.5rem; padding-bottom: calc(2rem + var(--bottom-safe)); } }
+/* Layout Grid & Containers */
+.container { max-width: 1200px; margin: 0 auto; padding: 1rem; padding-bottom: calc(5rem + var(--bottom-safe)); }
+@media (min-width: 768px) { .container { padding: 2rem 1.5rem; padding-bottom: calc(6rem + var(--bottom-safe)); } }
 
-/* Header - Compact for mobile */
-header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: #fff; padding: 1.5rem 1rem; text-align: center; }
-header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; }
-header p { font-size: 0.85rem; opacity: 0.8; margin-top: 0.2rem; }
-@media (min-width: 768px) { header { padding: 2.5rem 0; } header h1 { font-size: 2rem; } header p { font-size: 1rem; } }
+/* Header - Modern Card Layout */
+header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: #fff; padding: 2rem 1.5rem; text-align: center; border-radius: var(--radius); margin-bottom: 1.5rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+header::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, rgba(99,102,241,0.15), transparent 70%); pointer-events: none; }
+header h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+header p { font-size: 0.9rem; opacity: 0.85; margin-top: 0.4rem; }
+@media (min-width: 768px) { header { padding: 3rem 2rem; } header h1 { font-size: 2.2rem; } header p { font-size: 1.05rem; } }
 
-/* Sticky wrapper for gbar + nav */
-.sticky-wrapper { position: sticky; top: 0; z-index: 100; }
+/* Glassmorphism Global Bar (Navbar) */
+.sticky-wrapper { position: sticky; top: 0; z-index: 1000; }
+.gbar { background: rgba(30, 27, 75, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: #fff; height: var(--gbar-height); display: flex; align-items: center; }
+.gbar-inner { max-width: 1200px; margin: 0 auto; padding: 0 1rem; display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 1rem; }
+.gbar-brand { font-size: 1.25rem; font-weight: 800; color: #fff; text-decoration: none; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem; transition: opacity var(--transition); }
+.gbar-brand:hover { opacity: 0.9; text-decoration: none; }
+.gbar-nav { display: flex; gap: 0.25rem; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: center; }
+.gbar-nav::-webkit-scrollbar { display: none; }
+.gbar-nav a, .gbar-link { color: rgba(255, 255, 255, 0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); white-space: nowrap; transition: all var(--transition); border-bottom: 2px solid transparent; }
+.gbar-nav a:hover, .gbar-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; text-decoration: none; }
+.gbar-nav a.active, .gbar-nav a:active { color: #fff; background: rgba(255, 255, 255, 0.12); border-bottom-color: var(--accent); }
+.gbar-right { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+.xp-badge, .user-badge { background: rgba(255, 255, 255, 0.12); padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; border: 1px solid rgba(255,255,255,0.06); }
+.xp-badge { color: #fbbf24; }
 
-/* Navigation - Scrollable on mobile */
-nav { background: var(--primary); }
-nav .inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 0; min-height: var(--nav-height); }
-nav .inner::-webkit-scrollbar { display: none; }
-nav a { color: rgba(255,255,255,0.75); text-decoration: none; padding: 0.6rem 0.75rem; font-size: 0.82rem; font-weight: 500; white-space: nowrap; flex-shrink: 0; transition: all var(--transition); border-bottom: 2px solid transparent; }
-nav a:active, nav a.active { color: #fff; border-bottom-color: #fff; }
-nav .nav-right { margin-left: auto; display: flex; align-items: center; flex-shrink: 0; padding-right: 0.5rem; }
-.search-bar { display: flex; }
-.search-bar input { padding: 0.35rem 0.6rem; border: none; font-size: 0.8rem; width: 110px; background: rgba(255,255,255,0.1); color: #fff; outline: none; border-radius: 6px 0 0 6px; }
-.search-bar input:focus { background: rgba(255,255,255,0.2); width: 130px; }
-.search-bar input::placeholder { color: rgba(255,255,255,0.4); }
-.search-bar button { padding: 0.35rem 0.7rem; border: none; background: var(--highlight); color: #fff; cursor: pointer; font-size: 0.78rem; font-weight: 500; border-radius: 0 6px 6px 0; }
-@media (min-width: 768px) { nav a { padding: 0.6rem 1rem; font-size: 0.88rem; } .search-bar input { width: 180px; } }
-@media (max-width: 480px) { nav a { padding: 0.5rem 0.55rem; font-size: 0.75rem; } }
+@media (max-width: 640px) {
+    .gbar-brand { font-size: 1.1rem; }
+    .gbar-nav a, .gbar-link { font-size: 0.8rem; padding: 0.4rem 0.5rem; }
+    .xp-badge, .user-badge { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    .gbar-right { gap: 0.35rem; }
+}
+@media (max-width: 480px) {
+    .gbar-right .user-badge { display: none; }
+}
 
-/* Gamification Bar - Compact */
-.gbar { background: linear-gradient(90deg, var(--primary), var(--primary-light)); color: #fff; font-size: 0.78rem; height: var(--gbar-height); display: flex; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
-.gbar-inner { max-width: 1200px; margin: 0 auto; padding: 0 0.75rem; display: flex; align-items: center; justify-content: space-between; width: 100%; }
-.gbar-left, .gbar-right { display: flex; align-items: center; gap: 0.5rem; }
-.gbar-item { display: flex; align-items: center; gap: 0.15rem; font-weight: 500; white-space: nowrap; }
-.gbar-link { color: #fff; text-decoration: none; opacity: 0.85; font-size: 1rem; padding: 0.2rem; }
-.lives-display { font-size: 0.85rem; }
+/* Sections & Base Layout */
+.section { background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); border: 1px solid var(--border); transition: transform var(--transition); }
+.section h2 { margin-top: 0; font-size: 1.4rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; word-break: break-word; }
+.section-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.section .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: -0.5rem; margin-bottom: 1rem; }
 
-/* Hero */
-.hero { text-align: center; padding: 1.5rem 0 2rem; }
-.hero h2 { font-size: 1.3rem; color: var(--primary); margin-bottom: 0.5rem; }
-.hero p { font-size: 0.9rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6; }
-@media (min-width: 768px) { .hero h2 { font-size: 1.8rem; } .hero p { font-size: 1.05rem; } }
+a { color: var(--accent); text-decoration: none; transition: color var(--transition); word-break: break-word; overflow-wrap: break-word; }
+a:hover { color: var(--primary-light); text-decoration: underline; }
 
-/* Cards Grid - Mobile first */
-.subjects-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
-@media (min-width: 480px) { .subjects-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 768px) { .subjects-grid { grid-template-columns: repeat(3, 1fr); gap: 1.2rem; } }
+/* Grid Configurations */
+.subjects-grid, .cards-grid, .monitor-grid, .profile-stats { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media (min-width: 480px) {
+    .subjects-grid, .cards-grid, .monitor-grid, .profile-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 768px) {
+    .subjects-grid, .cards-grid { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .monitor-grid { grid-template-columns: repeat(4, 1fr); }
+    .profile-stats { grid-template-columns: repeat(4, 1fr); }
+}
 
-.subject-card { background: var(--card-bg); border-radius: var(--radius); padding: 1.2rem; cursor: pointer; transition: all var(--transition); box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden; min-height: 120px; }
-.subject-card:active { transform: scale(0.98); }
-.subject-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem; }
-.subject-card h3 { font-size: 1rem; margin-bottom: 0.2rem; color: var(--primary); }
-.subject-card p { color: var(--text-muted); font-size: 0.8rem; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-.ch-count { display: inline-block; margin-top: 0.5rem; padding: 0.2rem 0.7rem; background: linear-gradient(135deg, #eef2ff, #e0e5ff); color: var(--accent); border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
-@media (min-width: 768px) { .subject-card { padding: 1.5rem; } .subject-card h3 { font-size: 1.1rem; } }
+/* Cards & Interactions */
+.subject-card, .info-card, .stat-card, .monitor-stat { background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem; cursor: pointer; transition: all var(--transition); box-shadow: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 140px; }
+.subject-card:hover, .info-card:hover, .stat-card:hover, .monitor-stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--accent); }
+.subject-card:active { transform: translateY(-1px) scale(0.99); }
+.subject-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; margin-bottom: 0.8rem; box-shadow: 0 4px 12px rgba(99,102,241,0.2); }
+.subject-card h3 { font-size: 1.15rem; margin-bottom: 0.4rem; color: var(--primary); font-weight: 700; }
+.subject-card p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.5; flex: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.ch-count { display: inline-block; margin-top: auto; padding: 0.25rem 0.8rem; background: rgba(99, 102, 241, 0.08); color: var(--accent); border-radius: 20px; font-size: 0.75rem; font-weight: 600; width: fit-content; }
 
-/* Section */
-.section { margin-bottom: 1.5rem; }
-.section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
-.section h2 { font-size: 1.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--accent); color: var(--primary); margin-top: 0.25rem; word-break: break-word; }
-.chapter-actions { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.chapter-actions .tts-btn { white-space: nowrap; }
-@media (max-width: 480px) { .chapter-actions { gap: 0.35rem; } .chapter-actions .tts-btn { font-size: 0.72rem; padding: 0.35rem 0.5rem; } }
-.section .subtitle { color: var(--text-muted); font-size: 0.85rem; margin-top: -0.3rem; margin-bottom: 1rem; }
-@media (min-width: 768px) { .section h2 { font-size: 1.5rem; } }
+/* Book Sections */
+.book-section { background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); border: 1px solid var(--border); scroll-margin-top: calc(var(--gbar-height) + 12px); }
+.book-section h3 { font-size: 1.25rem; color: var(--primary); margin-bottom: 0.8rem; word-break: break-word; font-weight: 700; }
 
-/* Book Section / Cards */
-.book-section { background: var(--card-bg); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1rem; box-shadow: var(--shadow); border: 1px solid var(--border); }
-.book-section h3 { font-size: 1rem; color: var(--accent); margin-bottom: 0.6rem; word-break: break-word; }
-@media (min-width: 768px) { .book-section { padding: 1.5rem 1.8rem; } .book-section h3 { font-size: 1.15rem; } }
+/* Interactive Lists & Actions */
+.chapter-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.chapter-list li { padding: 0.8rem 1rem; border-left: 4px solid transparent; background: var(--bg); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition); display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 52px; }
+.chapter-list li:hover { border-left-color: var(--accent); background: rgba(99, 102, 241, 0.04); }
+.chapter-list li:active { background: rgba(99, 102, 241, 0.08); }
+.chapter-list .ch-row { display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0; }
+.chapter-list .ch-num { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; background: var(--card-bg); color: var(--accent); font-weight: 700; border-radius: 50%; font-size: 0.85rem; flex-shrink: 0; box-shadow: var(--shadow); }
+.chapter-list .ch-title { font-size: 0.95rem; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chapter-actions { display: flex; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+@media (max-width: 480px) {
+    .chapter-list li { padding: 0.6rem 0.8rem; min-height: 48px; }
+    .chapter-list .ch-title { font-size: 0.88rem; }
+    .chapter-actions { gap: 0.4rem; }
+    .chapter-actions .tts-btn, .chapter-actions .ncert-link { font-size: 0.8rem; padding: 0.5rem 0.75rem; width: 100%; text-align: center; justify-content: center; }
+}
 
-/* Chapter List */
-.chapter-list { list-style: none; }
-.chapter-list li { padding: 0.6rem 0.8rem; border-left: 3px solid transparent; margin-bottom: 0.25rem; border-radius: var(--radius-sm); cursor: pointer; min-height: 44px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
-.chapter-list li:active { background: #f1f5f9; }
-.chapter-list .ch-row { display: flex; align-items: center; gap: 0.4rem; }
-.chapter-list .ch-num { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; background: #eef2ff; color: var(--accent); font-weight: 700; border-radius: 50%; font-size: 0.75rem; flex-shrink: 0; }
-.chapter-list .ch-title { font-size: 0.88rem; font-weight: 500; word-break: break-word; }
-
-/* Topics */
-.topics { margin-top: 0.3rem; display: flex; flex-wrap: wrap; gap: 0.3rem; }
-.topic-tag { padding: 0.3rem 0.6rem; background: #f8fafc; border-radius: 8px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); min-height: 32px; display: flex; align-items: center; max-width: 100%; word-break: break-word; }
-.topic-tag:active { background: #eef2ff; border-color: var(--accent); }
+/* Topics Section */
+.topics { margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.topic-tag { padding: 0.4rem 0.8rem; background: var(--card-bg); border-radius: 8px; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); transition: all var(--transition); display: inline-flex; align-items: center; min-height: 36px; max-width: 100%; word-break: break-word; }
+.topic-tag:hover { background: rgba(99, 102, 241, 0.05); border-color: var(--accent); color: var(--accent); }
+.topic-tag:active { background: rgba(99, 102, 241, 0.1); }
+[id^="topic-"] { scroll-margin-top: calc(var(--gbar-height) + 12px); }
 
 /* Badges */
-.board-badge { display: inline-flex; align-items: center; padding: 0.15rem 0.6rem; border-radius: 20px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
-.board-badge.cbse { background: #dcfce7; color: #166534; }
-.board-badge.ap { background: #fff7ed; color: #9a3412; }
-.board-badge.ts { background: #fce4ec; color: #c62828; }
+.board-badge { display: inline-flex; align-items: center; padding: 0.2rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.board-badge.cbse { background: #dcfce7; color: #15803d; }
+.board-badge.ap { background: #fff7ed; color: #c2410c; }
+.board-badge.ts { background: #fee2e2; color: #b91c1c; }
 
-/* Breadcrumb */
-.breadcrumb { margin-bottom: 1rem; color: var(--text-muted); font-size: 0.82rem; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 0.2rem; }
-.breadcrumb a { color: var(--accent); text-decoration: none; }
-.breadcrumb span.sep { color: #cbd5e1; margin: 0 0.3rem; }
+/* Breadcrumb navigation */
+.breadcrumb { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 1.25rem; color: var(--text-muted); font-size: 0.85rem; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; padding-bottom: 0.4rem; }
+.breadcrumb::-webkit-scrollbar { display: none; }
+.breadcrumb a { color: var(--accent); font-weight: 500; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span.sep { color: #cbd5e1; }
 
-/* Chunk Views - Content Display */
-.chunk-view { background: var(--card-bg); border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid var(--border); }
-.chunk-view .chunk-title { font-weight: 600; color: var(--primary); margin-bottom: 0.4rem; font-size: 0.95rem; }
-.chunk-view .chunk-content { color: #334155; line-height: 1.7; font-size: 0.88rem; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; }
-.chunk-view .chunk-content p { margin-bottom: 0.5rem; }
+/* Filter System */
+.filter-panel { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
+.filter-panel label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.3px; }
+.filter-panel select { padding: 0.6rem 0.8rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); font-size: 0.9rem; min-width: 160px; outline: none; transition: border-color var(--transition); font-family: inherit; }
+.filter-panel select:focus { border-color: var(--accent); }
+@media (max-width: 768px) {
+    .filter-panel { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+    .filter-panel select { width: 100%; min-width: 100%; }
+    .filter-panel button { width: 100%; margin-top: 0.5rem; }
+}
+
+/* Forms & Inputs */
+.form-group { margin-bottom: 1.25rem; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem; }
+.form-input { width: 100%; padding: 0.75rem 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: var(--bg); font-family: inherit; transition: all var(--transition); }
+.form-input:focus { outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+.search-form { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.25rem 0; width: 100%; }
+.search-form input[type="text"] { flex: 1; min-width: 200px; }
+.search-form select { padding: 0.6rem 0.8rem; border: 2px solid var(--border); border-radius: 8px; background: var(--bg); font-size: 0.9rem; min-width: 150px; outline: none; font-family: inherit; }
+@media (max-width: 480px) {
+    .search-form { flex-direction: column; align-items: stretch; }
+    .search-form select, .search-form button, .search-form input[type="text"] { width: 100%; min-height: 44px; }
+}
+
+/* Button UI */
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all var(--transition); text-align: center; font-family: inherit; min-height: 44px; }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15); }
+.btn-primary:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(99, 102, 241, 0.25); }
+.btn-primary:active { transform: translateY(0); }
+
+.tts-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.6rem 1.2rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text); transition: all var(--transition); text-decoration: none; min-height: 40px; }
+.tts-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); text-decoration: none; }
+.tts-btn:active { transform: scale(0.98); }
+
+.ncert-link { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); color: #fff; border-radius: 8px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all var(--transition); border: none; cursor: pointer; min-height: 40px; box-shadow: 0 4px 12px rgba(99,102,241,0.15); }
+.ncert-link:hover { opacity: 0.95; transform: translateY(-1px); text-decoration: none; box-shadow: 0 6px 16px rgba(99,102,241,0.25); }
+.ncert-link:active { transform: translateY(0) scale(0.98); }
+
+/* Chunk (Content Block) Layout */
+.chunk-view { background: var(--card-bg); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.chunk-view .chunk-title { font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; font-size: 1.05rem; }
+.chunk-view .chunk-content { color: #334155; line-height: 1.8; font-size: 0.95rem; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; }
+.chunk-view .chunk-content p { margin-bottom: 0.75rem; }
 .chunk-view .chunk-content strong { color: var(--primary); }
-.chunk-view .chunk-type-badge { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 8px; font-size: 0.65rem; font-weight: 600; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.2px; }
+.chunk-view .chunk-type-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; }
 .chunk-view .chunk-type-badge.text { background: #dcfce7; color: #166534; }
-.chunk-view .chunk-type-badge.example { background: #fff7ed; color: #9a3412; }
-.chunk-view .chunk-type-badge.exercise { background: #fce4ec; color: #be123c; }
+.chunk-view .chunk-type-badge.example { background: #fff7ed; color: #c2410c; }
+.chunk-view .chunk-type-badge.exercise { background: #fee2e2; color: #991b1b; }
 .chunk-view .chunk-type-badge.theorem { background: #f3e8ff; color: #6b21a8; }
 .chunk-view .chunk-type-badge.formula { background: #dbeafe; color: #1e40af; }
-.chunk-view .chunk-type-badge.definition { background: #f0f9ff; color: #0369a1; }
+.chunk-view .chunk-type-badge.definition { background: #e0f2fe; color: #0369a1; }
 .chunk-view .chunk-type-badge.key_point { background: #fef3c7; color: #92400e; }
-.chunk-view .chunk-type-badge.summary { background: #f0fdf4; color: #15803d; }
-@media (min-width: 768px) { .chunk-view { padding: 1.3rem 1.5rem; } }
+.chunk-view .chunk-type-badge.summary { background: #e2e8f0; color: #334155; }
+@media (min-width: 768px) { .chunk-view { padding: 1.75rem; } }
 
-/* Topic Nav */
-.topic-nav { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1rem; }
-.topic-nav a { padding: 0.35rem 0.8rem; background: var(--card-bg); border-radius: 20px; text-decoration: none; color: var(--text-muted); font-size: 0.78rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-.topic-nav a:active { background: var(--accent); color: #fff; border-color: var(--accent); }
+/* Topic Navigation Tags */
+.topic-nav { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.topic-nav a { padding: 0.4rem 1rem; background: var(--card-bg); border-radius: 20px; text-decoration: none; color: var(--text-muted); font-size: 0.8rem; font-weight: 500; box-shadow: var(--shadow); border: 1px solid var(--border); transition: all var(--transition); }
+.topic-nav a:hover, .topic-nav a.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-/* Scroll offset for sticky header anchor targets */
-.book-section { scroll-margin-top: calc(var(--gbar-height) + var(--nav-height) + 8px); }
-[id^="topic-"] { scroll-margin-top: calc(var(--gbar-height) + var(--nav-height) + 8px); }
+/* Search Results UI */
+.search-result-item { background: var(--card-bg); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 0.75rem; box-shadow: var(--shadow); border-left: 4px solid var(--accent); transition: transform var(--transition); }
+.search-result-item:hover { transform: translateX(4px); }
+.search-result-item .result-title { font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; font-size: 1rem; }
+.search-result-item .result-excerpt { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 
-/* Buttons - 44px min touch target on mobile */
-.tts-btn, .ncert-link, .quiz-option, .exam-question, .search-bar button, nav a, .topic-tag, .chapter-list li { min-height: 36px; }
-@media (max-width: 480px) { .tts-btn, .ncert-link, .search-bar button { min-height: 44px; } }
+/* AI Tutor Elements */
+.tutor-question-card { background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.25rem; border: 1px solid #c7d2fe; box-shadow: var(--shadow); }
+.tutor-prompt { font-size: 0.85rem; color: var(--accent); font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.tutor-question-text { font-size: 1.15rem; font-weight: 700; color: var(--primary); line-height: 1.6; margin-bottom: 1.25rem; }
+.tutor-input { width: 100%; padding: 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.95rem; font-family: inherit; resize: vertical; transition: all var(--transition); box-sizing: border-box; min-height: 100px; }
+.tutor-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+.tutor-feedback-card { background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border); margin-top: 1.25rem; box-shadow: var(--shadow); }
+.tutor-model-answer { background: #f0fdf4; padding: 1rem; border-radius: var(--radius-sm); border-left: 4px solid var(--success); margin-bottom: 1rem; font-size: 0.9rem; }
+.tutor-remedial { background: #fff7ed; padding: 1rem; border-radius: var(--radius-sm); border-left: 4px solid #f97316; margin-top: 1rem; }
+.tutor-remedial-content { font-size: 0.9rem; line-height: 1.6; color: #431407; }
 
-.tts-btn { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.4rem 0.7rem; background: #fff; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.78rem; transition: all var(--transition); }
-.tts-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
-@media (min-width: 768px) { .tts-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); } }
-
-.ncert-link { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.9rem; background: var(--accent); color: #fff; border-radius: 8px; text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: all var(--transition); border: none; cursor: pointer; }
-.ncert-link:active { opacity: 0.9; transform: scale(0.97); }
-
-/* Search Results */
-.search-result-item { background: var(--card-bg); border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 0.6rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border-left: 3px solid var(--accent); }
-.search-result-item .result-title { font-weight: 600; color: var(--primary); margin-bottom: 0.2rem; font-size: 0.9rem; }
-.search-result-item .result-excerpt { font-size: 0.82rem; color: #475569; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
-mark { background: #fef08a; padding: 0.05rem 0.15rem; border-radius: 2px; }
-.math-sqrt { font-size: 1.1em; font-weight: 600; color: var(--accent); }
-.math-vec { border-top: 2px solid var(--accent); padding: 0 0.15rem; }
-.tutor-question-card { background: linear-gradient(135deg,#f0f4ff,#e8eeff); border-radius: var(--radius); padding: 1.2rem; margin-bottom: 1rem; border: 1px solid #c7d2fe; }
-.tutor-prompt { font-size: 0.88rem; color: var(--accent); font-weight: 500; margin-bottom: 0.5rem; }
-.tutor-question-text { font-size: 1.05rem; font-weight: 600; color: var(--primary); line-height: 1.5; margin-bottom: 1rem; }
-.tutor-input { width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: inherit; resize: vertical; transition: border-color var(--transition); box-sizing: border-box; }
-.tutor-input:focus { border-color: var(--accent); outline: none; }
-.tutor-feedback-card { background: var(--card-bg); border-radius: var(--radius); padding: 1.2rem; border: 1px solid var(--border); margin-top: 1rem; }
-.tutor-model-answer { background: #f0fdf4; padding: 0.8rem; border-radius: 6px; border-left: 3px solid #22c55e; margin-bottom: 0.8rem; }
-.tutor-remedial { background: #fff7ed; padding: 0.8rem 1rem; border-radius: 8px; border-left: 3px solid #f97316; margin-top: 0.8rem; }
-.tutor-remedial-content { font-size: 0.88rem; line-height: 1.6; color: #431407; }
-.report-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-.report-table th { background: var(--primary); color: #fff; padding: 0.5rem 0.8rem; text-align: left; }
-.report-table td { padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--border); }
-.report-table tr:nth-child(even) td { background: #f8fafc; }
-.stat-card { background: var(--card-bg); border-radius: var(--radius); padding: 1rem; text-align: center; box-shadow: var(--shadow); }
-.stat-value { font-size: 1.6rem; font-weight: 700; color: var(--accent); }
-.stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
-
-/* AI Chat Panel - Full width on mobile */
-.ai-chat-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 45vh; background: var(--card-bg); border-radius: 16px 16px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; z-index: 999; transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); border: none; }
-.ai-chat-panel.collapsed { transform: translateY(calc(100% - 44px)); }
-.ai-chat-header { padding: 0.6rem 1rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-radius: 16px 16px 0 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: 600; min-height: 44px; }
-.ai-chat-messages { flex: 1; overflow-y: auto; padding: 0.75rem; max-height: 30vh; }
-.ai-chat-msg { padding: 0.5rem 0.8rem; border-radius: 12px; font-size: 0.85rem; line-height: 1.5; max-width: 90%; margin-bottom: 0.4rem; word-wrap: break-word; overflow-wrap: break-word; }
-.ai-chat-msg.user { background: #eef2ff; margin-left: auto; }
-.ai-chat-msg.assistant { background: #f8fafc; margin-right: auto; }
-.ai-chat-input { display: flex; padding: 0.5rem; border-top: 1px solid var(--border); gap: 0.3rem; background: #fafafa; }
-.ai-chat-input input { flex: 1; padding: 0.5rem 0.8rem; border: 1px solid var(--border); border-radius: 24px; font-size: 0.85rem; outline: none; min-height: 44px; max-width: calc(100% - 70px); }
-.ai-chat-input button { padding: 0.5rem 1rem; background: var(--accent); color: #fff; border: none; border-radius: 24px; cursor: pointer; font-size: 0.85rem; font-weight: 500; min-height: 44px; white-space: nowrap; flex-shrink: 0; }
-@media (min-width: 768px) { .ai-chat-panel { left: auto; right: 1.5rem; width: 360px; max-height: 520px; } }
-
-/* Quiz - Touch friendly */
-.quiz-container { max-width: 100%; }
-@media (min-width: 768px) { .quiz-container { max-width: 700px; margin: 0 auto; } }
-.quiz-question { background: var(--card-bg); border-radius: var(--radius); padding: 1.2rem; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 0.75rem; }
-.quiz-options { display: flex; flex-direction: column; gap: 0.4rem; }
-.quiz-option { padding: 0.8rem 1rem; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 0.88rem; min-height: 44px; display: flex; align-items: center; }
-.quiz-option:active { border-color: var(--accent); background: #eef2ff; }
-.quiz-option.correct { border-color: #22c55e; background: #f0fdf4; }
-.quiz-option.wrong { border-color: #ef4444; background: #fef2f2; }
-
-/* Cards Grid */
-.cards-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
-@media (min-width: 480px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 768px) { .cards-grid { grid-template-columns: repeat(3, 1fr); } }
-.info-card { background: var(--card-bg); border-radius: var(--radius); padding: 1.2rem; box-shadow: var(--shadow); border: 1px solid var(--border); }
-.info-card h3 { color: var(--accent); font-size: 0.9rem; margin-bottom: 0.4rem; }
-
-/* Stats Grid */
-.profile-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-@media (min-width: 480px) { .profile-stats { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 768px) { .profile-stats { grid-template-columns: repeat(4, 1fr); } }
-.stat-card { background: var(--card-bg); border-radius: var(--radius); padding: 1rem; box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
-.stat-card .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
-.ix-match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 1rem 0; }
-.ix-match-col { display: flex; flex-direction: column; gap: 0.4rem; }
-.ix-term { padding: 0.6rem 0.8rem; background: linear-gradient(135deg,#eef2ff,#e0e7ff); border: 2px solid #c7d2fe; border-radius: 8px; cursor: grab; font-weight: 600; font-size: 0.85rem; text-align: center; user-select: none; }
-.ix-term:active { cursor: grabbing; opacity: 0.8; }
-.ix-def { padding: 0.6rem 0.8rem; background: #f8fafc; border: 2px dashed var(--border); border-radius: 8px; font-size: 0.82rem; line-height: 1.4; min-height: 44px; display: flex; align-items: center; transition: background 0.2s; }
-.ix-seq-list { display: flex; flex-direction: column; gap: 0.4rem; margin: 1rem 0; min-height: 100px; }
-.ix-seq-item { padding: 0.6rem 0.8rem; background: var(--card-bg); border: 2px solid var(--border); border-radius: 8px; cursor: grab; display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; user-select: none; }
-.ix-seq-item:active { cursor: grabbing; opacity: 0.8; }
-.ix-seq-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--accent); color: #fff; border-radius: 50%; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
-.ix-flip-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 0.8rem; margin: 1rem 0; }
-.ix-flip-card { perspective: 600px; height: 120px; cursor: pointer; }
-.ix-flip-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; }
-.ix-flipped .ix-flip-inner { transform: rotateY(180deg); }
-.ix-flip-front, .ix-flip-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; padding: 0.6rem; box-sizing: border-box; font-size: 0.82rem; text-align: center; line-height: 1.4; }
-.ix-flip-front { background: linear-gradient(135deg,var(--accent),var(--accent2)); color: #fff; font-weight: 600; }
-.ix-flip-back { background: #f0fdf4; border: 2px solid #bbf7d0; color: #166534; transform: rotateY(180deg); }
-.ix-result { margin: 0.5rem 0; font-size: 0.9rem; font-weight: 600; }
-.xp-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-.xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; }
-
-/* Monitor Grid */
-.monitor-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-@media (min-width: 480px) { .monitor-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 768px) { .monitor-grid { grid-template-columns: repeat(4, 1fr); } }
-.monitor-stat { background: var(--card-bg); padding: 1rem; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); border: 1px solid var(--border); }
-.monitor-stat .value { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
-
-/* Exam */
-.exam-paper { max-width: 100%; overflow-x: hidden; }
-@media (min-width: 768px) { .exam-paper { max-width: 900px; margin: 0 auto; } }
-
-/* Responsive images & embedded content */
-img, video, iframe, svg { max-width: 100%; height: auto; }
-.katex, .katex-display { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
-.katex-display > .katex { white-space: normal; }
-.math-error { word-break: break-all; }
-
-/* TTS Player */
-.tts-player { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 2px solid var(--accent); padding: 0.4rem 1rem; z-index: 998; display: none; }
-.tts-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 0.5rem; }
-.tts-player:not([style*="display:none"]):not([style*="display: none"]) ~ .ai-chat-panel,
-.tts-player[style*="display: flex"] ~ .ai-chat-panel { bottom: 44px; }
+/* Responsive Table UI */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1rem 0; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--card-bg); }
+.data-table, .report-table, table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; }
+th { text-align: left; padding: 0.75rem 1rem; background: rgba(99,102,241,0.04); border-bottom: 2px solid var(--border); font-weight: 700; color: var(--primary); font-size: 0.85rem; }
+td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(99, 102, 241, 0.02); }
 @media (max-width: 480px) {
-    .tts-player { padding: 0.3rem 0.6rem; }
-    .tts-inner { font-size: 0.78rem; }
+    th, td { padding: 0.6rem 0.75rem; font-size: 0.82rem; }
+}
+
+/* Statistics display */
+.stat-value { font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+
+/* AI Floating Chat Panel */
+.ai-chat-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 60vh; background: var(--card-bg); border-radius: 20px 20px 0 0; box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15); display: flex; flex-direction: column; z-index: 999; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid var(--border); }
+.ai-chat-panel.collapsed { transform: translateY(calc(100% - 48px)); }
+.ai-chat-header { padding: 0.75rem 1.25rem; background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); color: #fff; border-radius: 18px 18px 0 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: 700; min-height: 48px; }
+.ai-chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.ai-chat-msg { padding: 0.75rem 1rem; border-radius: 16px; font-size: 0.9rem; line-height: 1.5; max-width: 85%; word-wrap: break-word; overflow-wrap: break-word; }
+.ai-chat-msg.user { background: var(--accent); color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
+.ai-chat-msg.assistant { background: var(--bg); color: var(--text); margin-right: auto; border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+.ai-chat-input { display: flex; padding: 0.75rem 1rem; border-top: 1px solid var(--border); gap: 0.5rem; background: var(--card-bg); align-items: center; }
+.ai-chat-input input { flex: 1; padding: 0.6rem 1.2rem; border: 1px solid var(--border); border-radius: 24px; font-size: 0.9rem; outline: none; min-height: 40px; font-family: inherit; transition: border-color var(--transition); }
+.ai-chat-input input:focus { border-color: var(--accent); }
+.ai-chat-input button { padding: 0.6rem 1.25rem; background: var(--accent); color: #fff; border: none; border-radius: 24px; cursor: pointer; font-size: 0.9rem; font-weight: 600; min-height: 40px; white-space: nowrap; transition: background var(--transition); }
+.ai-chat-input button:hover { background: var(--primary-light); }
+
+@media (min-width: 768px) {
+    .ai-chat-panel { left: auto; right: 2rem; width: 380px; max-height: 520px; border-radius: var(--radius); bottom: 1rem; }
+    .ai-chat-panel.collapsed { transform: translateY(calc(100% - 48px)); }
+    .ai-chat-header { border-radius: 11px 11px 0 0; }
+}
+
+/* Quiz UI */
+.quiz-container { max-width: 750px; margin: 0 auto; width: 100%; }
+.quiz-question { background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 1.25rem; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.6rem; margin: 1rem 0; }
+.quiz-option { padding: 1rem 1.25rem; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 0.95rem; font-weight: 500; min-height: 48px; display: flex; align-items: center; transition: all var(--transition); background: var(--card-bg); }
+.quiz-option:hover { border-color: var(--accent); background: rgba(99,102,241,0.02); }
+.quiz-option:active { transform: scale(0.99); }
+.quiz-option.correct { border-color: var(--success); background: #f0fdf4; color: #166534; font-weight: 600; }
+.quiz-option.wrong { border-color: var(--error); background: #fef2f2; color: #991b1b; font-weight: 600; }
+
+/* Interactive Gamification Components */
+.ix-match-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 1.25rem 0; }
+@media (min-width: 580px) {
+    .ix-match-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+}
+.ix-match-col { display: flex; flex-direction: column; gap: 0.6rem; }
+.ix-term { padding: 0.8rem 1rem; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border: 2px solid #c7d2fe; border-radius: 10px; cursor: grab; font-weight: 700; font-size: 0.9rem; text-align: center; user-select: none; transition: all var(--transition); box-shadow: var(--shadow); }
+.ix-term:active { cursor: grabbing; transform: scale(0.98); opacity: 0.8; }
+.ix-def { padding: 0.8rem 1rem; background: var(--card-bg); border: 2px dashed var(--border); border-radius: 10px; font-size: 0.88rem; line-height: 1.5; min-height: 54px; display: flex; align-items: center; justify-content: center; text-align: center; transition: background var(--transition); }
+
+.ix-seq-list { display: flex; flex-direction: column; gap: 0.5rem; margin: 1.25rem 0; }
+.ix-seq-item { padding: 0.8rem 1.25rem; background: var(--card-bg); border: 2px solid var(--border); border-radius: 10px; cursor: grab; display: flex; align-items: center; gap: 0.8rem; font-size: 0.9rem; font-weight: 600; user-select: none; transition: all var(--transition); }
+.ix-seq-item:active { cursor: grabbing; opacity: 0.8; transform: scale(0.99); }
+.ix-seq-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: var(--accent); color: #fff; border-radius: 50%; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+
+.ix-flip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+.ix-flip-card { perspective: 800px; height: 140px; cursor: pointer; }
+.ix-flip-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+.ix-flipped .ix-flip-inner { transform: rotateY(180deg); }
+.ix-flip-front, .ix-flip-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; padding: 1rem; box-sizing: border-box; font-size: 0.9rem; text-align: center; line-height: 1.5; box-shadow: var(--shadow); }
+.ix-flip-front { background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); color: #fff; font-weight: 700; }
+.ix-flip-back { background: #f0fdf4; border: 2px solid #bbf7d0; color: #166534; transform: rotateY(180deg); font-weight: 500; }
+
+.xp-bar { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; margin-top: 0.4rem; }
+.xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 5px; transition: width 0.4s ease; }
+
+/* Responsive Media & Embeds */
+img, video, iframe, svg { max-width: 100%; height: auto; border-radius: var(--radius-sm); }
+.katex, .katex-display { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 0.2rem 0; }
+.math-error { color: var(--error); font-size: 0.85rem; word-break: break-all; }
+
+/* TTS Audio Player bar */
+.tts-player { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); border-top: 2px solid var(--accent); padding: 0.6rem 1.2rem; z-index: 998; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); display: none; min-height: 48px; }
+.tts-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; }
+.tts-player:not([style*="display:none"]):not([style*="display: none"]) ~ .ai-chat-panel,
+.tts-player[style*="display: flex"] ~ .ai-chat-panel { bottom: 48px; }
+@media (max-width: 768px) {
+    .tts-player { padding: 0.5rem 1rem; }
+    .tts-inner { font-size: 0.85rem; }
 }
 
 /* Result Card */
-.result-card { max-width: 400px; margin: 1.5rem auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); overflow: hidden; }
-.result-card-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; padding: 1.5rem; text-align: center; }
-.result-card-header h2 { color: #fbbf24; margin: 0; font-size: 1.3rem; }
-.result-card-body { padding: 1.5rem; text-align: center; }
-.result-card-score { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
-.result-card-xp { display: inline-block; background: #fef3c7; color: #92400e; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 600; margin-top: 0.75rem; font-size: 0.85rem; }
+.result-card { max-width: 440px; margin: 2rem auto; background: var(--card-bg); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid var(--border); }
+.result-card-header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: #fff; padding: 2rem 1.5rem; text-align: center; }
+.result-card-header h2 { color: #fbbf24; margin: 0; font-size: 1.5rem; font-weight: 800; }
+.result-card-body { padding: 2rem 1.5rem; text-align: center; }
+.result-card-score { font-size: 3rem; font-weight: 800; color: var(--primary); }
+.result-card-xp { display: inline-block; background: #fef3c7; color: #92400e; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; margin-top: 1rem; font-size: 0.9rem; }
 
-/* Quality Select */
-.quality-select { display: flex; gap: 0.2rem; flex-wrap: wrap; }
+/* Progress bar inside quizzes */
+.quiz-progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.6rem; }
+.quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 0.3s ease; }
+.quiz-header-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; gap: 0.5rem; flex-wrap: wrap; color: var(--text-muted); font-weight: 600; }
 
-/* Challenge History */
-.challenge-history-bar { display: flex; align-items: flex-end; gap: 2px; height: 50px; }
-.challenge-history-bar div { flex: 1; min-width: 6px; border-radius: 2px 2px 0 0; position: relative; }
-
-/* NotebookLM Export - Deprioritized */
-.notebooklm-btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem; background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.72rem; opacity: 0.7; }
-.notebooklm-btn:active { opacity: 1; }
-
-/* Progress bar */
-.quiz-progress-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-bottom: 0.4rem; }
-.quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.3s ease; }
-.quiz-header-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; gap: 0.3rem; flex-wrap: wrap; }
-
-/* Feedback */
-.q-feedback-correct { color: #166534; font-weight: 600; padding: 0.4rem; background: #f0fdf4; border-radius: 8px; text-align: center; font-size: 0.85rem; }
-.q-feedback-wrong { color: #991b1b; font-weight: 600; padding: 0.4rem; background: #fef2f2; border-radius: 8px; text-align: center; font-size: 0.85rem; }
-.q-feedback-retry { color: #9a3412; font-weight: 500; padding: 0.4rem; background: #fff7ed; border-radius: 8px; text-align: center; font-size: 0.85rem; }
-.q-explanation { margin-top: 0.4rem; padding: 0.6rem; background: #f8fafc; border-left: 3px solid var(--accent); border-radius: 6px; font-size: 0.82rem; line-height: 1.5; }
-
-/* Table responsive */
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0.5rem 0; }
-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: max-content; }
-th { text-align: left; padding: 0.5rem; border-bottom: 2px solid var(--border); font-size: 0.78rem; color: var(--text-muted); }
-td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
-@media (max-width: 480px) { td, th { padding: 0.35rem 0.4rem; font-size: 0.78rem; } }
+/* Explanations and Feedbacks */
+.q-feedback-correct { color: #15803d; font-weight: 700; padding: 0.6rem; background: #hnf0fdf4; background-color: #f0fdf4; border-radius: 8px; text-align: center; font-size: 0.9rem; border: 1px solid #bbf7d0; }
+.q-feedback-wrong { color: #b91c1c; font-weight: 700; padding: 0.6rem; background: #fef2f2; border-radius: 8px; text-align: center; font-size: 0.9rem; border: 1px solid #fecaca; }
+.q-explanation { margin-top: 0.75rem; padding: 0.8rem 1rem; background: var(--bg); border-left: 4px solid var(--accent); border-radius: var(--radius-sm); font-size: 0.88rem; line-height: 1.6; color: var(--text); }
 
 /* Footer */
-footer { text-align: center; padding: 1.5rem 1rem; color: var(--text-muted); font-size: 0.78rem; border-top: 1px solid var(--border); margin-top: 2rem; background: var(--card-bg); }
+footer { text-align: center; padding: 2rem 1.5rem; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 3rem; background: var(--card-bg); }
 
-/* Loading */
-.loading { text-align: center; padding: 2rem; color: var(--text-muted); }
-
-/* Prevent text/link overflow */
-a, .chunk-content, .tutor-question-text, .problem-text, .solution-steps, .ai-content { word-break: break-word; overflow-wrap: break-word; }
-code, pre { white-space: pre-wrap; word-break: break-word; max-width: 100%; }
-.loading .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; margin: 0 auto 0.75rem; }
+/* Load animations */
+.loading { text-align: center; padding: 3rem; color: var(--text-muted); }
+.loading .spinner { width: 36px; height: 36px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Animations */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+/* AI Content formatting boxes */
+.ai-section { margin: 2rem 0; padding: 1.5rem; background: var(--card-bg); border-radius: var(--radius); border-left: 4px solid var(--accent); box-shadow: var(--shadow); }
+.ai-section h3 { margin: 0 0 1rem; font-size: 1.2rem; color: var(--primary); font-weight: 700; }
+.ai-content { line-height: 1.8; font-size: 0.95rem; }
+.ai-content p { margin: 0.8rem 0; }
+.ai-content ul, .ai-content ol { padding-left: 1.5rem; margin: 0.6rem 0; }
+.ai-content li { margin: 0.4rem 0; }
 
-/* Print */
+.problem-box { margin: 1rem 0; padding: 1.25rem; border: 1px solid var(--border); border-radius: 12px; background: #fafbff; }
+.problem-header { font-weight: 700; font-size: 0.95rem; color: var(--accent); margin-bottom: 0.6rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.3px; }
+.problem-text { line-height: 1.7; margin: 0.6rem 0; }
+.formula-used { margin: 0.75rem 0; padding: 0.6rem 1rem; background: #f0f4ff; border-radius: 8px; font-size: 0.9rem; border-left: 4px solid var(--accent); color: var(--primary); font-weight: 600; }
+.solution-steps { margin: 0.75rem 0; padding: 0.75rem 1.25rem; background: #f8fafc; border-radius: 10px; border: 1px solid var(--border); }
+.solution-steps ol { padding-left: 1.25rem; }
+.solution-steps li { margin: 0.5rem 0; line-height: 1.7; }
+.final-answer { margin: 0.75rem 0; padding: 0.6rem 1rem; background: #e8faf0; border-radius: 8px; font-weight: 700; color: #15803d; border: 1px solid #bbf7d0; display: inline-block; }
+
+.formula-card { margin: 0.75rem 0; padding: 1.25rem; background: #f0f4ff; border-radius: var(--radius); border: 1px solid #d0d8ff; box-shadow: var(--shadow); }
+
+/* Print view optimization */
 @media print {
-    body { background: #fff !important; }
-    header, nav, footer, .breadcrumb, .ai-chat-panel, .gbar, #tts-player, .search-bar, .tts-btn, .ncert-link, .notebooklm-btn { display: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+    header, nav, footer, .breadcrumb, .ai-chat-panel, .gbar, #tts-player, .search-bar, .tts-btn, .ncert-link, .notebooklm-btn, .filter-panel { display: none !important; }
     .container { max-width: 100%; margin: 0; padding: 0.5in; }
     .result-card { box-shadow: none; border: 2px solid #ccc; page-break-inside: avoid; }
-    .chunk-view { break-inside: avoid; }
+    .chunk-view, .section, .book-section { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
     @page { margin: 0.5in; }
 }
-
-/* AI Content Sections */
-.ai-section { margin: 1.5rem 0; padding: 1.25rem; background: var(--card-bg); border-radius: 12px; border-left: 4px solid var(--accent); }
-.ai-section h3 { margin: 0 0 0.75rem; font-size: 1.1rem; color: var(--primary); }
-.ai-content { line-height: 1.8; font-size: 0.95rem; }
-.ai-content p { margin: 0.6rem 0; }
-.ai-content ul, .ai-content ol { padding-left: 1.5rem; margin: 0.4rem 0; }
-.ai-content li { margin: 0.25rem 0; }
-.problem-box { margin: 0.75rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; background: #fafbff; }
-.problem-header { font-weight: 600; font-size: 0.9rem; color: var(--accent); margin-bottom: 0.5rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
-.problem-text { line-height: 1.7; margin: 0.5rem 0; }
-.formula-used { margin: 0.5rem 0; padding: 0.5rem; background: #f0f4ff; border-radius: 6px; font-size: 0.9rem; border-left: 3px solid #4a90d9; }
-.solution-steps { margin: 0.5rem 0; padding: 0.5rem 1rem; background: #f8f9fa; border-radius: 8px; }
-.solution-steps ol { padding-left: 1.5rem; }
-.solution-steps li { margin: 0.4rem 0; line-height: 1.6; }
-.final-answer { margin: 0.5rem 0; padding: 0.5rem 1rem; background: #e8faf0; border-radius: 8px; font-weight: 500; }
-.mcq-box { margin: 0.6rem 0; padding: 0.8rem 1rem; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
-.mcq-option { display: block; margin: 0.3rem 0; padding: 0.4rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
-.mcq-option:hover { background: var(--hover-bg); }
-.mcq-feedback { margin-top: 0.3rem; padding: 0.4rem 0.6rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
-.math-error { color: #e74c3c; font-size: 0.8rem; }
-.formula-card { margin: 0.5rem 0; padding: 1rem; background: #f0f4ff; border-radius: 10px; border: 1px solid #d0d8ff; }
 """
+
 
 
 class CBSEHandler(BaseHTTPRequestHandler):
@@ -557,7 +573,10 @@ class CBSEHandler(BaseHTTPRequestHandler):
             parts = path.split("/")
             if len(parts) >= 4:
                 board_id = parts[2]
-                subj_id = parts[3]
+                if parts[3] == "subject" and len(parts) >= 5:
+                    subj_id = parts[4]
+                else:
+                    subj_id = parts[3]
                 self._serve_subject(board_id, subj_id)
             else:
                 board_id = parts[2]
@@ -583,6 +602,17 @@ class CBSEHandler(BaseHTTPRequestHandler):
             self._serve_about()
         elif path == "/health":
             self._send_json({"status": "ok", "boards": len(ALL_BOARDS)})
+        elif path == "/api/test_subjects":
+            conn = get_conn()
+            subjects = conn.execute("SELECT * FROM subjects").fetchall()
+            self._send_json({"subjects": [dict(s) for s in subjects]})
+        elif path == "/api/test_query":
+            conn = get_conn()
+            subject = conn.execute(
+                "SELECT * FROM subjects WHERE board_id = ? AND (LOWER(name) = ? OR LOWER(name) LIKE ?)",
+                ("cbse", "subject", "%subject%")
+            ).fetchone()
+            self._send_json({"subject": dict(subject) if subject else None})
         elif path == "/api/search":
             self._api_search(query)
         elif path == "/api/explain":
@@ -782,68 +812,51 @@ class CBSEHandler(BaseHTTPRequestHandler):
             self._serve_leaderboard()
         elif path == "/ai" or path == "/ai/studio":
             self._serve_ai_studio()
-        elif path == "/ai/diagram":
-            self._serve_ai_diagram()
-        elif path == "/ai/presentation":
-            self._serve_ai_presentation()
-        elif path == "/ai/voiceover":
-            self._serve_ai_voiceover()
         elif path == "/ai/research":
             self._serve_ai_research()
-        elif path == "/ai/music":
-            self._serve_ai_music()
         elif path == "/ai/literature":
             self._serve_ai_literature()
         elif path == "/ai/visualize":
             self._serve_ai_visualize()
-        elif path == "/ai/story":
-            self._serve_ai_story()
-        elif path == "/ai/pomelli":
-            self._serve_ai_pomelli()
-        elif path.startswith("/ai/pomelli/"):
-            tmpl = path[12:]
-            self._serve_ai_pomelli(tmpl)
-        elif path == "/ai/metai":
-            self._serve_ai_metai()
         elif path == "/ai/pedagogical":
             self._serve_ai_pedagogical()
         elif path == "/ai/youtube":
             self._serve_ai_youtube()
-        elif path == "/ai/opengrok":
-            self._serve_ai_opengrok()
         elif path.startswith("/api/ai/youtube"):
             self._api_ai_youtube(query)
-        elif path.startswith("/api/ai/opengrok"):
-            self._api_ai_opengrok(query)
-        elif path.startswith("/api/ai/diagram"):
-            self._api_ai_diagram(query)
-        elif path.startswith("/api/ai/presentation"):
-            self._api_ai_presentation(query)
-        elif path.startswith("/api/ai/voiceover"):
-            self._api_ai_voiceover(query)
         elif path.startswith("/api/ai/research"):
             self._api_ai_research(query)
-        elif path.startswith("/api/ai/music"):
-            self._api_ai_music(query)
         elif path.startswith("/api/ai/literature"):
             self._api_ai_literature(query)
         elif path.startswith("/api/ai/visualize"):
             self._api_ai_visualize(query)
-        elif path.startswith("/api/ai/story"):
-            self._api_ai_story(query)
-        elif path == "/api/ai/pomelli":
-            self._api_ai_pomelli(query)
-        elif path.startswith("/api/ai/pomelli/generate"):
-            self._api_ai_pomelli_generate(query)
-        elif path.startswith("/api/ai/metai"):
-            self._api_ai_metai(query)
         elif path.startswith("/api/ai/pedagogical"):
             self._api_ai_pedagogical(query)
-        elif path == "/api/ai/generate":
-            self._api_ai_generate(query)
         elif path == "/api/ai/status":
             client = get_client()
             self._send_json(client.get_status())
+        elif path == "/api/view_logs":
+            import glob
+            log_content = ""
+            log_files = ["/tmp/server.log", "server.log", "app.log"]
+            found_file = None
+            for lf in log_files:
+                if os.path.exists(lf):
+                    found_file = lf
+                    break
+            if not found_file:
+                all_logs = glob.glob("/tmp/*.log") + glob.glob("*.log")
+                if all_logs:
+                    found_file = all_logs[0]
+            if found_file:
+                try:
+                    with open(found_file, "r", encoding="utf-8", errors="replace") as f:
+                        log_content = f.read()[-8000:]
+                    self._send_json({"file": found_file, "logs": log_content})
+                except Exception as e:
+                    self._send_json({"error": f"Failed to read {found_file}: {e}"})
+            else:
+                self._send_json({"error": "No log files found", "searched": log_files})
         elif path == "/api/ai/enrich":
             topic = query.get("topic", [""])[0]
             chapter = query.get("chapter", [""])[0]
@@ -887,6 +900,8 @@ class CBSEHandler(BaseHTTPRequestHandler):
             self._api_register(query)
         elif path == "/api/login":
             self._api_login(query)
+        elif path == "/api/mock-exam/submit":
+            self._api_mock_exam_submit(query)
         else:
             self._send_error(404, "Not found")
 
@@ -1008,11 +1023,11 @@ function selfAssess(answerId,assessment,sessionId){{
                 method:'POST', headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
                 body:'session_id='+sessionId
             }}).then(r=>r.json()).then(d=>{{
-                document.getElementById('tutor-content').innerHTML=\\
+                document.getElementById('tutor-content').innerHTML =
                     '<div style="text-align:center;padding:2rem;"><h3>🎉 Session Complete!</h3><p style="font-size:1.2rem;margin:1rem 0;">+'+d.xp+' XP earned</p><p>Keep up the great work!</p><div style="display:flex;gap:0.5rem;justify-content:center;margin-top:1rem;"><a class="tts-btn" href="/topic/'+topicId+'">Back to Topic</a><a class="tts-btn" href="/tutor">Next Topic Suggestion</a></div></div>';
-            }}));
+            }});
         }}
-    }}));
+    }});
 }}
 function skipTutorQuestion(sessionId){{
     if(confirm('Skip this question?')){{
@@ -1031,9 +1046,9 @@ function skipTutorQuestion(sessionId){{
                     method:'POST', headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
                     body:'session_id='+sessionId
                 }}).then(r=>r.json()).then(d=>{{
-                    document.getElementById('tutor-content').innerHTML=\\
+                    document.getElementById('tutor-content').innerHTML =
                         '<div style="text-align:center;padding:2rem;"><h3>🎉 Session Complete!</h3><p style="font-size:1.2rem;margin:1rem 0;">+'+d.xp+' XP earned</p><p>Keep up the great work!</p><div style="display:flex;gap:0.5rem;justify-content:center;margin-top:1rem;"><a class="tts-btn" href="/topic/'+topicId+'">Back to Topic</a><a class="tts-btn" href="/tutor">Next Topic Suggestion</a></div></div>';
-                }}));
+                }});
             }}
         }});
     }}
@@ -1599,44 +1614,23 @@ function skipTutorQuestion(sessionId){{
         backend_html = f"""
         <div id="ai-status" style="margin-bottom:1rem;padding:0.75rem 1rem;border-radius:8px;font-size:0.85rem;background:{'#f0fdf4' if status['available'] else '#fff7ed'};border:1px solid {'#bbf7d0' if status['available'] else '#fed7aa'};">
             <strong>AI Backend:</strong> {'🟢 Online' if status['available'] else '🟡 Offline'}
-            {' · ' + status['backend'].title() + ' · ' + status['model'] if status['available'] else ' · Set GEMINI_API_KEY, ANTHROPIC_API_KEY, or OLLAMA_URL'}
+            {' · ' + status['backend'].title() + ' · ' + status['model'] if status['available'] else ' · Set GEMINI_API_KEY'}
         </div>"""
         content = f"""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> AI Studio</div>
         <div class="section">
             <h2>🧠 AI Studio</h2>
-            <p class="subtitle">MetaAI Llama 3 · YouTube Data API v3 · OpenGrok · Gemini Flash · NotebookLM · Ollama · Napkin AI · Gamma · Quillbot · Pomelli · MetAI</p>
+            <p class="subtitle">Google Gemini · Gemma 4 · NotebookLM · YouTube Data API · SVG Visualizer</p>
             {backend_html}
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1.5rem;">
-                <a href="/ai/diagram" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">📊</div><h3>Napkin AI</h3><p style="font-size:0.85rem;color:var(--text-muted);">Generate concept diagrams</p>
-                </a>
-                <a href="/ai/presentation" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">📽️</div><h3>Gamma</h3><p style="font-size:0.85rem;color:var(--text-muted);">Create presentations</p>
-                </a>
-                <a href="/ai/voiceover" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">✍️</div><h3>Quillbot</h3><p style="font-size:0.85rem;color:var(--text-muted);">Paraphrase & read aloud</p>
-                </a>
                 <a href="/ai/research" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">🔬</div><h3>AI Research</h3><p style="font-size:0.85rem;color:var(--text-muted);">Deep research assistant</p>
-                </a>
-                <a href="/ai/music" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">🎵</div><h3>Browser Music</h3><p style="font-size:0.85rem;color:var(--text-muted);">Ambient study sounds</p>
+                    <div style="font-size:2.5rem;">🔬</div><h3>Gemini Research</h3><p style="font-size:0.85rem;color:var(--text-muted);">Deep research by Google Gemini</p>
                 </a>
                 <a href="/ai/literature" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">📚</div><h3>AI Literature</h3><p style="font-size:0.85rem;color:var(--text-muted);">Research overviews</p>
+                    <div style="font-size:2.5rem;">📚</div><h3>Gemini Literature</h3><p style="font-size:0.85rem;color:var(--text-muted);">Research overviews by Gemini</p>
                 </a>
                 <a href="/ai/visualize" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">🎨</div><h3>SVG Visualizer</h3><p style="font-size:0.85rem;color:var(--text-muted);">Concept visualization</p>
-                </a>
-                <a href="/ai/story" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">📖</div><h3>Tome</h3><p style="font-size:0.85rem;color:var(--text-muted);">Storytelling & analogies</p>
-                </a>
-                <a href="/ai/pomelli" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">📐</div><h3>Pomelli</h3><p style="font-size:0.85rem;color:var(--text-muted);">Math animations & visualizations</p>
-                </a>
-                <a href="/ai/metai" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">🎬</div><h3>MetAI</h3><p style="font-size:0.85rem;color:var(--text-muted);">Concept video storyboards</p>
+                    <div style="font-size:2.5rem;">🎨</div><h3>SVG Visualizer</h3><p style="font-size:0.85rem;color:var(--text-muted);">Concept visualization by Gemma 4</p>
                 </a>
                 <a href="/ai/pedagogical" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
                     <div style="font-size:2.5rem;">📓</div><h3>NotebookLM</h3><p style="font-size:0.85rem;color:var(--text-muted);">Pedagogical study guides</p>
@@ -1647,188 +1641,17 @@ function skipTutorQuestion(sessionId){{
                 <a href="/ai/youtube" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
                     <div style="font-size:2.5rem;">▶️</div><h3>YouTube Videos</h3><p style="font-size:0.85rem;color:var(--text-muted);">Google YouTube Data API v3 — Free Tier</p>
                 </a>
-                <a href="/ai/opengrok" class="book-section" style="display:block;text-align:center;padding:1.5rem;text-decoration:none;color:inherit;">
-                    <div style="font-size:2.5rem;">📐</div><h3>Formulas & Theorems</h3><p style="font-size:0.85rem;color:var(--text-muted);">OpenGrok + Local Formula Database</p>
-                </a>
             </div>
         </div>"""
         body = render_template("base.html", title="AI Studio - Class X", body_class="", extra_css="", content=content, board_name="")
-        self._send_html(body)
-
-    def _serve_ai_diagram(self):
-        content = """
-        <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Napkin AI Diagrams</div>
-        <div class="section">
-            <h2>📊 Napkin AI — Diagram Generator</h2>
-            <p class="subtitle">Turn any concept into a visual diagram in seconds</p>
-            <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Concept</label>
-                <input type="text" id="diagram-concept" value="Photosynthesis" placeholder="Enter a topic or concept"
-                       style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Diagram Type</label>
-                <select id="diagram-type" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                    <option value="flowchart">Flowchart</option>
-                    <option value="mindmap">Mind Map</option>
-                    <option value="timeline">Timeline</option>
-                    <option value="quadrant">Quadrant Chart</option>
-                </select>
-                <button onclick="generateDiagram()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">Generate Diagram</button>
-            </div>
-            <div id="diagram-output" style="margin-top:1.5rem;background:#fff;border-radius:12px;padding:1.5rem;overflow-x:auto;display:none;">
-                <div class="mermaid" id="mermaid-container"></div>
-            </div>
-        </div>
-        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-        <script>
-        mermaid.initialize({startOnLoad:false,theme:'default',themeVariables:{primaryColor:'#e8f4f8',primaryTextColor:'#1a1a2e',lineColor:'#0f3460'}});
-        async function generateDiagram() {
-            const concept = document.getElementById('diagram-concept').value;
-            const type = document.getElementById('diagram-type').value;
-            const btn = event.target; btn.textContent='Generating...'; btn.disabled=true;
-            try {
-                const resp = await fetch('/api/ai/diagram?concept='+encodeURIComponent(concept)+'&type='+encodeURIComponent(type));
-                const data = await resp.json();
-                if (data.success) {
-                    document.getElementById('diagram-output').style.display = 'block';
-                    const container = document.getElementById('mermaid-container');
-                    container.innerHTML = '<div class="mermaid">' + data.diagram + '</div>';
-                    mermaid.run({nodes:[container]});
-                } else {
-                    alert('Error: ' + (data.error || 'Could not generate'));
-                }
-            } catch(e) { alert('Generation failed.'); }
-            btn.textContent='Generate Diagram'; btn.disabled=false;
-        }
-        </script>"""
-        body = render_template("base.html", title="Napkin AI Diagrams - Class X", body_class="", extra_css="<style>.mermaid svg{max-width:100%;height:auto;}</style>", content=content, board_name="")
-        self._send_html(body)
-
-    def _serve_ai_presentation(self):
-        content = """
-        <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Gamma Presentations</div>
-        <div class="section">
-            <h2>📽️ Gamma — AI Presentation Generator</h2>
-            <p class="subtitle">Convert any chapter into a beautiful slide deck</p>
-            <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Subject</label>
-                <input type="text" id="pres-subject" value="Science" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Chapter</label>
-                <input type="text" id="pres-chapter" value="Life Processes" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                <button onclick="generatePresentation()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">Generate Presentation</button>
-            </div>
-            <div id="presentation-output" style="margin-top:1.5rem;display:none;">
-                <div class="book-section" style="padding:0;overflow:hidden;" id="slides-container"></div>
-                <div style="text-align:center;margin-top:1rem;">
-                    <button onclick="prevSlide()" class="btn-primary" style="padding:0.5rem 1rem;background:var(--primary);color:#fff;border:none;border-radius:6px;cursor:pointer;">◀ Prev</button>
-                    <span id="slide-counter" style="margin:0 1rem;font-weight:600;">1 / 1</span>
-                    <button onclick="nextSlide()" class="btn-primary" style="padding:0.5rem 1rem;background:var(--primary);color:#fff;border:none;border-radius:6px;cursor:pointer;">Next ▶</button>
-                </div>
-            </div>
-        </div>
-        <script>
-        let slides = []; let currentSlide = 0;
-        async function generatePresentation() {
-            const subject = document.getElementById('pres-subject').value;
-            const chapter = document.getElementById('pres-chapter').value;
-            const btn = event.target; btn.textContent='Generating...'; btn.disabled=true;
-            try {
-                const resp = await fetch('/api/ai/presentation?subject='+encodeURIComponent(subject)+'&chapter='+encodeURIComponent(chapter));
-                const data = await resp.json();
-                if (data.success) {
-                    const container = document.getElementById('slides-container');
-                    container.innerHTML = data.html;
-                    slides = container.querySelectorAll('.slide');
-                    currentSlide = 0;
-                    showSlide(0);
-                    document.getElementById('presentation-output').style.display = 'block';
-                }
-            } catch(e) { alert('Failed to generate.'); }
-            btn.textContent='Generate Presentation'; btn.disabled=false;
-        }
-        function showSlide(n) {
-            slides.forEach((s,i) => s.style.display = i===n ? 'block' : 'none');
-            document.getElementById('slide-counter').textContent = (n+1) + ' / ' + slides.length;
-        }
-        function nextSlide() { if (currentSlide < slides.length-1) { currentSlide++; showSlide(currentSlide); } }
-        function prevSlide() { if (currentSlide > 0) { currentSlide--; showSlide(currentSlide); } }
-        </script>"""
-        body = render_template("base.html", title="Gamma Presentations - Class X", body_class="", extra_css="", content=content, board_name="")
-        self._send_html(body)
-
-    def _serve_ai_voiceover(self):
-        content = """
-        <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Quillbot Paraphraser</div>
-        <div class="section">
-            <h2>✍️ Quillbot — AI Paraphraser & Voice Reader</h2>
-            <p class="subtitle">Rewrite any text in your own words, then listen with AI voiceover</p>
-            <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Text to Paraphrase</label>
-                <textarea id="quillbot-text" rows="4" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;font-family:inherit;">Photosynthesis is the process by which plants convert light energy into chemical energy to fuel their growth.</textarea>
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Mode</label>
-                <select id="quillbot-mode" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                    <option value="simpler">Simpler — easier to understand</option>
-                    <option value="formal">Formal — academic style</option>
-                    <option value="bullets">Bullet Points — key ideas</option>
-                    <option value="summarize">Summarize — brief summary</option>
-                    <option value="expand">Expand — add detail & examples</option>
-                </select>
-                <button onclick="paraphraseText()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">Paraphrase</button>
-            </div>
-            <div id="quillbot-output" style="margin-top:1.5rem;display:none;">
-                <div class="book-section" style="padding:1.5rem;">
-                    <h3 style="margin:0 0 0.5rem;">📝 Paraphrased</h3>
-                    <div id="quillbot-result" style="line-height:1.8;font-size:1.05rem;"></div>
-                    <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-                        <button onclick="readAloud()" style="padding:0.5rem 1rem;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;">🔊 Read Aloud</button>
-                        <button onclick="copyText()" style="padding:0.5rem 1rem;background:var(--primary);color:#fff;border:none;border-radius:6px;cursor:pointer;">📋 Copy</button>
-                    </div>
-                    <div id="tts-status" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-muted);display:none;">🔊 Speaking...</div>
-                </div>
-            </div>
-        </div>
-        <script>
-        let lastResult = '';
-        async function paraphraseText() {
-            const text = document.getElementById('quillbot-text').value;
-            const mode = document.getElementById('quillbot-mode').value;
-            const btn = event.target; btn.textContent='Paraphrasing...'; btn.disabled=true;
-            try {
-                const resp = await fetch('/api/ai/voiceover?text='+encodeURIComponent(text)+'&mode='+encodeURIComponent(mode));
-                const data = await resp.json();
-                if (data.success) {
-                    lastResult = data.paraphrased;
-                    document.getElementById('quillbot-output').style.display = 'block';
-                    document.getElementById('quillbot-result').innerHTML = data.paraphrased.replace(/\\n/g, '<br>');
-                } else {
-                    alert('Paraphrasing failed.');
-                }
-            } catch(e) { alert('Error: ' + e.message); }
-            btn.textContent='Paraphrase'; btn.disabled=false;
-        }
-        function readAloud() {
-            if (!lastResult) return;
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(lastResult);
-                u.lang = 'en-IN'; u.rate = 0.9;
-                window.speechSynthesis.speak(u);
-                document.getElementById('tts-status').style.display = 'block';
-                u.onend = function() { document.getElementById('tts-status').style.display = 'none'; };
-            }
-        }
-        function copyText() {
-            if (lastResult) { navigator.clipboard.writeText(lastResult); alert('Copied!'); }
-        }
-        </script>"""
-        body = render_template("base.html", title="Quillbot Paraphraser - Class X", body_class="", extra_css="", content=content, board_name="")
         self._send_html(body)
 
     def _serve_ai_research(self):
         content = """
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> AI Research</div>
         <div class="section">
-            <h2>🔬 AI Research Assistant</h2>
-            <p class="subtitle">Deep research on any academic topic — powered by Gemma 4 / Claude / Ollama</p>
+            <h2>🔬 Gemini Research</h2>
+            <p class="subtitle">Deep research on any academic topic — powered by Google Gemini</p>
             <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
                 <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Research Question</label>
                 <input type="text" id="research-query" value="How does photosynthesis work?" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
@@ -1858,67 +1681,15 @@ function skipTutorQuestion(sessionId){{
             btn.textContent='Research'; btn.disabled=false;
         }
         </script>"""
-        body = render_template("base.html", title="AI Research - Class X", body_class="", extra_css="", content=content, board_name="")
-        self._send_html(body)
-
-    def _serve_ai_music(self):
-        content = """
-        <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Browser Music</div>
-        <div class="section">
-            <h2>🎵 Browser Music — Ambient Study Sounds</h2>
-            <p class="subtitle">Generate calm study music directly in your browser — no API keys needed</p>
-            <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Mood / Style</label>
-                <select id="music-mood" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                    <option value="calm study piano">Calm Piano Study</option>
-                    <option value="lo-fi study beats">Lo-fi Study Beats</option>
-                    <option value="nature sounds for focus">Nature Sounds</option>
-                    <option value="classical study music">Classical Study</option>
-                    <option value="ambient electronic">Ambient Electronic</option>
-                </select>
-                <button onclick="startMusic()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">▶ Start Music</button>
-                <button onclick="stopMusic()" style="padding:0.8rem 2rem;background:var(--text-muted);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;margin-left:0.5rem;">⏹ Stop</button>
-            </div>
-            <div id="music-status" style="margin-top:1rem;text-align:center;color:var(--text-muted);font-size:0.9rem;"></div>
-        </div>
-        <script>
-        let audioCtx = null; let osc = null; let gain = null; let lfo = null; let lfoGain = null;
-        function startMusic() {
-            const mood = document.getElementById('music-mood').value;
-            const status = document.getElementById('music-status');
-            if (audioCtx) { stopMusic(); }
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const params = {
-                'calm study piano': {type:'sine', freq:261.63, lfo:0.5, gain:0.15},
-                'lo-fi study beats': {type:'triangle', freq:220, lfo:0.8, gain:0.12},
-                'nature sounds for focus': {type:'sine', freq:180, lfo:0.3, gain:0.1},
-                'classical study music': {type:'sine', freq:392, lfo:0.4, gain:0.13},
-                'ambient electronic': {type:'sawtooth', freq:130.81, lfo:0.2, gain:0.08},
-            }[mood] || {type:'sine', freq:261.63, lfo:0.5, gain:0.15};
-            gain = audioCtx.createGain(); gain.gain.value = params.gain; gain.connect(audioCtx.destination);
-            lfoGain = audioCtx.createGain(); lfoGain.gain.value = 5;
-            lfo = audioCtx.createOscillator(); lfo.frequency.value = params.lfo; lfo.type = 'sine';
-            lfo.connect(lfoGain); lfoGain.connect(gain.gain);
-            osc = audioCtx.createOscillator(); osc.type = params.type; osc.frequency.value = params.freq;
-            osc.connect(gain); osc.start(); lfo.start();
-            status.innerHTML = '🎵 Playing: ' + mood + ' — <span style="font-size:0.85rem;">Study while you learn!</span>';
-        }
-        function stopMusic() {
-            if (osc) { try { osc.stop(); } catch(e) {} osc = null; }
-            if (lfo) { try { lfo.stop(); } catch(e) {} lfo = null; }
-            if (audioCtx) { audioCtx.close(); audioCtx = null; }
-            document.getElementById('music-status').innerHTML = '⏹ Music stopped';
-        }
-        </script>"""
-        body = render_template("base.html", title="Browser Music - Class X", body_class="", extra_css="", content=content, board_name="")
+        body = render_template("base.html", title="Gemini Research - Class X", body_class="", extra_css="", content=content, board_name="")
         self._send_html(body)
 
     def _serve_ai_literature(self):
         content = """
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> AI Literature</div>
         <div class="section">
-            <h2>📚 AI Literature — Research Overview Generator</h2>
-            <p class="subtitle">Get research summaries on any academic topic</p>
+            <h2>📚 Gemini Literature — Research Overview Generator</h2>
+            <p class="subtitle">Get research summaries on any academic topic — powered by Google Gemini</p>
             <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
                 <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Research Topic</label>
                 <input type="text" id="lit-query" value="Photosynthesis efficiency" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
@@ -1956,15 +1727,15 @@ function skipTutorQuestion(sessionId){{
             btn.textContent='Generate Overview'; btn.disabled=false;
         }
         </script>"""
-        body = render_template("base.html", title="AI Literature - Class X", body_class="", extra_css="", content=content, board_name="")
+        body = render_template("base.html", title="Gemini Literature - Class X", body_class="", extra_css="", content=content, board_name="")
         self._send_html(body)
 
     def _serve_ai_visualize(self):
         content = """
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> SVG Visualizer</div>
         <div class="section">
-            <h2>🎨 SVG Visualizer — AI Concept Diagrams</h2>
-            <p class="subtitle">Generate clean SVG diagrams for any concept — no API keys needed</p>
+            <h2>🎨 SVG Visualizer — Concept Diagrams</h2>
+            <p class="subtitle">Generate clean SVG diagrams for any concept — powered by Gemma 4</p>
             <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
                 <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Concept</label>
                 <input type="text" id="vis-concept" value="Plant cell structure" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
@@ -2016,124 +1787,6 @@ function skipTutorQuestion(sessionId){{
         }
         </script>"""
         body = render_template("base.html", title="SVG Visualizer - Class X", body_class="", extra_css="", content=content, board_name="")
-        self._send_html(body)
-
-    def _serve_ai_story(self):
-        content = """
-        <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Tome Storytelling</div>
-        <div class="section">
-            <h2>📖 Tome — Storytelling & Analogy Engine</h2>
-            <p class="subtitle">Learn any concept through engaging stories and analogies</p>
-            <div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Topic</label>
-                <input type="text" id="story-topic" value="Photosynthesis" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Chapter (optional)</label>
-                <input type="text" id="story-chapter" value="Life Processes" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Subject</label>
-                <input type="text" id="story-subject" value="Science" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-                <button onclick="generateStory()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">Tell Me a Story</button>
-            </div>
-            <div id="story-output" style="margin-top:1.5rem;display:none;">
-                <div class="book-section" style="padding:1.5rem;line-height:1.8;" id="story-content"></div>
-            </div>
-        </div>
-        <script>
-        async function generateStory() {
-            const topic = document.getElementById('story-topic').value;
-            const chapter = document.getElementById('story-chapter').value;
-            const subject = document.getElementById('story-subject').value;
-            const output = document.getElementById('story-output');
-            const content = document.getElementById('story-content');
-            const btn = event.target; btn.textContent='Generating...'; btn.disabled=true;
-            content.innerHTML = '<p><em>Crafting a story to explain ' + topic + '...</em></p>'; output.style.display='block';
-            try {
-                const resp = await fetch('/api/ai/story?topic='+encodeURIComponent(topic)+'&chapter='+encodeURIComponent(chapter)+'&subject='+encodeURIComponent(subject));
-                const data = await resp.json();
-                if (data.success) { content.innerHTML = data.story; }
-                else { content.innerHTML = '<p>Could not generate story.</p>'; }
-            } catch(e) { content.innerHTML = '<p>Story generation failed.</p>'; }
-            btn.textContent='Tell Me a Story'; btn.disabled=false;
-        }
-        </script>"""
-        body = render_template("base.html", title="Tome Storytelling - Class X", body_class="", extra_css="", content=content, board_name="")
-        self._send_html(body)
-
-    # ─── Pomelli Math Animations ────────────────────────────────────────────
-
-    def _serve_ai_pomelli(self, template_id=None):
-        if template_id:
-            content = f"""
-<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> <a href="/ai/pomelli">Pomelli</a> <span class="sep">›</span> {{template_id}}</div>
-<div class="section"><h2>📐 Pomelli — {{template_id}}</h2><p class="subtitle">Interactive math visualization</p>
-<div id="pomelli-output"><p style="text-align:center;color:var(--text-muted);">Loading animation...</p></div></div>
-<script>
-fetch('/api/ai/pomelli/generate?template={template_id}').then(r=>r.json()).then(d=>{{if(d.success)document.getElementById('pomelli-output').innerHTML=d.html;}});
-</script>"""
-            body = render_template("base.html", title=f"Pomelli: {template_id} - Class X", body_class="", extra_css="", content=content, board_name="")
-            self._send_html(body)
-            return
-        content = """
-<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Pomelli</div>
-<div class="section">
-<h2>📐 Pomelli — Math Animation Engine</h2>
-<p class="subtitle">Interactive visualizations for Mathematical concepts — powered by HTML5 Canvas</p>
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;margin-top:1.5rem;" id="pomelli-grid"></div>
-</div>
-<script>
-fetch('/api/ai/pomelli').then(r=>r.json()).then(d=>{
-  let html = ''; const grid = document.getElementById('pomelli-grid');
-  Object.entries(d.templates).forEach(([id,t]) => {
-    html += '<a href="/ai/pomelli/'+id+'" class="book-section" style="display:block;padding:1.5rem;text-decoration:none;color:inherit;text-align:center;">';
-    html += '<div style="font-size:2rem;margin-bottom:0.5rem;">📐</div><h3 style="margin:0;font-size:1rem;">'+t.title+'</h3>';
-    html += '<p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.3rem;">'+t.desc+'</p></a>';
-  }); grid.innerHTML = html;
-});
-</script>"""
-        body = render_template("base.html", title="Pomelli Math Animations - Class X", body_class="", extra_css="", content=content, board_name="")
-        self._send_html(body)
-
-    # ─── MetAI Concept Videos ───────────────────────────────────────────────
-
-    def _serve_ai_metai(self):
-        content = """
-<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> MetAI</div>
-<div class="section">
-<h2>🎬 MetAI — Concept Video Storyboard Generator</h2>
-<p class="subtitle">Generate animated explainer storyboards for Science & Social concepts</p>
-<div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-  <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Concept</label>
-  <input type="text" id="metai-concept" value="Photosynthesis" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-  <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Subject</label>
-  <select id="metai-subject" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-    <option value="Science">Science</option>
-    <option value="Social Studies">Social Studies</option>
-    <option value="Biology">Biology</option>
-    <option value="Physics">Physics</option>
-    <option value="Chemistry">Chemistry</option>
-    <option value="History">History</option>
-    <option value="Geography">Geography</option>
-  </select>
-  <button onclick="generateMetAI()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">Generate Storyboard</button>
-</div>
-<div id="metai-output" style="margin-top:1.5rem;display:none;"></div>
-</div>
-<script>
-async function generateMetAI() {
-  const concept = document.getElementById('metai-concept').value;
-  const subject = document.getElementById('metai-subject').value;
-  const output = document.getElementById('metai-output');
-  const btn = event.target; btn.textContent='Generating...'; btn.disabled=true;
-  output.style.display='block'; output.innerHTML = '<p style="text-align:center;color:var(--text-muted);">Creating animated storyboard...</p>';
-  try {
-    const resp = await fetch('/api/ai/metai?concept='+encodeURIComponent(concept)+'&subject='+encodeURIComponent(subject));
-    const data = await resp.json();
-    if (data.success) { output.innerHTML = data.html; }
-    else { output.innerHTML = '<p>Could not generate storyboard.</p>'; }
-  } catch(e) { output.innerHTML = '<p>Generation failed.</p>'; }
-  btn.textContent='Generate Storyboard'; btn.disabled=false;
-}
-</script>"""
-        body = render_template("base.html", title="MetAI Concept Videos - Class X", body_class="", extra_css="", content=content, board_name="")
         self._send_html(body)
 
     # ─── Enhanced NotebookLM: Pedagogical ────────────────────────────────────
@@ -2238,88 +1891,12 @@ async function searchYouTube() {
         body = render_template("base.html", title="YouTube Videos - Class X", body_class="", extra_css="", content=content, board_name="")
         self._send_html(body)
 
-    # ─── OpenGrok: Formulas & Theorems Search ──────────────────────────────────
-
-    def _serve_ai_opengrok(self):
-        content = """
-<div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Formulas & Theorems</div>
-<div class="section">
-<h2>📐 Formulas & Theorems Search</h2>
-<p class="subtitle">Search CBSE Class 10 formulas, theorems, and code via OpenGrok API + Local Knowledge Base</p>
-<div class="book-section" style="padding:1.5rem;margin-top:1rem;">
-  <label style="font-weight:500;display:block;margin-bottom:0.5rem;">Search (e.g. quadratic, pythagoras, trigonometry, theorem)</label>
-  <input type="text" id="og-query" value="quadratic" style="width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;">
-  <button onclick="searchOpenGrok()" class="btn-primary" style="padding:0.8rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;">🔍 Search</button>
-</div>
-<div id="og-output" style="margin-top:1rem;"></div>
-</div>
-<script>
-async function searchOpenGrok() {
-  var q = document.getElementById('og-query').value;
-  var out = document.getElementById('og-output');
-  out.innerHTML = '<p style="color:#888;"><em>Searching formulas & theorems...</em></p>';
-  try {
-    var r = await fetch('/api/ai/opengrok?query=' + encodeURIComponent(q));
-    var data = await r.json();
-    var html = '';
-    if (data.results && data.results.length > 0) {
-      for (var res of data.results) {
-        html += '<div class="og-result" style="background:var(--card-bg);border-radius:8px;padding:0.8rem 1rem;border:1px solid var(--border);margin-bottom:0.5rem;">';
-        html += '<div style="font-size:0.95rem;font-weight:600;color:var(--primary);font-family:\\'Courier New\\',monospace;">' + res.title + '</div>';
-        if (res.category) html += '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:0.2rem;"><span style="background:#eef2ff;padding:0.05rem 0.4rem;border-radius:4px;">' + res.category + '</span></div>';
-        if (res.snippet) html += '<div style="font-size:0.82rem;color:#555;margin-top:0.3rem;">' + res.snippet + '</div>';
-        html += '</div>';
-      }
-    } else {
-      html = '<p style="color:#888;">No results found. Try: quadratic, pythagoras, trigonometry, circle, theorem</p>';
-    }
-    out.innerHTML = html;
-  } catch(e) {
-    out.innerHTML = '<p style="color:#c62828;">Search failed.</p>';
-  }
-}
-</script>"""
-        body = render_template("base.html", title="Formulas & Theorems - Class X", body_class="", extra_css="", content=content, board_name="")
-        self._send_html(body)
-
-    # ─── AI API Handlers ────────────────────────────────────────────────────
-
-    def _api_ai_diagram(self, query):
-        concept = query.get("concept", [""])[0]
-        d_type = query.get("type", ["flowchart"])[0]
-        result = ai_services.napkin_diagram(concept, d_type)
-        self._send_json(result)
-
-    def _api_ai_presentation(self, query):
-        subject = query.get("subject", [""])[0]
-        chapter = query.get("chapter", [""])[0]
-        topics = []
-        conn = get_conn()
-        rows = conn.execute("""SELECT t.id, t.title, ch.title as chapter_title, s.name as subject_name
-            FROM topics t JOIN chapters ch ON t.chapter_id = ch.id JOIN subjects s ON ch.subject_id = s.id
-            WHERE s.name LIKE ? AND ch.title LIKE ? LIMIT 10""",
-            (f"%{subject}%", f"%{chapter}%")).fetchall()
-        for r in rows:
-            chunks = conn.execute("SELECT title, content FROM chunks WHERE topic_id = ? ORDER BY seq LIMIT 8", (r["id"],)).fetchall()
-            topics.append({"title": r["title"], "chunks": [dict(c) for c in chunks]})
-        result = ai_services.gamma_presentation(subject, chapter, topics)
-        self._send_json(result)
-
-    def _api_ai_voiceover(self, query):
-        text = query.get("text", [""])[0]
-        mode = query.get("mode", ["simpler"])[0]
-        result = ai_services.quillbot_paraphrase(text, mode)
-        self._send_json(result)
+    # ─── AI API Handlers (Google Only) ─────────────────────────────────────
 
     def _api_ai_research(self, query):
         q = query.get("query", [""])[0]
         subject = query.get("subject", [""])[0]
         result = ai_services.llm_research(q, subject)
-        self._send_json(result)
-
-    def _api_ai_music(self, query):
-        mood = query.get("prompt", ["calm study piano"])[0]
-        result = ai_services.browser_music_params(mood)
         self._send_json(result)
 
     def _api_ai_literature(self, query):
@@ -2332,30 +1909,6 @@ async function searchOpenGrok() {
         concept = query.get("concept", [""])[0]
         style = query.get("style", ["diagram"])[0]
         result = ai_services.svg_visualize(concept, style)
-        self._send_json(result)
-
-    def _api_ai_story(self, query):
-        topic = query.get("topic", [""])[0]
-        chapter = query.get("chapter", [""])[0]
-        subject = query.get("subject", [""])[0]
-        result = ai_services.tome_story(topic, chapter, subject)
-        self._send_json(result)
-
-    def _api_ai_pomelli(self, query):
-        result = ai_services.pomelli_list_templates()
-        self._send_json(result)
-
-    def _api_ai_pomelli_generate(self, query):
-        template_id = query.get("template", ["graph-linear"])[0]
-        params = {k: v[0] for k, v in query.items()}
-        result = ai_services.pomelli_generate(template_id, params)
-        self._send_json(result)
-
-    def _api_ai_metai(self, query):
-        concept = query.get("concept", [""])[0]
-        subject = query.get("subject", ["Science"])[0]
-        style = query.get("style", ["explainer"])[0]
-        result = ai_services.metai_generate(concept, subject, style)
         self._send_json(result)
 
     def _api_ai_pedagogical(self, query):
@@ -2371,45 +1924,6 @@ async function searchOpenGrok() {
         search_query = f"{topic} {chapter}" if chapter else topic
         results = ai_services.youtube_search(search_query, max_results=5)
         self._send_json({"videos": results, "query": search_query})
-
-    def _api_ai_opengrok(self, query):
-        search = query.get("query", [""])[0] or query.get("q", [""])[0]
-        if not search:
-            self._send_json({"results": []})
-            return
-        results = ai_services.opengrok_search(search)
-        self._send_json({"results": results, "query": search})
-
-    def _api_ai_generate(self, query):
-        mode = query.get("mode", ["diagram"])[0]
-        if mode == "diagram":
-            self._api_ai_diagram(query)
-        elif mode == "presentation":
-            self._api_ai_presentation(query)
-        elif mode == "voiceover":
-            self._api_ai_voiceover(query)
-        elif mode == "research":
-            self._api_ai_research(query)
-        elif mode == "music":
-            self._api_ai_music(query)
-        elif mode == "literature":
-            self._api_ai_literature(query)
-        elif mode == "visualize":
-            self._api_ai_visualize(query)
-        elif mode == "story":
-            self._api_ai_story(query)
-        elif mode == "pomelli":
-            self._api_ai_pomelli_generate(query)
-        elif mode == "metai":
-            self._api_ai_metai(query)
-        elif mode == "pedagogical":
-            self._api_ai_pedagogical(query)
-        elif mode == "youtube":
-            self._api_ai_youtube(query)
-        elif mode == "opengrok":
-            self._api_ai_opengrok(query)
-        else:
-            self._send_json({"success": False, "error": "Unknown mode"})
 
     def _api_pillars(self):
         conn = get_conn()
@@ -2608,13 +2122,88 @@ async function searchOpenGrok() {
             cards = "".join(build_subject_card(s, bid) for s in board["subjects"])
             badge_class = {"cbse": "cbse", "ap": "ap", "ts": "ts"}.get(bid, "cbse")
             board_html += f"""
-            <div class="section">
+            <div class="section board-section-container" data-board="{bid}">
                 <div class="section-header">
                     <span class="board-badge {badge_class}">{board["name"]}</span>
                 </div>
                 <p class="subtitle">{board["description"]}</p>
                 <div class="subjects-grid">{cards}</div>
             </div>"""
+
+        filter_panel = """
+        <!-- Filter Controls -->
+        <div class="filter-panel" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center;">
+            <div style="flex: 1; min-width: 200px;">
+                <label for="filter-board" style="display: block; font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 0.5rem;">Filter by Board</label>
+                <select id="filter-board" onchange="filterHomeContent()" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; cursor: pointer; outline: none;">
+                    <option value="">All Boards</option>
+                    <option value="cbse">CBSE Board</option>
+                    <option value="ap">AP Board (Andhra Pradesh)</option>
+                    <option value="ts">TS Board (Telangana)</option>
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <label for="filter-subject" style="display: block; font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 0.5rem;">Filter by Subject</label>
+                <select id="filter-subject" onchange="filterHomeContent()" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; cursor: pointer; outline: none;">
+                    <option value="">All Subjects</option>
+                    <option value="mathematics">Mathematics</option>
+                    <option value="science">Science / Physical & Biological</option>
+                    <option value="social">Social Sciences / Studies</option>
+                    <option value="languages">Languages (English, Hindi, Sanskrit, French)</option>
+                    <option value="electives">Skill Electives (AI, IT)</option>
+                </select>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <label for="filter-medium" style="display: block; font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 0.5rem;">Medium of Instruction</label>
+                <select id="filter-medium" onchange="filterHomeContent()" style="width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 0.95rem; cursor: pointer; outline: none;">
+                    <option value="">All Mediums</option>
+                    <option value="english">English Medium</option>
+                    <option value="hindi">Hindi Medium</option>
+                    <option value="sanskrit">Sanskrit Medium</option>
+                </select>
+            </div>
+        </div>
+
+        <script>
+        function filterHomeContent() {
+            const boardVal = document.getElementById('filter-board').value;
+            const subjectVal = document.getElementById('filter-subject').value;
+            const mediumVal = document.getElementById('filter-medium').value;
+
+            const sections = document.querySelectorAll('.board-section-container');
+
+            sections.forEach(section => {
+                const sectBoard = section.getAttribute('data-board');
+                let hasVisibleCards = false;
+
+                const cards = section.querySelectorAll('.subject-card');
+                cards.forEach(card => {
+                    const cardBoard = card.getAttribute('data-board');
+                    const cardSubj = card.getAttribute('data-subject-type');
+                    const cardMedium = card.getAttribute('data-medium');
+
+                    const matchBoard = !boardVal || cardBoard === boardVal;
+                    const matchSubj = !subjectVal || cardSubj === subjectVal;
+                    const matchMedium = !mediumVal || cardMedium === mediumVal;
+
+                    if (matchBoard && matchSubj && matchMedium) {
+                        card.style.display = 'block';
+                        hasVisibleCards = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                const matchSectionBoard = !boardVal || sectBoard === boardVal;
+                if (matchSectionBoard && hasVisibleCards) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+        </script>
+        """
 
         content = f"""
         <div class="hero">
@@ -2628,6 +2217,7 @@ async function searchOpenGrok() {
                 <span>NCERT &amp; SCERT</span>
             </div>
         </div>
+        {filter_panel}
         {board_html}"""
         html = render_template("base.html", title="Class X Education Platform",
                                body_class="", extra_css="",
@@ -2656,6 +2246,18 @@ async function searchOpenGrok() {
             "SELECT * FROM subjects WHERE id = ? AND board_id = ?",
             (subject_id_raw, board_id)
         ).fetchone()
+        if not subject:
+            # Fallback slug name/substring search matching server.py lookup behavior
+            slug_name = subject_id_raw.replace("-", " ").lower()
+            subject = conn.execute(
+                "SELECT * FROM subjects WHERE board_id = ? AND LOWER(name) = ?",
+                (board_id, slug_name)
+            ).fetchone()
+            if not subject:
+                subject = conn.execute(
+                    "SELECT * FROM subjects WHERE board_id = ? AND LOWER(name) LIKE ?",
+                    (board_id, f"%{slug_name}%")
+                ).fetchone()
         if not subject:
             self._serve_error_page(f"Subject '{subject_id_raw}' not found for board '{board_id}'")
             return
@@ -3225,22 +2827,8 @@ function loadAI(topicId, topicTitle, chapterTitle, subjectName) {
         if not q:
             self._send_json({"results": []})
             return
-        engine = get_engine()
+        engine = get_index()
         results = engine.search(q, board=board, limit=20)
-        if not results and len(q.split()) <= 2:
-            conn = get_conn()
-            like_q = f"%{q}%"
-            rows = conn.execute("""
-                SELECT c.* FROM chunks c
-                JOIN chapters ch ON c.chapter_id = ch.id
-                WHERE c.content LIKE ? OR c.title LIKE ?
-                LIMIT 20
-            """, (like_q, like_q)).fetchall()
-            results = [dict(r) for r in rows]
-            for r in results:
-                chapter = conn.execute("SELECT title, num FROM chapters WHERE id = ?", (r["chapter_id"],)).fetchone()
-                r["chapter_title"] = chapter["title"] if chapter else ""
-                r["chapter_num"] = chapter["num"] if chapter else 0
         self._send_json({"results": results})
 
     def _api_explain(self, query):
@@ -3251,8 +2839,12 @@ function loadAI(topicId, topicTitle, chapterTitle, subjectName) {
             self._send_json({"error": "No topic specified"})
             return
         client = get_client()
-        engine = get_engine()
-        context = engine.retrieve_context(topic, max_chunks=3)
+        engine = get_index()
+        context_results = engine.search(topic, limit=3)
+        context = "\n\n".join(
+            f"[{r.get('chapter_title','')} > {r.get('title','')}]\n{r.get('excerpt','')}"
+            for r in context_results
+        )
         explanation = client.explain_topic(topic, chapter, context, level)
         self._send_json({"topic": topic, "chapter": chapter, "level": level, "explanation": explanation})
 
@@ -5060,14 +4652,10 @@ for fname in os.listdir(templates_dir):
 def main():
     log.info("Class X Education Platform starting...")
     llm_client = get_client()
-    if llm_client.claude_api_key:
-        log.info("LLM: Claude (%s)", llm_client.claude_model)
-    elif llm_client.ollama_url:
-        log.info("LLM: Ollama (%s) at %s", llm_client.ollama_model, llm_client.ollama_url)
-    elif llm_client.available:
-        log.info("LLM: Configured")
+    if llm_client.available:
+        log.info("AI: Google Gemini (%s)", llm_client.model_name or "default")
     else:
-        log.info("LLM: Not configured (set OLLAMA_URL, ANTHROPIC_API_KEY, LLAMA_MODEL_PATH, or LLAMA_SERVER_URL)")
+        log.info("AI: Gemini not configured — set GEMINI_API_KEY")
     server = ThreadingHTTPServer((HOST, PORT), CBSEHandler)
     server.timeout = 30
     log.info("Server started on http://%s:%s", HOST, PORT)

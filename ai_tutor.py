@@ -319,12 +319,11 @@ def complete_session(session_id):
         "UPDATE tutor_sessions SET completed = 1, ended_at = datetime('now','localtime') WHERE id = ?",
         (session_id,)
     )
-    # Award XP for completion
+    conn.commit()
     row = conn.execute("SELECT correct_answers, questions_asked FROM tutor_sessions WHERE id = ?", (session_id,)).fetchone()
     if row:
         xp = row['correct_answers'] * 10 + row['questions_asked'] * 3
-        conn.execute("UPDATE learner SET xp = xp + ?, total_xp_earned = total_xp_earned + ? WHERE id = 1", (xp, xp))
-        conn.execute("INSERT INTO xp_events (xp, reason, detail) VALUES (?, 'tutor_session', ?)",
-                     (xp, f"Tutor session completed: {row['correct_answers']}/{row['questions_asked']} correct"))
-    conn.commit()
-    return xp if row else 0
+        from gamification import add_xp
+        new_level = add_xp(xp, "tutor_session", f"Tutor session completed: {row['correct_answers']}/{row['questions_asked']} correct")
+        return xp
+    return 0

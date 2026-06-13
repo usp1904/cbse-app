@@ -6,7 +6,10 @@ Set DATABASE_URL to switch backends:
 """
 import os
 import json
+import logging
 from db import get_db, DatabaseError as DbError
+
+log = logging.getLogger("cbse.db")
 
 DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "cbse_content.db"))
 SCHEMA_SQL = """
@@ -23,7 +26,8 @@ CREATE TABLE IF NOT EXISTS subjects (
     name TEXT NOT NULL,
     code TEXT,
     description TEXT,
-    ncert_url TEXT
+    ncert_url TEXT,
+    class TEXT DEFAULT 'X'
 );
 
 CREATE TABLE IF NOT EXISTS books (
@@ -234,29 +238,51 @@ def init_db():
     db = get_db()
     db.executescript(SCHEMA_SQL)
 
+    # Safety ALTER TABLE for subjects table
+    try:
+        db.execute("ALTER TABLE subjects ADD COLUMN class TEXT DEFAULT 'X'")
+    except Exception as e:
+        log.debug("Column class already exists in subjects: %s", e)
+
+    # central indices for query optimization
+    indexes = [
+        "CREATE INDEX IF NOT EXISTS idx_chapters_subject ON chapters(subject_id)",
+        "CREATE INDEX IF NOT EXISTS idx_chapters_board ON chapters(board_id)",
+        "CREATE INDEX IF NOT EXISTS idx_topics_chapter ON topics(chapter_id)",
+        "CREATE INDEX IF NOT EXISTS idx_chunks_topic ON chunks(topic_id)",
+        "CREATE INDEX IF NOT EXISTS idx_chunks_chapter ON chunks(chapter_id)",
+        "CREATE INDEX IF NOT EXISTS idx_problems_chapter ON problems(chapter_id)",
+        "CREATE INDEX IF NOT EXISTS idx_problems_topic ON problems(topic_id)"
+    ]
+    for idx_sql in indexes:
+        try:
+            db.execute(idx_sql)
+        except Exception as e:
+            log.warning("Failed to create index (%s): %s", idx_sql, e)
+
     for col in ("email", "password_hash"):
         try:
             db.execute(f"ALTER TABLE learner ADD COLUMN {col} TEXT")
-        except Exception:
-            pass
+        except Exception as e:
+            log.debug("Column %s already exists: %s", col, e)
 
     try:
         db.execute("INSERT INTO learner (id, name, xp, level, streak, lives, max_lives, last_active, last_life_refill) "
                     "VALUES (1, 'Learner', 0, 1, 0, 5, 5, date('now','localtime'), datetime('now','localtime')) "
                     "ON CONFLICT (id) DO NOTHING")
-    except Exception:
+    except Exception as e:
         try:
             db.execute("INSERT OR IGNORE INTO learner (id, name, xp, level, streak, lives, max_lives, last_active, last_life_refill) "
                         "VALUES (1, 'Learner', 0, 1, 0, 5, 5, date('now','localtime'), datetime('now','localtime'))")
-        except Exception:
-            pass
+        except Exception as e2:
+            log.warning("Failed to insert default learner: %s / %s", e, e2)
 
     try:
         db.execute("INSERT OR IGNORE INTO content_meta (key, value) VALUES ('schema_version', '2.0')")
         db.execute("INSERT OR IGNORE INTO content_meta (key, value) VALUES ('total_chunks', '0')")
         db.execute("INSERT OR IGNORE INTO content_meta (key, value) VALUES ('last_indexed', '')")
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning("Failed to insert content_meta: %s", e)
 
     from db import rebuild_fts as _rebuild_fts
     _rebuild_fts(db)
@@ -264,18 +290,27 @@ def init_db():
     try:
         from badges import init_badges_table
         init_badges_table()
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning("Badges table init skipped: %s", e)
     try:
         from mock_exam import init_exam_tables
         init_exam_tables()
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning("Exam tables init skipped: %s", e)
     try:
         from spaced_repetition import init_review_tables
         init_review_tables()
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning("Review tables init skipped: %s", e)
+
+    # Invalidate syllabus cache
+    try:
+        import os
+        cache_file = os.path.join(os.path.dirname(__file__), "syllabus_index.json")
+        if os.path.exists(cache_file):
+            os.remove(cache_file)
+    except Exception as e:
+        log.warning("Failed to invalidate syllabus cache: %s", e)
 
 
 def close():

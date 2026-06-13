@@ -126,10 +126,11 @@ class Database:
     @classmethod
     def get(cls, url=None):
         key = url or DATABASE_URL
-        with cls._lock:
-            if key not in cls._instances:
-                cls._instances[key] = cls(url)
-            return cls._instances[key]
+        if key not in cls._instances:
+            with cls._lock:
+                if key not in cls._instances:
+                    cls._instances[key] = cls(url)
+        return cls._instances[key]
 
     def _get_sqlite_conn(self):
         import sqlite3
@@ -146,21 +147,59 @@ class Database:
     def _row_from_sqlite(self, row, description):
         return Row((d[0], row[d[0]]) for d in description)
 
+    def _init_pg_pool(self):
+        with self._pool_lock:
+            if self._pool is None:
+                from psycopg2.pool import ThreadedConnectionPool
+                dsn = self.config["url"]
+                if dsn.startswith("postgresql+pool://"):
+                    dsn = dsn.replace("postgresql+pool://", "postgresql://")
+                self._pool = ThreadedConnectionPool(1, 50, dsn, application_name="cbse_app")
+
     def _get_pg_conn(self):
-        if not hasattr(self._local, "pg_conn") or self._local.pg_conn is None:
-            import psycopg2
-            import psycopg2.extras
-            dsn = self.config["url"]
-            self._local.pg_conn = psycopg2.connect(dsn, application_name="cbse_app")
-            self._local.pg_conn.autocommit = False
-        return self._local.pg_conn
+        if self._pool is None:
+            self._init_pg_pool()
+        return self._pool.getconn()
+
+    def _put_pg_conn(self, conn):
+        if self._pool is not None and conn is not None:
+            self._pool.putconn(conn)
+
+    _last_cache_invalidation = 0
+
+    def _invalidate_syllabus_cache(self, sql):
+        now = time.time()
+        if now - Database._last_cache_invalidation < 5:
+            return
+        sql_lower = sql.lower()
+        if any(table in sql_lower for table in ["chapters", "topics", "chunks", "problems"]):
+            if any(keyword in sql.upper() for keyword in ["INSERT", "UPDATE", "DELETE", "REPLACE"]):
+                try:
+                    cache_file = os.path.join(os.path.dirname(__file__), "syllabus_index.json")
+                    if os.path.exists(cache_file):
+                        os.remove(cache_file)
+                        Database._last_cache_invalidation = now
+                except Exception:
+                    pass
 
     def _translate_sql(self, sql):
         if self.backend == "sqlite":
             return sql
         if self.backend == "postgresql":
             s = sql.strip()
-            orig_upper = sql.strip().upper()
+            # Convert SQLite FTS MATCH query to PostgreSQL FTS
+            if "chunks_fts" in s:
+                s = re.sub(r"SELECT\s+c\.\*,\s*rank\s+FROM\s+chunks_fts", 
+                           "SELECT c.*, ts_rank(to_tsvector('english', coalesce(c.title, '') || ' ' || coalesce(c.content, '')), plainto_tsquery('english', %s)) as rank FROM chunks_fts", 
+                           s, flags=re.IGNORECASE)
+                s = re.sub(r"JOIN\s+chunks\s+c\s+ON\s+chunks_fts\.rowid\s*=\s*c\.rowid", "", s, flags=re.IGNORECASE)
+                s = re.sub(r"chunks_fts\s+MATCH\s+\?", 
+                           "to_tsvector('english', coalesce(c.title, '') || ' ' || coalesce(c.content, '')) @@ plainto_tsquery('english', %s)", 
+                           s, flags=re.IGNORECASE)
+                s = re.sub(r"FROM\s+chunks_fts", "FROM chunks c", s, flags=re.IGNORECASE)
+                # _translate_params will duplicate the first param so both %s get the search term
+
+            orig_upper = s.upper()
             s = re.sub(r"(?<!')datetime\('now','localtime'(?:,'([^']+)')?\)", lambda m: self._pg_now(m), s)
             s = re.sub(r"(?<!')date\('now','localtime'(?:,'([^']+)')?\)", lambda m: self._pg_now(m, date_only=True), s)
             s = re.sub(r"datetime\('now'(?:,'([^']+)')?\)", lambda m: self._pg_now(m), s)
@@ -247,6 +286,13 @@ class Database:
         if self.backend == "postgresql":
             if params is None:
                 return sql, None
+            # FTS MATCH translation parameter duplication
+            if "plainto_tsquery" in sql:
+                if isinstance(params, (list, tuple)):
+                    params_list = list(params)
+                    if len(params_list) > 0:
+                        params_list.insert(0, params_list[0])
+                    params = tuple(params_list)
             if isinstance(params, (list, tuple)):
                 return sql, tuple(params)
             return sql, params
@@ -264,17 +310,25 @@ class Database:
                 else:
                     cur = conn.execute(sql)
                 conn.commit()
+                self._invalidate_syllabus_cache(sql)
                 return ExecutionResult(cur)
             else:
                 conn = self._get_pg_conn()
-                with conn.cursor() as cur:
-                    if params:
-                        cur.execute(sql, params)
-                    else:
-                        cur.execute(sql)
-                    result = list(cur.fetchall()) if cur.description else []
-                    conn.commit()
-                    return ExecutionResult.from_pg(result, cur.description)
+                try:
+                    with conn.cursor() as cur:
+                        if params:
+                            cur.execute(sql, params)
+                        else:
+                            cur.execute(sql)
+                        result = list(cur.fetchall()) if cur.description else []
+                        conn.commit()
+                        self._invalidate_syllabus_cache(sql)
+                        return ExecutionResult.from_pg(result, cur.description)
+                except Exception:
+                    conn.rollback()
+                    raise
+                finally:
+                    self._put_pg_conn(conn)
         except Exception as e:
             raise DatabaseError(f"execute failed: {e}\nSQL: {sql}\nParams: {params}") from e
 
@@ -287,13 +341,28 @@ class Database:
                 conn = self._get_sqlite_conn()
                 conn.executemany(sql, params_list)
                 conn.commit()
+                self._invalidate_syllabus_cache(sql)
             else:
                 conn = self._get_pg_conn()
-                with conn.cursor() as cur:
-                    for params in params_list:
-                        pg_sql, pg_params = self._translate_params(sql, params)
-                        cur.execute(pg_sql, pg_params)
-                conn.commit()
+                try:
+                    from psycopg2.extras import execute_values
+                    with conn.cursor() as cur:
+                        if all(isinstance(p, (list, tuple)) for p in params_list):
+                            template = ",".join(["%s"] * len(params_list[0]))
+                            values_sql = sql.rstrip(";") + f" VALUES ({template})"
+                            flat_params = [tuple(p) for p in params_list]
+                            execute_values(cur, values_sql.replace("%s", "%s"), flat_params)
+                        else:
+                            for params in params_list:
+                                pg_sql, pg_params = self._translate_params(sql, params)
+                                cur.execute(pg_sql, pg_params)
+                    conn.commit()
+                    self._invalidate_syllabus_cache(sql)
+                except Exception:
+                    conn.rollback()
+                    raise
+                finally:
+                    self._put_pg_conn(conn)
         except Exception as e:
             raise DatabaseError(f"executemany failed: {e}") from e
 
@@ -330,15 +399,24 @@ class Database:
                 return [self._row_from_sqlite(row, cur.description) for row in cur.fetchall()]
             else:
                 conn = self._get_pg_conn()
-                with conn.cursor() as cur:
-                    if params:
-                        cur.execute(sql, params)
-                    else:
-                        cur.execute(sql)
-                    if cur.description:
-                        cols = [d[0] for d in cur.description]
-                        return [Row(zip(cols, row)) for row in cur.fetchall()]
-                    return []
+                try:
+                    with conn.cursor() as cur:
+                        if params:
+                            cur.execute(sql, params)
+                        else:
+                            cur.execute(sql)
+                        if cur.description:
+                            cols = [d[0] for d in cur.description]
+                            rows = [Row(zip(cols, row)) for row in cur.fetchall()]
+                        else:
+                            rows = []
+                        conn.commit()
+                        return rows
+                except Exception:
+                    conn.rollback()
+                    raise
+                finally:
+                    self._put_pg_conn(conn)
         except Exception as e:
             raise DatabaseError(f"query failed: {e}\nSQL: {sql}\nParams: {params}") from e
 
@@ -359,19 +437,27 @@ class Database:
                 else:
                     cur = conn.execute(sql)
                 conn.commit()
+                self._invalidate_syllabus_cache(sql)
                 return cur.lastrowid
             else:
                 conn = self._get_pg_conn()
-                if "RETURNING" not in sql.upper():
-                    sql += " RETURNING id"
-                with conn.cursor() as cur:
-                    if params:
-                        cur.execute(sql, params)
-                    else:
-                        cur.execute(sql)
-                    conn.commit()
-                    row = cur.fetchone()
-                    return row[0] if row else None
+                try:
+                    if "RETURNING" not in sql.upper():
+                        sql += " RETURNING id"
+                    with conn.cursor() as cur:
+                        if params:
+                            cur.execute(sql, params)
+                        else:
+                            cur.execute(sql)
+                        conn.commit()
+                        self._invalidate_syllabus_cache(sql)
+                        row = cur.fetchone()
+                        return row[0] if row else None
+                except Exception:
+                    conn.rollback()
+                    raise
+                finally:
+                    self._put_pg_conn(conn)
         except Exception as e:
             raise DatabaseError(f"insert failed: {e}\nSQL: {sql}\nParams: {params}") from e
 
@@ -387,9 +473,13 @@ class Database:
                 self._local.conn.close()
                 self._local.conn = None
         else:
-            if hasattr(self._local, "pg_conn") and self._local.pg_conn:
-                self._local.pg_conn.close()
-                self._local.pg_conn = None
+            with self._pool_lock:
+                if self._pool is not None:
+                    try:
+                        self._pool.closeall()
+                    except Exception:
+                        pass
+                    self._pool = None
 
     @property
     def is_postgresql(self):
@@ -419,12 +509,15 @@ class Database:
             ))
 
 _db = None
+_db_lock = threading.Lock()
 
 
 def get_db():
     global _db
     if _db is None:
-        _db = Database.get()
+        with _db_lock:
+            if _db is None:
+                _db = Database.get()
     return _db
 
 

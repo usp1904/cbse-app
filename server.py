@@ -12,7 +12,7 @@ Usage:
   DATABASE_URL=postgresql://user:pass@host/db uvicorn server:app --host 0.0.0.0 --port 9090 --workers 4
   DATABASE_URL=sqlite:///cbse_content.db uvicorn server:app --host 0.0.0.0 --port 9090 --reload
 """
-import os
+import os  # reload trigger 123
 import json
 import re
 import html as htmlmod
@@ -110,7 +110,7 @@ def esc_js(s):
     return str(s).replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n").replace("\r", "").replace('"', '&quot;')
 
 
-def _render(title="CBSE Class X", content="", extra_css="", body_class="", board_name="", description="", user=None) -> str:
+def _render(title="AI Study Companion for class V - Class XII", content="", extra_css="", body_class="", board_name="", description="", user=None) -> str:
     xp = "0"
     try:
         if DB and DB.table_exists("learner"):
@@ -123,7 +123,7 @@ def _render(title="CBSE Class X", content="", extra_css="", body_class="", board
     template = templates.get_template("base.html")
     return template.render(
         title=title,
-        description=description or "CBSE Class 10 learning platform with AI tutor, quizzes, interactive tools",
+        description=description or "AI Study Companion for class V - Class XII with AI tutor, quizzes, interactive tools",
         content=content,
         extra_css=extra_css,
         body_class=body_class,
@@ -222,8 +222,8 @@ def _pomelli_hero_svg():
   <circle cx="380" cy="55" r="20" fill="#4a90d9" opacity="0.15"><animate attributeName="r" values="20;25;18;20" dur="4s" repeatCount="indefinite"/></circle>
   <circle cx="420" cy="70" r="14" fill="#2ecc71" opacity="0.12"><animate attributeName="r" values="14;18;12;14" dur="3.5s" repeatCount="indefinite"/></circle>
   <circle cx="450" cy="45" r="10" fill="#9b59b6" opacity="0.15"><animate attributeName="r" values="10;14;8;10" dur="3s" repeatCount="indefinite"/></circle>
-  <text x="530" y="55" font-family="sans-serif" font-size="22" font-weight="700" fill="#1a1a2e">CBSE Class X</text>
-  <text x="530" y="82" font-family="sans-serif" font-size="13" fill="#666">CBSE · AP Board · TS Board · Class V–X</text>
+  <text x="530" y="55" font-family="sans-serif" font-size="20" font-weight="700" fill="#1a1a2e">AI Study Companion</text>
+  <text x="530" y="82" font-family="sans-serif" font-size="13" fill="#666">CBSE · AP Board · TS Board · Class V–XII</text>
   <text x="530" y="100" font-family="sans-serif" font-size="11" fill="#999">English · हिन्दी · తెలుగు</text>
   <g transform="translate(700,20)" opacity="0.3">
     <path d="M30 30 L70 30 L90 60 L50 60 Z" fill="#4a90d9"/>
@@ -257,6 +257,26 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         log.warning("JsonIndex init failed (non-fatal): %s", e)
     init_db()
+    try:
+        # Force update board names to ensure dropdowns are immediately updated
+        DB.execute("UPDATE boards SET name = 'CBSE' WHERE id = 'cbse'")
+        DB.execute("UPDATE boards SET name = 'State board of AP' WHERE id = 'ap'")
+        DB.execute("UPDATE boards SET name = 'Telangana Board' WHERE id = 'ts'")
+        DB.commit()
+    except Exception as e:
+        log.warning("Failed to force update board names: %s", e)
+    try:
+        prob_count = DB.query_one("SELECT COUNT(*) as cnt FROM problems")["cnt"]
+        unsolved_count = DB.query_one("SELECT COUNT(*) as cnt FROM problems WHERE solution_text IS NULL OR solution_text = '' OR LOWER(solution_text) LIKE '%placeholder%' OR LOWER(solution_text) LIKE '%lorem ipsum%'")["cnt"]
+        cbse_board = DB.query_one("SELECT name FROM boards WHERE id = 'cbse'")
+        if prob_count == 0 or unsolved_count > 0 or (cbse_board and cbse_board.get("name") == "CBSE Class X"):
+            log.info("Fresh database, unsolved problems, or old board names detected. Running db_seeder...")
+            import db_seeder
+            db_seeder.seed_database_full()
+            # Force rebuild index after seeding
+            get_index().build()
+    except Exception as e:
+        log.warning("Auto-seed check failed (non-fatal): %s", e)
     log.info("Database: %s", "PostgreSQL/Neon" if DB.is_postgresql else "SQLite")
     log.info("LLM: %s (%s)", getattr(LLM, 'backend_name', 'N/A') if LLM else "N/A",
              getattr(LLM, 'model_name', 'N/A') if LLM else "N/A")
@@ -267,7 +287,7 @@ async def lifespan(app: FastAPI):
 # ─── FastAPI App ────────────────────────────────────────────────────────────
 
 app = FastAPI(
-    title="CBSE Class X Education Platform",
+    title="AI Study Companion",
     version="3.0.0",
     lifespan=lifespan,
     docs_url="/docs" if os.environ.get("ENV") == "dev" else None,
@@ -301,6 +321,72 @@ async def health():
             "boards": len(ALL_BOARDS)}
 
 
+@app.get("/api/admin/reseed-db")
+async def admin_reseed_db():
+    import db_seeder
+    try:
+        stats = db_seeder.seed_database_full()
+        # Force reload of JSON index in memory
+        from json_index import get_index
+        idx = get_index()
+        idx.build()
+        return {"status": "success", "message": "Database seeded and solved successfully", "stats": stats}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@app.get("/api/admin/db-status")
+async def db_status_endpoint():
+    conn = DB
+    stats = {}
+    try:
+        stats["boards"] = [dict(r) for r in conn.query("SELECT id, name FROM boards")]
+        stats["subjects"] = [dict(r) for r in conn.query("SELECT id, board_id, name FROM subjects")]
+        stats["chapters_count"] = conn.query_one("SELECT COUNT(*) as cnt FROM chapters")["cnt"]
+        stats["topics_count"] = conn.query_one("SELECT COUNT(*) as cnt FROM topics")["cnt"]
+        stats["chunks_count"] = conn.query_one("SELECT COUNT(*) as cnt FROM chunks")["cnt"]
+        stats["problems_count"] = conn.query_one("SELECT COUNT(*) as cnt FROM problems")["cnt"]
+        
+        # Count problems by subject
+        problems_by_subject = conn.query("""
+            SELECT s.name as subject_name, COUNT(p.id) as cnt
+            FROM problems p
+            JOIN chapters c ON p.chapter_id = c.id
+            JOIN subjects s ON c.subject_id = s.id
+            GROUP BY s.name
+        """)
+        stats["problems_by_subject"] = [dict(r) for r in problems_by_subject]
+
+        # Check for empty/placeholder solutions
+        unsolved_count = conn.query_one("""
+            SELECT COUNT(*) as cnt
+            FROM problems
+            WHERE solution_text IS NULL 
+               OR solution_text = '' 
+               OR LOWER(solution_text) LIKE '%placeholder%' 
+               OR LOWER(solution_text) LIKE '%lorem ipsum%'
+        """)["cnt"]
+        stats["unsolved_count"] = unsolved_count
+        
+        # Sample unsolved problems
+        sample_unsolved = conn.query("""
+            SELECT p.id, p.problem_text, p.solution_text, s.name as subject_name
+            FROM problems p
+            JOIN chapters c ON p.chapter_id = c.id
+            JOIN subjects s ON c.subject_id = s.id
+            WHERE p.solution_text IS NULL 
+               OR p.solution_text = '' 
+               OR LOWER(p.solution_text) LIKE '%placeholder%' 
+               OR LOWER(p.solution_text) LIKE '%lorem ipsum%'
+            LIMIT 5
+        """)
+        stats["sample_unsolved"] = [dict(r) for r in sample_unsolved]
+
+    except Exception as e:
+        stats["error"] = str(e)
+    return stats
+
+
 @app.get("/api/ai/status")
 async def ai_status():
     if not LLM:
@@ -308,7 +394,67 @@ async def ai_status():
     return LLM.get_status()
 
 
-@app.get("/api/view_logs")
+@app.get("/test-import")
+async def test_import_endpoint():
+    import sys, os, traceback
+    _archive_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "_archive")
+    exists = os.path.exists(_archive_dir)
+    sys.path.insert(0, _archive_dir)
+    
+    output = []
+    output.append(f"Archive dir exists: {exists}")
+    output.append(f"sys.path: {sys.path}")
+    
+    try:
+        from _archive.enrich_all import PHASE1_SUBJECTS
+        output.append("SUCCESS importing enrich_all!")
+    except Exception as e:
+        output.append(f"ERROR: {e}")
+        output.append(traceback.format_exc())
+        
+    return {"output": "\n".join(output)}
+
+
+@app.get("/trigger-reseed")
+async def trigger_reseed_endpoint():
+    import sys, os, traceback
+    for k in list(sys.modules.keys()):
+        if "db_seeder" in k or "_archive" in k or "scraper" in k:
+            del sys.modules[k]
+    try:
+        import db_seeder
+        stats = db_seeder.seed_database_full()
+        return {"status": "success", "stats": stats}
+    except Exception as e:
+        return {"status": "error", "message": str(e), "traceback": traceback.format_exc()}
+
+
+@app.get("/api/admin/restart")
+async def admin_restart():
+    import os, shutil, signal
+    # Clean __pycache__ folders
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    for root, dirs, files in os.walk(base_dir):
+        for d in dirs:
+            if d == "__pycache__":
+                shutil.rmtree(os.path.join(root, d), ignore_errors=True)
+        for f in files:
+            if f.endswith(".pyc") or f.endswith(".pyo"):
+                try:
+                    os.remove(os.path.join(root, f))
+                except Exception:
+                    pass
+    try:
+        os.system("pkill -9 -f uvicorn")
+    except Exception:
+        pass
+    try:
+        os.kill(os.getppid(), signal.SIGKILL)
+    except Exception:
+        pass
+    os._exit(0)
+
+
 @app.get("/api/audit/data")
 async def api_audit_data():
     import json, os, re as _re
@@ -336,6 +482,7 @@ async def audit_dashboard():
         return HTMLResponse("<h1>Audit Dashboard</h1><p>Template not found</p>")
 
 
+@app.get("/api/view_logs")
 async def view_logs():
     import glob
     log_content = ""
@@ -369,7 +516,7 @@ async def view_logs():
 async def profile_page(user: Optional[dict] = Depends(get_current_user)):
     if not user:
         return _render(
-            title="Profile — CBSE Class X",
+            title="Profile — AI Study Companion",
             content=f"""
             <div class="card" style="text-align:center;padding:3rem 2rem;">
                 <h2>🔒 Profile</h2>
@@ -381,7 +528,7 @@ async def profile_page(user: Optional[dict] = Depends(get_current_user)):
             """,
         )
     return _render(
-        title=f"Profile — {user['username']} | CBSE Class X",
+        title=f"Profile — {user['username']} | AI Study Companion",
         content=f"""
         <div class="card">
             <h2>👤 {user['username']}</h2>
@@ -395,7 +542,7 @@ async def profile_page(user: Optional[dict] = Depends(get_current_user)):
 @app.get("/progress", response_class=HTMLResponse)
 async def progress_page(user: dict = Depends(require_user)):
     return _render(
-        title="My Progress | CBSE Class X",
+        title="My Progress | AI Study Companion",
         content="""
         <div class="card">
             <h2>📊 Learning Progress</h2>
@@ -416,7 +563,7 @@ async def leaderboard_page(user: dict = Depends(get_current_user)):
         for i, l in enumerate(learners)
     )
     return _render(
-        title="Leaderboard | CBSE Class X",
+        title="Leaderboard | AI Study Companion",
         content=f"""
         <div class="card">
             <h2>🏆 Leaderboard</h2>
@@ -442,7 +589,7 @@ class AuthSignup(BaseModel):
 @app.get("/login", response_class=HTMLResponse)
 async def login_page():
     return _render(
-        title="Login | CBSE Class X",
+        title="Login | AI Study Companion",
         content="""
         <div class="card" style="max-width:400px;margin:2rem auto;">
             <h2>🔐 Login</h2>
@@ -489,7 +636,7 @@ async def login_page():
 @app.get("/signup", response_class=HTMLResponse)
 async def signup_page():
     return _render(
-        title="Sign Up | CBSE Class X",
+        title="Sign Up | AI Study Companion",
         content="""
         <div class="card" style="max-width:400px;margin:2rem auto;">
             <h2>📝 Create Account</h2>
@@ -732,8 +879,8 @@ async def home():
 
     pomelli_hero = _pomelli_hero_svg()
     content = f"""<div class="section">{pomelli_hero}
-<h2>📚 CBSE Education Platform</h2>
-<p style="color:#666;margin-bottom:1rem;">Multiple boards · Indian languages · Class V–X · AI-powered learning</p>
+<h2>📚 AI Study Companion</h2>
+<p style="color:#666;margin-bottom:1rem;">Multiple boards · Indian languages · Class V–XII · AI-powered learning</p>
 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
 <a href="/search" class="tts-btn">🔍 Search Topics</a>
 <a href="/exams" class="tts-btn">🏆 Mock Exams</a>
@@ -741,7 +888,7 @@ async def home():
 <a href="/ai" class="tts-btn">🤖 AI Studio</a>
 </div></div>{filter_panel}
 <div id="home-tables">{tables}</div>"""
-    return HTMLResponse(_render(title="CBSE Education Platform - Home", content=content))
+    return HTMLResponse(_render(title="AI Study Companion - Home", content=content))
 
 
 @app.get("/search", response_class=HTMLResponse)
@@ -801,7 +948,7 @@ async def search_page(request: Request):
 <div class="section">
 {results_html}
 </div>"""
-    return HTMLResponse(_render(title=f"Search: {q}" if q else "Search - CBSE Class X", content=content))
+    return HTMLResponse(_render(title=f"Search: {q}" if q else "Search - AI Study Companion", content=content))
 
 
 @app.get("/tutor", response_class=HTMLResponse)
@@ -837,7 +984,7 @@ async def tutor_hub():
         rows = '<p style="text-align:center;padding:2rem;color:#666;">No topics available yet.</p>'
     content = f"""<div class="breadcrumb">{_build_breadcrumb([("Home", "/"), ("AI Tutor Hub", None)])}</div>
 <div class="section"><h2>🧠 AI Tutor Hub</h2><p>Select a chapter to start a question-based learning session.</p>{rows}</div>"""
-    return HTMLResponse(_render(title="AI Tutor Hub - CBSE Class X", content=content))
+    return HTMLResponse(_render(title="AI Tutor Hub - AI Study Companion", content=content))
 
 
 @app.get("/tutor/{topic_id}", response_class=HTMLResponse)
@@ -917,9 +1064,9 @@ function selfAssess(answerId,assessment,sessionId){{
             fetch('/api/tutor/complete',{{
                 method:'POST', headers:{{'Content-Type':'application/x-www-form-urlencoded'}},
                 body:'session_id='+sessionId
-            }}).then(r=>r.json()).then(d=>{{ document.getElementById('tutor-content').innerHTML='<div style="text-align:center;padding:2rem;"><h3>🎉 Session Complete!</h3><p>+'+d.xp+' XP</p><a class="tts-btn" href="/topic/'+topicId+'">Back to Topic</a></div>'; }}));
+            }}).then(r=>r.json()).then(d=>{{ document.getElementById('tutor-content').innerHTML='<div style="text-align:center;padding:2rem;"><h3>🎉 Session Complete!</h3><p>+'+d.xp+' XP</p><a class="tts-btn" href="/topic/'+topicId+'">Back to Topic</a></div>'; }});
         }}
-    }}));
+    }});
 }}
 function skipTutorQuestion(sessionId){{
     if(confirm('Skip this question?')){{
@@ -962,7 +1109,7 @@ async def board_page(board_id: str):
         rows += f'<div class="book-section"><h3><a href="/board/{board_id}/{s["id"]}" style="color:var(--primary);">{s["name"]}</a></h3><div style="margin-bottom:0.8rem;">{ch_links}</div></div>'
     content = f"""<div class="breadcrumb">{_build_breadcrumb([("Home", "/"), (board_id.upper(), None)])}</div>
 <div class="section"><h2>📘 {board_id.upper()} Board</h2><p style="color:#666;margin-bottom:1rem;">Select a subject to begin learning.</p>{rows}</div>"""
-    return HTMLResponse(_render(title=f"{board_id.upper()} Board - CBSE Class X", content=content))
+    return HTMLResponse(_render(title=f"{board_id.upper()} Board - AI Study Companion", content=content))
 
 
 @app.get("/board/{board_id}/{subject_slug}", response_class=HTMLResponse)
@@ -993,11 +1140,16 @@ async def subject_page(board_id: str, subject_slug: str):
     rows = ""
     for s in subjects:
         chs = _get_chapters(conn, s["id"])
-        ch_links = "".join(f'<a href="/chapter/{ch["id"]}" class="chunk-view"><div class="chunk-title">Ch {ch["num"]}: {ch["title"]}</div></a>' for ch in chs)
-        rows += f'<h3>{s["name"]}</h3><div style="margin-bottom:1.2rem;">{ch_links}</div>'
+        ch_links = "".join(f'<a href="/chapter/{ch["id"]}" class="chapter-card-premium"><span class="chapter-badge">Chapter {ch["num"]}</span><h3 class="chapter-title">{ch["title"]}</h3><span class="start-learning-btn">Start Learning &rarr;</span></a>' for ch in chs)
+        rows += f'<h3 style="margin:2rem 0 1rem;color:var(--primary);font-weight:800;font-size:1.3rem;">{s["name"]}</h3><div class="chapters-grid">{ch_links}</div>'
     content = f"""<div class="breadcrumb">{_build_breadcrumb([("Home", "/"), (board_id.upper(), f"/board/{board_id}"), (subject_name, None)])}</div>
-<div class="section"><h2>📘 {board_id.upper()} › {subject_name}</h2>{rows}</div>"""
-    return HTMLResponse(_render(title=f"{board_id.upper()} - {subject_name} - CBSE Class X", content=content))
+<div class="subject-header-card">
+    <div class="subject-badge">{board_id.upper()} Board</div>
+    <h2>{subject_name} Syllabus</h2>
+    <p>Explore chapters, topics, formulas, solved examples, and experiments.</p>
+</div>
+{rows}"""
+    return HTMLResponse(_render(title=f"{board_id.upper()} - {subject_name} - AI Study Companion", content=content))
 
 
 @app.get("/board/{board_id}/subject/{subject_slug}", response_class=HTMLResponse)
@@ -1077,7 +1229,7 @@ async def chapter_page(chapter_id: str):
 <a href="/quiz/{chapter_id}" class="tts-btn" style="font-size:0.8rem;">📝 Quiz</a>
 </div>
 </div>{topics_html}"""
-    return HTMLResponse(_render(title=f"Ch {chapter['num']}: {chapter['title']} - CBSE Class X", content=content))
+    return HTMLResponse(_render(title=f"Ch {chapter['num']}: {chapter['title']} - AI Study Companion", content=content))
 
 
 def format_math_content(text):
@@ -1124,24 +1276,31 @@ def build_math_cheat_sheet(content, chunks):
     for line in lines:
         if "=" in line and any(x in line.lower() for x in ["sin", "cos", "tan", "sec", "cosec", "cot", "log", "hcf", "lcm", "area", "volume", "perimeter", "mean", "mode", "median", "probability", "d_i", "f_i", "x_i", "u_i", "a_i", "r^2", "pi", "a = bq"]):
             line_clean = line.strip("•-* ").strip()
-            if line_clean and len(line_clean) < 150 and line_clean not in formulas:
-                formulas.append(line_clean)
+            if line_clean and len(line_clean) < 150 and line_clean not in [f if isinstance(f, str) else f[0] for f in formulas]:
+                formulas.append((line_clean, True))
                 
     if not formulas:
         return f'<div class="concept-tip-card"><div class="concept-tip-title">⚡ Formula Sheet</div><p>Refer to the Concept Explainer tab for key equations.</p></div>'
         
     html = '<div class="section"><h3>⚡ Key Formulas & Reference Sheet</h3><p style="color:#666;margin-bottom:1.5rem;">Quick reference formulas and relationships for this topic.</p>'
-    for idx, formula in enumerate(formulas):
-        # Format equations nicely
-        if formula.startswith(r'\(') or '$$' in formula or '\\' in formula or '=' in formula:
+    for idx, item in enumerate(formulas):
+        is_plain = False
+        if isinstance(item, tuple):
+            formula, is_plain = item
+        else:
+            formula = item
+            
+        if is_plain:
+            formatted_eq = f'<div style="text-align:center; font-size:1.1rem; font-weight:600; margin:1rem 0; color:var(--accent2);">{formula}</div>'
+        else:
             if '=' in formula and '\\' not in formula and '$$' not in formula:
                 formatted_eq = f'<div style="text-align:center; font-size:1.1rem; font-weight:600; margin:1rem 0; color:var(--accent2);">$${formula}$$</div>'
             else:
                 formatted_eq = f'<div style="text-align:center; font-size:1.1rem; font-weight:600; margin:1rem 0; color:var(--accent2);">$${formula.replace("$$", "")}$$</div>'
-            html += f"""<div class="formula-card" style="margin-bottom: 1rem;">
-                <div style="font-weight:700; font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem;">Formula {idx+1}</div>
-                {formatted_eq}
-            </div>"""
+        html += f"""<div class="formula-card" style="margin-bottom: 1rem;">
+            <div style="font-weight:700; font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem;">Formula {idx+1}</div>
+            {formatted_eq}
+        </div>"""
     html += '</div>'
     return html
 
@@ -1739,7 +1898,7 @@ async def topic_page(topic_id: str):
 
 
 
-    return HTMLResponse(_render(title=f"{topic['title']} - CBSE Class X", content=content))
+    return HTMLResponse(_render(title=f"{topic['title']} - AI Study Companion", content=content))
 
 
 
@@ -1996,7 +2155,7 @@ async def api_ai_voiceover(request: Request, text: str = Query(...), voice: str 
 @app.get("/ai/diagram", response_class=HTMLResponse)
 async def ai_diagram():
     return _render(
-        title="AI Diagram Generator — CBSE Class X",
+        title="AI Diagram Generator — AI Study Companion",
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Diagram Generator</div>
         <div class="section">
@@ -2063,7 +2222,7 @@ async def ai_diagram():
 @app.get("/ai/presentation", response_class=HTMLResponse)
 async def ai_presentation():
     return _render(
-        title="AI Presentation Generator — CBSE Class X",
+        title="AI Presentation Generator — AI Study Companion",
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Presentation</div>
         <div class="section">
@@ -2099,7 +2258,7 @@ async def ai_presentation():
 @app.get("/ai/voiceover", response_class=HTMLResponse)
 async def ai_voiceover():
     return _render(
-        title="AI Voiceover — CBSE Class X",
+        title="AI Voiceover — AI Study Companion",
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Voiceover</div>
         <div class="section">
@@ -2217,7 +2376,7 @@ async def ai_voiceover():
 @app.get("/ai/music", response_class=HTMLResponse)
 async def ai_music():
     return _render(
-        title="AI Music — CBSE Class X",
+        title="AI Music — AI Study Companion",
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Music</div>
         <div class="section">
@@ -2254,7 +2413,7 @@ async def ai_music():
 @app.get("/ai/story", response_class=HTMLResponse)
 async def ai_story():
     return _render(
-        title="AI Story Generator — CBSE Class X",
+        title="AI Story Generator — AI Study Companion",
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Story</div>
         <div class="section">
@@ -2290,7 +2449,7 @@ async def ai_story():
 @app.get("/ai/pomelli", response_class=HTMLResponse)
 async def ai_pomelli():
     return _render(
-        title="Pomelli Interactive Math — CBSE Class X",
+        title="Pomelli Interactive Math — AI Study Companion",
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Pomelli Math</div>
         <div class="section">
@@ -2334,7 +2493,7 @@ async def ai_pomelli():
 @app.get("/ai/metai", response_class=HTMLResponse)
 async def ai_metai():
     return _render(
-        title="MetaAI Learning — CBSE Class X",
+        title="MetaAI Learning — AI Study Companion",
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> MetaAI</div>
         <div class="section">
@@ -2375,7 +2534,7 @@ async def ai_metai():
 @app.get("/ai/opengrok", response_class=HTMLResponse)
 async def ai_opengrok():
     return _render(
-        title="OpenGrok Search — CBSE Class X",
+        title="OpenGrok Search — AI Study Companion",
         content="""
         <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> OpenGrok</div>
         <div class="section">
@@ -2412,9 +2571,9 @@ async def ai_opengrok():
 
 @app.get("/about", response_class=HTMLResponse)
 async def about_page():
-    return HTMLResponse(_render(title="About — CBSE Class X", content="""
+    return HTMLResponse(_render(title="About — AI Study Companion", content="""
     <div class="section">
-        <h2>📖 About CBSE Education Platform</h2>
+        <h2>📖 About AI Study Companion</h2>
         <p style="color:#666;margin-bottom:1rem;">AI-powered learning platform for CBSE, AP Board, and TS Board Class V–X students.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;">
             <div class="book-section"><h3>📚 Multi-Board Support</h3><p>CBSE · AP Board · Telangana Board — complete syllabus coverage.</p></div>
@@ -2440,14 +2599,14 @@ async def exams_page():
                 rows += f'<div class="book-section"><h3><a href="/board/{s["board_id"]}/{s["id"]}">{s["name"]}</a></h3><ul>{ch_links}</ul><p style="margin-top:0.3rem;"><a href="/quiz/{s["id"]}" class="tts-btn" style="font-size:0.78rem;">Take Mock Exam</a></p></div>'
     if not rows:
         rows = '<p style="text-align:center;padding:2rem;color:#666;">No exams available yet.</p>'
-    return HTMLResponse(_render(title="Mock Exams — CBSE Class X", content=f"""
+    return HTMLResponse(_render(title="Mock Exams — AI Study Companion", content=f"""
     <div class="breadcrumb">{_build_breadcrumb([("Home", "/"), ("Mock Exams", None)])}</div>
     <div class="section"><h2>🏆 Mock Exams</h2><p style="color:#666;margin-bottom:1rem;">Practice with chapter-wise mock exams. Track your progress and improve.</p>{rows}</div>"""))
 
 
 @app.get("/ai", response_class=HTMLResponse)
 async def ai_studio_hub():
-    return HTMLResponse(_render(title="AI Studio — CBSE Class X", content="""
+    return HTMLResponse(_render(title="AI Studio — AI Study Companion", content="""
     <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> AI Studio</div>
     <div class="section"><h2>🤖 AI Studio</h2>
     <p style="color:#666;margin-bottom:1rem;">AI-powered learning tools powered by Mistral AI & Gemini.</p>
@@ -2470,7 +2629,7 @@ async def ai_studio_hub():
 
 @app.get("/ai/youtube", response_class=HTMLResponse)
 async def ai_youtube_page():
-    return HTMLResponse(_render(title="AI Concept Storyboard Studio — CBSE Class X", content="""
+    return HTMLResponse(_render(title="AI Concept Storyboard Studio — AI Study Companion", content="""
     <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Concept Storyboards</div>
     <div class="section">
         <h2>🎬 AI Concept Storyboard Studio</h2>
@@ -2566,7 +2725,7 @@ async def ai_youtube_page():
 
 @app.get("/ai/research", response_class=HTMLResponse)
 async def ai_research_page():
-    return HTMLResponse(_render(title="AI Research Assistant — CBSE Class X", content="""
+    return HTMLResponse(_render(title="AI Research Assistant — AI Study Companion", content="""
     <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Research</div>
     <div class="section">
         <h2>🔬 AI Research Assistant</h2>
@@ -2596,7 +2755,7 @@ async def ai_research_page():
 
 @app.get("/ai/literature", response_class=HTMLResponse)
 async def ai_literature_page():
-    return HTMLResponse(_render(title="AI Literature Review — CBSE Class X", content="""
+    return HTMLResponse(_render(title="AI Literature Review — AI Study Companion", content="""
     <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Literature</div>
     <div class="section">
         <h2>📚 AI Literature Review</h2>
@@ -2631,7 +2790,7 @@ async def ai_literature_page():
 
 @app.get("/ai/visualize", response_class=HTMLResponse)
 async def ai_visualize_page():
-    return HTMLResponse(_render(title="AI SVG Visualizer — CBSE Class X", content="""
+    return HTMLResponse(_render(title="AI SVG Visualizer — AI Study Companion", content="""
     <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Visualizer</div>
     <div class="section">
         <h2>👁️ AI SVG Visualizer</h2>
@@ -2661,7 +2820,7 @@ async def ai_visualize_page():
 
 @app.get("/ai/pedagogical", response_class=HTMLResponse)
 async def ai_pedagogical_page():
-    return HTMLResponse(_render(title="NotebookLM Pedagogical Guide — CBSE Class X", content="""
+    return HTMLResponse(_render(title="NotebookLM Pedagogical Guide — AI Study Companion", content="""
     <div class="breadcrumb"><a href="/">Home</a> <span class="sep">›</span> <a href="/ai">AI Studio</a> <span class="sep">›</span> Pedagogical Guide</div>
     <div class="section">
         <h2>📖 AI Pedagogical Guide</h2>

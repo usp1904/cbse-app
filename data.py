@@ -473,9 +473,9 @@ TS_BOARD_SUBJECTS = [
 ]
 
 ALL_BOARDS = {
-    "cbse": {"name": "CBSE Class X", "subjects": SUBJECTS, "description": "Central Board of Secondary Education - National curriculum based on NCERT"},
-    "ap": {"name": "Andhra Pradesh Board Class X", "subjects": AP_BOARD_SUBJECTS, "description": "Andhra Pradesh State Board of Secondary Education"},
-    "ts": {"name": "Telangana Board Class X", "subjects": TS_BOARD_SUBJECTS, "description": "Telangana State Board of Secondary Education"},
+    "cbse": {"name": "CBSE", "subjects": SUBJECTS, "description": "Central Board of Secondary Education"},
+    "ap": {"name": "State board of AP", "subjects": AP_BOARD_SUBJECTS, "description": "Andhra Pradesh State Board of Secondary Education"},
+    "ts": {"name": "Telangana Board", "subjects": TS_BOARD_SUBJECTS, "description": "Telangana State Board of Secondary Education"},
 }
 
 

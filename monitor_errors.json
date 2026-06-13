@@ -1,0 +1,8 @@
+{
+  "2026-06-12": {
+    "runs": 5,
+    "page_fails": 20,
+    "api_fails": 3,
+    "log_fails": 7
+  }
+}

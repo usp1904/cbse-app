@@ -1,0 +1,4 @@
+model:
+  provider: mistral  # Change from local/cpu to mistral api
+  name: mistral-large-latest  # This has a large 128K context window
+  api_key: "ollamakey"
