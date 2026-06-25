@@ -1,0 +1,20 @@
+[Unit]
+Description=Class X Education Platform (CBSE App)
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=windows
+WorkingDirectory=/home/windows/cbse-app
+ExecStart=/bin/bash start.sh mesh
+Restart=always
+RestartSec=5
+Environment=PORT=9090
+Environment=UVICORN_WORKERS=1
+Environment=WORKER_COUNT=1
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

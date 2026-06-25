@@ -136,12 +136,18 @@ class Database:
         import sqlite3
         if not hasattr(self._local, "conn") or self._local.conn is None:
             path = self.config["path"]
-            self._local.conn = sqlite3.connect(path, check_same_thread=False)
-            self._local.conn.row_factory = sqlite3.Row
-            self._local.conn.execute("PRAGMA journal_mode=WAL")
-            self._local.conn.execute("PRAGMA synchronous=NORMAL")
-            self._local.conn.execute("PRAGMA cache_size=-8000")
-            self._local.conn.execute("PRAGMA busy_timeout=5000")
+            try:
+                self._local.conn = sqlite3.connect(path, check_same_thread=False)
+                self._local.conn.row_factory = sqlite3.Row
+                self._local.conn.execute("PRAGMA journal_mode=WAL")
+                self._local.conn.execute("PRAGMA synchronous=NORMAL")
+                self._local.conn.execute("PRAGMA cache_size=-8000")
+                self._local.conn.execute("PRAGMA busy_timeout=5000")
+            except Exception as e:
+                # Log to stdout/stderr since logger might not be fully configured in all contexts
+                print(f"WARNING: Failed to connect to SQLite file '{path}', falling back to in-memory database: {e}")
+                self._local.conn = sqlite3.connect(":memory:", check_same_thread=False)
+                self._local.conn.row_factory = sqlite3.Row
         return self._local.conn
 
     def _row_from_sqlite(self, row, description):

@@ -16,4 +16,4 @@ ENV ALLOWED_HOSTS=*
 
 EXPOSE 9090
 
-CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port $PORT --workers $UVICORN_WORKERS --proxy-headers --forwarded-allow-ips='*'"]
+CMD ["/bin/sh", "start.sh"]

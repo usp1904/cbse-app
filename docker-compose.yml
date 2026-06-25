@@ -5,8 +5,13 @@ services:
     build: .
     ports:
       - "${PORT:-9090}:9090"
+      - "9091:9091"
+      - "9092:9092"
+      - "9093:9093"
+      - "9094:9094"
     environment:
       - PORT=9090
+      - MODE=${MODE:-server}
       - UVICORN_WORKERS=4
       - DATABASE_URL=${DATABASE_URL:-sqlite:///cbse_content.db}
       - OLLAMA_URL=${OLLAMA_URL:-http://ollama:11434}
@@ -14,7 +19,8 @@ services:
       - ALLOWED_HOSTS=*
       - ENV=production
     volumes:
-      - ./cbse_content.db:/app/cbse_content.db
+      - .:/app
+
     depends_on:
       - ollama
     restart: unless-stopped

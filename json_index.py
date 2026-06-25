@@ -54,10 +54,12 @@ class JsonIndex:
         }
         self._last_refresh = 0
         self._frozen = False
+        self._all_boards_tree_cache = None
 
     def build(self):
         """Build the full index from the database. Called once at startup."""
         with _INDEX_LOCK:
+            self._all_boards_tree_cache = None
             conn = get_conn()
             boards = conn.execute("SELECT * FROM boards ORDER BY name").fetchall()
             for b in boards:
@@ -95,6 +97,23 @@ class JsonIndex:
 
             self._build_search_terms()
 
+            # Group chapters, topics, chunks, and problems to build hierarchy in O(N)
+            chapters_by_subject = {}
+            for ch in self._data["chapters"].values():
+                chapters_by_subject.setdefault(ch["subject_id"], []).append(ch)
+
+            topics_by_chapter = {}
+            for t in self._data["topics"].values():
+                topics_by_chapter.setdefault(t["chapter_id"], []).append(t)
+
+            chunks_by_topic = {}
+            for c in self._data["chunks"]:
+                chunks_by_topic.setdefault(c["topic_id"], []).append(c)
+
+            problems_by_topic = {}
+            for p in self._data["problems"]:
+                problems_by_topic.setdefault(p["topic_id"], []).append(p)
+
             # Build board > subject > chapter > topic tree
             for board_id in self._data["boards"]:
                 board_subjects = [
@@ -102,24 +121,12 @@ class JsonIndex:
                     if s["board_id"] == board_id
                 ]
                 for s in board_subjects:
-                    s["chapters"] = [
-                        ch for ch in self._data["chapters"].values()
-                        if ch["subject_id"] == s["id"]
-                    ]
+                    s["chapters"] = chapters_by_subject.get(s["id"], [])
                     for ch in s["chapters"]:
-                        ch["topics"] = [
-                            t for t in self._data["topics"].values()
-                            if t["chapter_id"] == ch["id"]
-                        ]
+                        ch["topics"] = topics_by_chapter.get(ch["id"], [])
                         for t in ch["topics"]:
-                            t["chunks"] = [
-                                c for c in self._data["chunks"]
-                                if c["topic_id"] == t["id"]
-                            ]
-                            t["problems"] = [
-                                p for p in self._data["problems"]
-                                if p["topic_id"] == t["id"]
-                            ]
+                            t["chunks"] = chunks_by_topic.get(t["id"], [])
+                            t["problems"] = problems_by_topic.get(t["id"], [])
 
             self._data["built_at"] = time.time()
             self._last_refresh = time.time()
@@ -290,11 +297,8 @@ class JsonIndex:
             "subjects": [],
         }
         for s in subjects:
-            chapters = [c for c in self._data["chapters"].values() if c["subject_id"] == s["id"]]
-            topic_count = sum(
-                len([t for t in self._data["topics"].values() if t["chapter_id"] == c["id"]])
-                for c in chapters
-            )
+            chapters = s.get("chapters", [])
+            topic_count = sum(len(ch.get("topics", [])) for ch in chapters)
             result["subjects"].append({
                 "id": s["id"],
                 "name": s["name"],
@@ -306,7 +310,9 @@ class JsonIndex:
         return result
 
     def get_all_boards_tree(self):
-        return [self.get_board_tree(bid) for bid in self._data["boards"]]
+        if self._all_boards_tree_cache is None:
+            self._all_boards_tree_cache = [self.get_board_tree(bid) for bid in self._data["boards"]]
+        return self._all_boards_tree_cache
 
     def get_languages(self):
         langs = {"English"}

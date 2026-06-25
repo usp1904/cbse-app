@@ -9,7 +9,7 @@ import threading
 import http.server
 import urllib.request
 
-WORKER_COUNT = int(os.environ.get("WORKER_COUNT", 4))
+WORKER_COUNT = int(os.environ.get("WORKER_COUNT", 1))
 BASE_PORT = int(os.environ.get("BASE_PORT", 9091))
 LB_PORT = int(os.environ.get("LB_PORT", 9090))
 APP_SCRIPT = os.path.join(os.path.dirname(os.path.dirname(__file__)), "server.py")
@@ -92,10 +92,12 @@ class MeshLoadBalancer:
         print(f"Starting {WORKER_COUNT} worker processes...")
         for i in range(WORKER_COUNT):
             port = BASE_PORT + i
-            env = dict(os.environ, PORT=str(port))
+            env = dict(os.environ, PORT=str(port), UVICORN_WORKERS="1")
+            # Run with relative script name and explicit cwd to prevent UNC path issues on Windows
             proc = subprocess.Popen(
-                [sys.executable, APP_SCRIPT],
+                [sys.executable, os.path.basename(APP_SCRIPT)],
                 env=env,
+                cwd=os.path.dirname(APP_SCRIPT),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
             )
@@ -110,10 +112,23 @@ class MeshLoadBalancer:
                     pass
             except (socket.timeout, ConnectionRefusedError):
                 print(f"  Worker {w['index']+1} on port {w['port']} is DOWN, restarting...")
-                env = dict(os.environ, PORT=str(w["port"]))
+                
+                # Retrieve and print error output from the crashed worker
+                try:
+                    if w["proc"].poll() is not None:
+                        out, _ = w["proc"].communicate(timeout=1)
+                        if out:
+                            print(f"--- Worker {w['index']+1} Startup Error Log ---")
+                            print(out.decode(errors="replace").strip())
+                            print("------------------------------------------")
+                except Exception as e:
+                    print(f"  Failed to read worker error log: {e}")
+                
+                env = dict(os.environ, PORT=str(w["port"]), UVICORN_WORKERS="1")
                 proc = subprocess.Popen(
-                    [sys.executable, APP_SCRIPT],
+                    [sys.executable, os.path.basename(APP_SCRIPT)],
                     env=env,
+                    cwd=os.path.dirname(APP_SCRIPT),
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                 )
@@ -124,6 +139,7 @@ class MeshLoadBalancer:
         self.start_workers()
         LoadBalancerProxyHandler.workers = self.workers
 
+        http.server.HTTPServer.allow_reuse_address = True
         server = http.server.HTTPServer(("0.0.0.0", LB_PORT), LoadBalancerProxyHandler)
         proxy_thread = threading.Thread(target=server.serve_forever, daemon=True)
         proxy_thread.start()
@@ -155,5 +171,14 @@ class MeshLoadBalancer:
 
 
 if __name__ == "__main__":
+    import subprocess
+    # Automatically stop conflicting Docker container or local process on port 9090
+    try:
+        subprocess.run("docker update --restart=no $(docker ps -q --filter publish=9090) 2>/dev/null", shell=True)
+        subprocess.run("docker stop $(docker ps -q --filter publish=9090) 2>/dev/null", shell=True)
+        subprocess.run("fuser -k 9090/tcp 2>/dev/null", shell=True)
+    except Exception:
+        pass
+
     lb = MeshLoadBalancer()
     lb.run()

@@ -2,7 +2,7 @@
 # Start server — auto-detects environment and chooses the right backend
 # Usage: ./start.sh [app|server|mesh]
 
-MODE=${1:-server}
+MODE=${1:-${MODE:-server}}
 cd "$(dirname "$0")"
 
 # Auto-install dependencies if needed
@@ -15,10 +15,14 @@ fi
 
 if [ "$MODE" = "app" ] || [ "$MODE" = "legacy" ]; then
     echo "Starting legacy CBSEHandler on port ${PORT:-9090}..."
-    exec python3 app.py
+    exec python3 server.py
 elif [ "$MODE" = "mesh" ]; then
     echo "Starting Mesh Load Balancer on port ${LB_PORT:-9090}..."
-    exec python3 mesh_lb.py
+    if [ -f mesh_lb.py ]; then
+        exec python3 mesh_lb.py
+    else
+        exec python3 _archive/mesh_lb.py
+    fi
 else
     echo "Starting FastAPI server on 0.0.0.0:${PORT:-9090} with ${UVICORN_WORKERS:-4} workers..."
     echo "Database: ${DATABASE_URL:-sqlite:///cbse_content.db}"

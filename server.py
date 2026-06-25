@@ -12,7 +12,9 @@ Usage:
   DATABASE_URL=postgresql://user:pass@host/db uvicorn server:app --host 0.0.0.0 --port 9090 --workers 4
   DATABASE_URL=sqlite:///cbse_content.db uvicorn server:app --host 0.0.0.0 --port 9090 --reload
 """
-import os  # reload trigger 123
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import json
 import re
 import html as htmlmod
@@ -265,18 +267,23 @@ async def lifespan(app: FastAPI):
         DB.commit()
     except Exception as e:
         log.warning("Failed to force update board names: %s", e)
+
+    # Auto-seed check for stateless in-memory or empty databases
     try:
-        prob_count = DB.query_one("SELECT COUNT(*) as cnt FROM problems")["cnt"]
-        unsolved_count = DB.query_one("SELECT COUNT(*) as cnt FROM problems WHERE solution_text IS NULL OR solution_text = '' OR LOWER(solution_text) LIKE '%placeholder%' OR LOWER(solution_text) LIKE '%lorem ipsum%'")["cnt"]
-        cbse_board = DB.query_one("SELECT name FROM boards WHERE id = 'cbse'")
-        if prob_count == 0 or unsolved_count > 0 or (cbse_board and cbse_board.get("name") == "CBSE Class X"):
-            log.info("Fresh database, unsolved problems, or old board names detected. Running db_seeder...")
+        topic_count = DB.query_one("SELECT COUNT(*) as cnt FROM topics")["cnt"]
+    except Exception:
+        topic_count = 0
+
+    if topic_count == 0:
+        log.info("Database is empty. Running db_seeder to populate content...")
+        try:
             import db_seeder
             db_seeder.seed_database_full()
             # Force rebuild index after seeding
             get_index().build()
-    except Exception as e:
-        log.warning("Auto-seed check failed (non-fatal): %s", e)
+        except Exception as e:
+            log.warning("Auto-seeding failed: %s", e)
+
     log.info("Database: %s", "PostgreSQL/Neon" if DB.is_postgresql else "SQLite")
     log.info("LLM: %s (%s)", getattr(LLM, 'backend_name', 'N/A') if LLM else "N/A",
              getattr(LLM, 'model_name', 'N/A') if LLM else "N/A")
@@ -1331,7 +1338,7 @@ def format_solved_problem(p, idx):
     return f"""
     <div class="solved-problem-card">
         <div class="solved-problem-header" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); var sign = this.querySelector('.sign'); if (sign) sign.textContent = this.classList.contains('open') ? '−' : '+';">
-            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:100])}...</span>
+            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:300])}...</span>
             <span class="sign" style="font-size:1.2rem; color:var(--accent); font-weight:bold;">+</span>
         </div>
         <div class="solved-problem-body">
@@ -1429,7 +1436,7 @@ def format_science_solved_problem(p, idx):
     return f"""
     <div class="solved-problem-card" style="border-color:rgba(13,148,136,0.15);">
         <div class="solved-problem-header" style="background:#fafdfd;" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); var sign = this.querySelector('.sign'); if (sign) sign.textContent = this.classList.contains('open') ? '−' : '+';">
-            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:100])}...</span>
+            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:300])}...</span>
             <span class="sign" style="font-size:1.2rem; color:#0d9488; font-weight:bold;">+</span>
         </div>
         <div class="solved-problem-body">
@@ -1535,7 +1542,7 @@ def format_social_solved_problem(p, idx):
     return f"""
     <div class="solved-problem-card" style="border-color:rgba(217,119,6,0.15);">
         <div class="solved-problem-header" style="background:#fffdfa;" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); var sign = this.querySelector('.sign'); if (sign) sign.textContent = this.classList.contains('open') ? '−' : '+';">
-            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:100])}...</span>
+            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:300])}...</span>
             <span class="sign" style="font-size:1.2rem; color:#d97706; font-weight:bold;">+</span>
         </div>
         <div class="solved-problem-body">
@@ -1633,7 +1640,7 @@ def format_general_solved_problem(p, idx):
     return f"""
     <div class="solved-problem-card" style="border-color:var(--border);">
         <div class="solved-problem-header" style="background:#fafafa;" onclick="this.classList.toggle('open'); this.nextElementSibling.classList.toggle('open'); var sign = this.querySelector('.sign'); if (sign) sign.textContent = this.classList.contains('open') ? '−' : '+';">
-            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:100])}...</span>
+            <span>❓ Question {idx}: {htmlmod.escape(p.get('problem_text', '')[:300])}...</span>
             <span class="sign" style="font-size:1.2rem; color:var(--accent); font-weight:bold;">+</span>
         </div>
         <div class="solved-problem-body">
@@ -2179,6 +2186,14 @@ async def ai_diagram():
         <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
         <script>
         mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'loose' });
+        function runInjectedScripts(container) {
+            const scripts = container.querySelectorAll('script');
+            scripts.forEach(s => {
+                const newScript = document.createElement('script');
+                newScript.textContent = s.textContent;
+                document.body.appendChild(newScript);
+            });
+        }
         async function generateDiagram() {
             const concept = document.getElementById('diagram-concept').value;
             const type = document.getElementById('diagram-type').value;
@@ -2189,6 +2204,7 @@ async def ai_diagram():
                 const data = await resp.json();
                 if (data.html) {
                     out.innerHTML = data.html;
+                    runInjectedScripts(out);
                 } else if (data.diagram) {
                     const id = 'mermaid-' + Math.floor(Math.random() * 10000);
                     let contentHtml = '<div style="display:flex; flex-direction:column; gap:1.5rem; width:100%;">';
@@ -2197,13 +2213,42 @@ async def ai_diagram():
                     contentHtml += '</div>';
                     
                     if (data.explanation) {
+                        let headerTitle = "📖 Study Guide & Exam Prep";
+                        let introText = "";
+                        if (type === 'mindmap') {
+                            headerTitle = "🗺️ Dot-Connection & Association Guide";
+                            introText = '<div style="margin-bottom:1rem; padding:1rem; border-radius:8px; background:#e0f2fe; border-left:4px solid #0284c7; font-size:0.95rem; color:#0369a1;"><strong>Mind Map focus: Connecting concepts & filling gaps.</strong> Mapping associative properties radially outward back to the core concept.</div>';
+                        } else if (type === 'flowchart') {
+                            headerTitle = "📐 Sequential Process & Outcomes Guide";
+                            introText = '<div style="margin-bottom:1rem; padding:1rem; border-radius:8px; background:#fef3c7; border-left:4px solid #d97706; font-size:0.95rem; color:#b45309;"><strong>Flowchart focus: Step outcomes.</strong> Follow the step outcomes in the flowchart to understand the product at each milestone.</div>';
+                        } else if (type === 'concept-map') {
+                            headerTitle = "🔗 Detailed Concept Relation Guide";
+                            introText = '<div style="margin-bottom:1rem; padding:1rem; border-radius:8px; background:#dcfce7; border-left:4px solid #16a34a; font-size:0.95rem; color:#15803d;"><strong>Relation Map focus: High fidelity structural connections.</strong> Maps complex cross-links and semantic verbs. See the dynamic simulator player added below the diagram.</div>';
+                        }
+                        
                         contentHtml += '<div class="study-guide-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03); text-align:left;">';
-                        contentHtml += '<h3 style="color:var(--primary); margin-top:0; border-bottom:1px solid var(--border); padding-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;">📖 Study Guide & Exam Prep</h3>';
+                        contentHtml += '<h3 style="color:var(--primary); margin-top:0; border-bottom:1px solid var(--border); padding-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;">' + headerTitle + '</h3>';
+                        contentHtml += introText;
                         contentHtml += '<div style="font-size:0.95rem; line-height:1.6; color:#333;">' + data.explanation + '</div>';
                         contentHtml += '</div>';
                     }
+                    
+                    // If concept-map, inject video simulator below the diagram card
+                    if (type === 'concept-map') {
+                        try {
+                            const videoResp = await fetch('/api/ai/diagram?concept='+encodeURIComponent(concept)+'&type=veo-animator');
+                            const videoData = await videoResp.json();
+                            if (videoData.html) {
+                                contentHtml += '<div style="margin-top:1.5rem; width:100%;">' + videoData.html + '</div>';
+                            }
+                        } catch (err) {
+                            console.error("Failed to load video animator: ", err);
+                        }
+                    }
+                    
                     contentHtml += '</div>';
                     out.innerHTML = contentHtml;
+                    runInjectedScripts(out);
                     
                     await mermaid.run({
                         nodes: [document.getElementById(id)]
@@ -2858,14 +2903,17 @@ self.addEventListener('activate', function(e) { e.waitUntil(clients.claim()); })
 self.addEventListener('fetch', function(e) {
     if (e.request.method === 'GET') {
         e.respondWith(
-            caches.open('cbse-v1').then(function(cache) {
-                return cache.match(e.request).then(function(response) {
-                    return response || fetch(e.request).then(function(resp) {
-                        if (resp.status === 200) cache.put(e.request, resp.clone());
-                        return resp;
+            fetch(e.request).then(function(resp) {
+                if (resp.status === 200) {
+                    var respClone = resp.clone();
+                    caches.open('cbse-v1').then(function(cache) {
+                        cache.put(e.request, respClone);
                     });
-                });
-            }).catch(function() { return fetch(e.request); })
+                }
+                return resp;
+            }).catch(function() {
+                return caches.match(e.request);
+            })
         );
     }
 });"""
@@ -2942,12 +2990,106 @@ async def mindmap_page(topic_id: str):
     topic = conn.query_one("SELECT * FROM topics WHERE id = ?", (topic_id,)) if conn and conn.table_exists("topics") else None
     if not topic:
         return HTMLResponse(_render(title="Mind Map — Not Found", content='<div class="section"><h2>Mind Map Not Found</h2><p><a href="/">Go Home</a></p></div>'), status_code=404)
-    res = await _run_in_thread(ai_services.napkin_diagram, topic["title"], "mindmap")
-    content_html = res.get("html", "")
-    return HTMLResponse(_render(title=f"Mind Map: {topic['title']}", content=f"""
-    <div class="breadcrumb">{_build_breadcrumb([("Home", "/"), (topic['title'], f"/topic/{topic_id}"), ("Mind Map", None)])}</div>
-    <div class="section"><h2>🧠 Mind Map & Study Guide: {topic['title']}</h2>
-    <div style="margin-top:1.5rem;">{content_html}</div></div>"""))
+    
+    import asyncio
+    res_mm, res_fc, res_cm = await asyncio.gather(
+        _run_in_thread(ai_services.napkin_diagram, topic["title"], "mindmap"),
+        _run_in_thread(ai_services.napkin_diagram, topic["title"], "flowchart"),
+        _run_in_thread(ai_services.napkin_diagram, topic["title"], "concept-map")
+    )
+    
+    veo_html = ai_services.get_fallback_veo_animator(topic["title"])
+
+    content = f"""
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({{ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' }});
+        function switchDiagTab(tab) {{
+            document.querySelectorAll('.diag-tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.diag-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('diag-tab-' + tab).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }}
+    </script>
+    <style>
+        .diag-explanation {{
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            font-size: 0.95rem;
+            color: #475569;
+        }}
+        .concept-badge {{
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }}
+    </style>
+    <div class="breadcrumb">{_build_breadcrumb([("Home", "/"), (topic['title'], f"/topic/{topic_id}"), ("Visualizations", None)])}</div>
+    <div class="section">
+        <h2>🧠 Interactive Concept Visualizer: {htmlmod.escape(topic['title'])}</h2>
+        <p class="subtitle" style="color:#666; margin-bottom:1.5rem;">Explore customized representations of this concept tailored for different learning modes.</p>
+        
+        <div class="math-tabs">
+            <button class="math-tab-btn active diag-tab-btn" onclick="switchDiagTab('mindmap')">🗺️ 1. Radial Mind Map (Dot Connectors)</button>
+            <button class="math-tab-btn diag-tab-btn" onclick="switchDiagTab('flowchart')">📐 2. Process Flowchart (Step Outcomes)</button>
+            <button class="math-tab-btn diag-tab-btn" onclick="switchDiagTab('conceptmap')">🔗 3. Relation Map & Video (Detailed Visuals)</button>
+        </div>
+        
+        <div id="diag-tab-mindmap" class="diag-tab-content" style="margin-top:1.5rem; display:block;">
+            <span class="concept-badge" style="background:#e0f2fe; color:#0369a1;">MIND MAP CONCEPT</span>
+            <div class="diag-explanation">
+                <strong>Mind Map focus: Connecting the concepts and filling knowledge gaps.</strong> Radial diagrams allow you to map associations outwards, connecting new definitions back to the core concept root.
+            </div>
+            <div class="mermaid-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03); text-align:center; margin-top:1rem;">
+                <pre class="mermaid" style="background:none; border:none; margin:0; padding:0; overflow-x:auto;">{res_mm.get("diagram", "")}</pre>
+            </div>
+            <div class="study-guide-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03); text-align:left; margin-top:1.5rem;">
+                <h3 style="color:var(--primary); margin-top:0; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">📖 Dot-Connection & Association Guide</h3>
+                <div style="font-size:0.95rem; line-height:1.6; color:#333;">{res_mm.get("explanation", "")}</div>
+            </div>
+        </div>
+
+        <div id="diag-tab-flowchart" class="diag-tab-content" style="margin-top:1.5rem; display:none;">
+            <span class="concept-badge" style="background:#fef3c7; color:#b45309;">PROCESS FLOWCHART</span>
+            <div class="diag-explanation">
+                <strong>Flowchart focus: Step-by-step outcomes.</strong> Follow the directional processes below to see what output is produced by each step.
+            </div>
+            <div class="mermaid-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03); text-align:center; margin-top:1rem;">
+                <pre class="mermaid" style="background:none; border:none; margin:0; padding:0; overflow-x:auto;">{res_fc.get("diagram", "")}</pre>
+            </div>
+            <div class="study-guide-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03); text-align:left; margin-top:1.5rem;">
+                <h3 style="color:var(--primary); margin-top:0; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">📖 Sequential Process & Outcomes Guide</h3>
+                <div style="font-size:0.95rem; line-height:1.6; color:#333;">{res_fc.get("explanation", "")}</div>
+            </div>
+        </div>
+
+        <div id="diag-tab-conceptmap" class="diag-tab-content" style="margin-top:1.5rem; display:none;">
+            <span class="concept-badge" style="background:#dcfce7; color:#15803d;">RELATION MAP & VIDEO</span>
+            <div class="diag-explanation">
+                <strong>Relation Map focus: High fidelity structural connections.</strong> Cross-link multiple sub-concepts with clear connecting verbs, accompanied by a dynamic Google Veo video concept simulator below.
+            </div>
+            <div class="mermaid-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03); text-align:center; margin-top:1rem;">
+                <pre class="mermaid" style="background:none; border:none; margin:0; padding:0; overflow-x:auto;">{res_cm.get("diagram", "")}</pre>
+            </div>
+            
+            <div style="margin-top:2rem;">
+                {veo_html}
+            </div>
+
+            <div class="study-guide-card" style="background:#fff; padding:1.5rem; border-radius:12px; border:1px solid var(--border); box-shadow:0 4px 12px rgba(0,0,0,0.03); text-align:left; margin-top:1.5rem;">
+                <h3 style="color:var(--primary); margin-top:0; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">📖 Detailed Concept Relation Guide</h3>
+                <div style="font-size:0.95rem; line-height:1.6; color:#333;">{res_cm.get("explanation", "")}</div>
+            </div>
+        </div>
+    </div>
+    """
+    return HTMLResponse(_render(title=f"Diagrams: {topic['title']}", content=content))
 
 
 @app.get("/interactives/cards/{topic_id}", response_class=HTMLResponse)

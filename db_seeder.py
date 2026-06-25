@@ -65,9 +65,9 @@ Step 1: Write the given quadratic polynomial in standard form: $$p(x) = ax^2 + b
 Step 2: To find the zeroes (roots α and β), equate the polynomial to zero: $$ax^2 + bx + c = 0$$.
 Step 3: Split the middle term or apply the quadratic formula to solve for x, obtaining the roots.
 Step 4: Verify the sum of zeroes:
-   $$\\alpha + \\beta = -\\frac{b}{a} = -\\frac{\\text{Coefficient of } x}{\\text{Coefficient of } x^2}$$
+   $$\\alpha + \\beta = -\\frac{{b}}{{a}} = -\\frac{{\\text{{Coefficient of }} x}}{{\\text{{Coefficient of }} x^2}}$$
 Step 5: Verify the product of zeroes:
-   $$\\alpha\\beta = \\frac{c}{a} = \\frac{\\text{Constant term}}{\\text{Coefficient of } x^2}$$
+   $$\\alpha\\beta = \\frac{{c}}{{a}} = \\frac{{\\text{{Constant term}}}}{{\\text{{Coefficient of }} x^2}}$$
 
 **Answer:** Zeroes are successfully computed and the relationship with coefficients is verified.
 
@@ -194,12 +194,12 @@ Step 5: Re-verify that the solved sides satisfy the triangle inequality.
 ---
 **Shortcut Trick:**
 • Ratio of areas of two similar triangles is equal to the square of the ratio of their corresponding sides:
-  $$\\text{Area Ratio} = (\\text{Side Ratio})^2$$
+  $$\\text{{Area Ratio}} = (\\text{{Side Ratio}})^2$$
 • Pythagoras triples to memorize: 3-4-5, 5-12-13, 8-15-17.
 
 **Formulas used:**
 • Pythagoras Theorem: $$Hypotenuse^2 = Base^2 + Height^2$$
-• Area Ratio: $$\\frac{Area(\\triangle 1)}{Area(\\triangle 2)} = \\left(\\frac{s_1}{s_2}\\right)^2$$"""
+• Area Ratio: $$\\frac{{Area(\\triangle 1)}}{{Area(\\triangle 2)}} = \\left(\\frac{{s_1}}{{s_2}}\\right)^2$$"""
 
     # Coordinate Geometry
     elif any(_word_match(w, topic.lower()) or _word_match(w, p_text.lower()) for w in ["coordinate", "distance", "section", "collinear"]):
@@ -214,12 +214,12 @@ Step 5: Write the final coordinate pair or distance in units.
 
 ---
 **Shortcut Trick:**
-• The distance of a point $$(x, y)$$ from the origin $$(0,0)$$ is simply $$\\sqrt{x^2 + y^2}$$.
+• The distance of a point $$(x, y)$$ from the origin $$(0,0)$$ is simply $$\\sqrt{{x^2 + y^2}}$$.
 • Midpoint coordinates are simply the average of x-coordinates and average of y-coordinates.
 
 **Formulas used:**
-• Distance Formula: $$d = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$$
-• Section Formula: $$P(x,y) = \\left(\\frac{m_1x_2 + m_2x_1}{m_1+m_2}, \\frac{m_1y_2 + m_2y_1}{m_1+m_2}\\right)$$"""
+• Distance Formula: $$d = \\sqrt{{(x_2-x_1)^2 + (y_2-y_1)^2}}$$
+• Section Formula: $$P(x,y) = \\left(\\frac{{m_1x_2 + m_2x_1}}{{m_1+m_2}}, \\frac{{m_1y_2 + m_2y_1}}{{m_1+m_2}}\\right)$$"""
 
     # Trigonometry
     elif any(_word_match(w, topic.lower()) or _word_match(w, p_text.lower()) for w in ["trigonometry", "trigonometric", "identity", "sine", "cosine", "tangent", "height", "elevation"]):
@@ -240,7 +240,7 @@ In Heights and Distances:
 
 **Formulas used:**
 • Trigonometric Identity: $$\\sin^2\\theta + \\cos^2\\theta = 1$$
-• Definition: $$\\tan\\theta = \\frac{\\text{Perpendicular}}{\\text{Base}}$$"""
+• Definition: $$\\tan\\theta = \\frac{{\\text{{Perpendicular}}}}{{\\text{{Base}}}}$$"""
 
     # Circle / Areas related to circles
     elif any(_word_match(w, topic.lower()) or _word_match(w, p_text.lower()) for w in ["circle", "tangent", "sector", "segment", "circumference"]):
@@ -249,19 +249,19 @@ Step 1: Write down the given radius (r), diameter (d), or sector angle (θ).
 Step 2: State the appropriate formula for area, perimeter, sector area, or length of an arc.
 Step 3: Substitute the value of $$\\pi \\approx 22/7$$ (or $$3.14$$) along with other values.
 Step 4: Perform calculation (square the radius, multiply by angle/360, etc.).
-Step 5: State the final calculated value in square units ($$\\text{cm}^2$$, $$\\text{m}^2$$) or linear units (cm, m).
+Step 5: State the final calculated value in square units ($$\\text{{cm}}^2$$, $$\\text{{m}}^2$$) or linear units (cm, m).
 
 **Answer:** The area / perimeter is computed successfully.
 
 ---
 **Shortcut Trick:**
-• The area of a sector is simply the fraction of the circle's area: $$\\text{Area} = \\frac{\\theta}{360} \\times \\pi r^2$$.
+• The area of a sector is simply the fraction of the circle's area: $$\\text{{Area}} = \\frac{{\\theta}}{{360}} \\times \\pi r^2$$.
 • Area of minor segment = Area of corresponding sector - Area of corresponding triangle.
 
 **Formulas used:**
 • Area of a Circle: $$A = \\pi r^2$$
-• Area of a Sector: $$A_{sec} = \\frac{\\theta}{360} \\pi r^2$$
-• Arc Length: $$l = \\frac{\\theta}{360} \\times 2\\pi r$$"""
+• Area of a Sector: $$A_{{sec}} = \\frac{{\\theta}}{{360}} \\pi r^2$$
+• Arc Length: $$l = \\frac{{\\theta}}{{360}} \\times 2\\pi r$$"""
 
     # Surface Areas and Volumes
     elif any(_word_match(w, topic.lower()) or _word_match(w, p_text.lower()) for w in ["surface", "volume", "cylinder", "cone", "sphere", "frustum"]):
@@ -276,12 +276,12 @@ Step 5: Solve the equation, taking care to use identical units of measurement.
 
 ---
 **Shortcut Trick:**
-• Slant height of a cone: $$l = \\sqrt{r^2 + h^2}$$.
+• Slant height of a cone: $$l = \\sqrt{{r^2 + h^2}}$$.
 • When a solid is melted and recast into another shape, the total volume remains constant: $$V_1 = V_2$$.
 
 **Formulas used:**
-• Volume of Cone: $$V = \\frac{1}{3}\\pi r^2 h$$
-• Volume of Sphere: $$V = \\frac{4}{3}\\pi r^3$$
+• Volume of Cone: $$V = \\frac{{1}}{{3}}\\pi r^2 h$$
+• Volume of Sphere: $$V = \\frac{{4}}{{3}}\\pi r^3$$
 • Curved Surface Area of Cylinder: $$CSA = 2\\pi r h$$"""
 
     # Statistics / Mean / Median / Mode
@@ -298,12 +298,12 @@ Step 5: Substitute these values into the respective statistical formula (mean, m
 ---
 **Shortcut Trick:**
 Use the Empirical Formula to find the third measure if two are known:
-$$\\text{Mode} = 3 \\times \\text{Median} - 2 \\times \\text{Mean}$$
+$$\\text{{Mode}} = 3 \\times \\text{{Median}} - 2 \\times \\text{{Mean}}$$
 
 **Formulas used:**
-• Mean (Direct): $$\\bar{x} = \\frac{\\sum f_i x_i}{\\sum f_i}$$
-• Median: $$Median = l + \\left( \\frac{\\frac{N}{2} - cf}{f} \\right) \\times h$$
-• Mode: $$Mode = l + \\left( \\frac{f_1 - f_0}{2f_1 - f_0 - f_2} \\right) \\times h$$"""
+• Mean (Direct): $$\\bar{{x}} = \\frac{{\\sum f_i x_i}}{{\\sum f_i}}$$
+• Median: $$Median = l + \\left( \\frac{{\\frac{{N}}{{2}} - cf}}{{f}} \\right) \\times h$$
+• Mode: $$Mode = l + \\left( \\frac{{f_1 - f_0}}{{2f_1 - f_0 - f_2}} \\right) \\times h$$"""
 
     # Probability
     elif any(_word_match(w, topic.lower()) or _word_match(w, p_text.lower()) for w in ["probability", "dice", "coin", "card"]):
@@ -322,7 +322,7 @@ Step 5: Simplify the fraction to its lowest terms.
 • The sum of probabilities of an event and its complement is always 1: $$P(E) + P(E') = 1$$.
 
 **Formulas used:**
-• Classical Probability: $$P(E) = \\frac{\\text{Favorable Outcomes } n(E)}{\\text{Total Outcomes } n(S)}$$"""
+• Classical Probability: $$P(E) = \\frac{{\\text{{Favorable Outcomes }} n(E)}}{{\\text{{Total Outcomes }} n(S)}}$$"""
 
     # Balance chemical equation templates
     elif any(_word_match(w, topic.lower()) or _word_match(w, p_text.lower()) for w in ["balance", "chemical", "reaction", "equation", "→", "->"]):
@@ -364,7 +364,7 @@ Step 5: State the products of the neutralization reaction: Acid + Base -> Salt +
 • Weak Acid + Strong Base -> pH > 7 (basic salt).
 
 **Key concept used:**
-• pH scale is logarithmic: $$pH = -\\log_{10}[H^+]$$
+• pH scale is logarithmic: $$pH = -\\log_{{10}}[H^+]$$
 • Litmus paper colors: Acid = Blue to Red, Base = Red to Blue."""
 
     # Electricity
@@ -383,13 +383,13 @@ Step 5: Apply the electrical power formula ($$P = VI = I^2 R = V^2/R$$) if power
 ---
 **Shortcut Trick:**
 For two resistors in parallel, the equivalent resistance is always smaller than the smallest individual resistor:
-$$R_{eq} = \\frac{R_1 \\times R_2}{R_1 + R_2}$$
+$$R_{{eq}} = \\frac{{R_1 \\times R_2}}{{R_1 + R_2}}$$
 
 **Formulas used:**
 • Ohm's Law: $$V = IR$$
 • Electrical Power: $$P = VI$$
 • Series Resistance: $$R_s = R_1 + R_2$$
-• Parallel Resistance: $$\\frac{1}{R_p} = \\frac{1}{R_1} + \\frac{1}{R_2}$$"""
+• Parallel Resistance: $$\\frac{{1}}{{R_p}} = \\frac{{1}}{{R_1}} + \\frac{{1}}{{R_2}}$$"""
 
     # General template fallback that is rich and high quality
     else:
@@ -575,22 +575,40 @@ def seed_database_full():
                 with open(os.path.join(_data_dir, _fn), encoding="utf-8") as _f:
                     TOPIC_CONTENT.update(json.load(_f))
                     
-    # Insert board, subjects, books, chapters, topics
-    insert_board("cbse", "CBSE", "Central Board of Secondary Education", "https://ncert.nic.in/")
-    
-    for subject in SUBJECTS:
-        sid = subject["id"]
-        insert_subject(sid, "cbse", subject["name"], subject.get("code", ""),
-                       subject.get("description", ""), subject.get("ncert_url", ""))
-        
-        # Insert books if any
-        if "books" in subject:
-            for book in subject["books"]:
-                bid = make_id(sid, book.get("code", book["name"]))
-                insert_book(bid, sid, book["name"], book.get("code", ""), book.get("ncert_url", ""))
-                for ch in book.get("chapters", []):
-                    cid = make_id(sid, bid, str(ch["num"]))
-                    insert_chapter(cid, bid, sid, "cbse", ch["num"], ch["title"])
+    # Insert boards, subjects, books, chapters, topics for CBSE, AP State, and TS State
+    from data import ALL_BOARDS
+    for board_id, binfo in ALL_BOARDS.items():
+        insert_board(board_id, binfo["name"], binfo.get("description", ""), "")
+        for subject in binfo["subjects"]:
+            sid = subject["id"]
+            insert_subject(sid, board_id, subject["name"], subject.get("code", ""),
+                           subject.get("description", ""), subject.get("ncert_url", ""))
+            
+            # Insert books if any
+            if "books" in subject:
+                for book in subject["books"]:
+                    bid = make_id(sid, book.get("code", book["name"]))
+                    insert_book(bid, sid, book["name"], book.get("code", ""), book.get("ncert_url", ""))
+                    for ch in book.get("chapters", []):
+                        cid = make_id(sid, bid, str(ch["num"]))
+                        insert_chapter(cid, bid, sid, board_id, ch["num"], ch["title"])
+                        if ch.get("topics"):
+                            for i, tname in enumerate(ch["topics"]):
+                                tid = make_id(cid, tname)
+                                insert_topic(tid, cid, i + 1, tname)
+                        else:
+                            tid = make_id(cid, ch["title"])
+                            insert_topic(tid, cid, 1, ch["title"])
+                    if "poems" in book:
+                        for po in book.get("poems", []):
+                            cid = make_id(sid, bid, "poem_" + str(po["num"]))
+                            insert_chapter(cid, bid, sid, board_id, po["num"], po["title"])
+                            tid = make_id(cid, po["title"])
+                            insert_topic(tid, cid, 1, f"Summary of '{po['title']}'")
+            else:
+                for ch in subject.get("chapters", []):
+                    cid = make_id(sid, str(ch["num"]))
+                    insert_chapter(cid, None, sid, board_id, ch["num"], ch["title"])
                     if ch.get("topics"):
                         for i, tname in enumerate(ch["topics"]):
                             tid = make_id(cid, tname)
@@ -598,22 +616,6 @@ def seed_database_full():
                     else:
                         tid = make_id(cid, ch["title"])
                         insert_topic(tid, cid, 1, ch["title"])
-                for po in book.get("poems", []):
-                    cid = make_id(sid, bid, "poem_" + str(po["num"]))
-                    insert_chapter(cid, bid, sid, "cbse", po["num"], po["title"])
-                    tid = make_id(cid, po["title"])
-                    insert_topic(tid, cid, 1, f"Summary of '{po['title']}'")
-        else:
-            for ch in subject.get("chapters", []):
-                cid = make_id(sid, str(ch["num"]))
-                insert_chapter(cid, None, sid, "cbse", ch["num"], ch["title"])
-                if ch.get("topics"):
-                    for i, tname in enumerate(ch["topics"]):
-                        tid = make_id(cid, tname)
-                        insert_topic(tid, cid, i + 1, tname)
-                else:
-                    tid = make_id(cid, ch["title"])
-                    insert_topic(tid, cid, 1, ch["title"])
                     
     # Seed chunks from JSON content
     for topic_id, data in TOPIC_CONTENT.items():
@@ -859,92 +861,92 @@ def seed_database_full():
 
 def replicate_classes_v_xii(conn):
     import re
-    log.info("Starting V-XII curriculum replication using Class X benchmark...")
+    from curriculum_data import NCERT_CURRICULUM
+    from _archive.enrich_all import _make_chunks, _revision_summary, _make_problem_extra
     
-    # Get all subjects of Class X (default subjects in DB where class = 'X' or doesn't have suffix)
-    class_x_subjects = conn.execute("SELECT * FROM subjects").fetchall()
+    log.info("Seeding V-IX and XI-XII curricula from NCERT_CURRICULUM 2026-27...")
     
-    classes = ["V", "VI", "VII", "VIII", "IX", "XI", "XII"]
-    
-    for cls in classes:
-        log.info(f"Replicating Class {cls}...")
-        for s in class_x_subjects:
-            sd = dict(s)
+    # We will seed these from NCERT_CURRICULUM
+    for cls, cls_data in NCERT_CURRICULUM.items():
+        log.info(f"Seeding Class {cls}...")
+        for subject in cls_data["subjects"]:
+            sub_id = subject["id"]
+            new_subject_id = f"{sub_id}-{cls.lower()}"
+            new_subject_name = f"{subject['name']} (Class {cls})"
+            new_desc = f"{subject['name']} for Class {cls}"
             
-            # Skip if it's already a class-specific subject (to avoid double replication)
-            if re.search(r'-(v|vi|vii|viii|ix|x|xi|xii)$', sd["id"]):
-                continue
-                
-            new_subject_id = f"{sd['id']}-{cls.lower()}"
-            new_subject_name = f"{sd['name']} (Class {cls})"
-            new_desc = f"{sd['description'] or sd['name']} for Class {cls}"
+            # Use appropriate code/ncert_url
+            code = f"ncert-c{cls.lower()}-{sub_id[:3]}"
+            ncert_url = f"https://ncert.nic.in/textbook.php?{code}=0-10"
             
-            # Insert subject with class column
             try:
                 conn.execute(
-                    "INSERT OR REPLACE INTO subjects (id, board_id, name, code, description, ncert_url, class) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (new_subject_id, sd["board_id"], new_subject_name, sd["code"], new_desc, sd["ncert_url"], cls)
+                    "INSERT OR REPLACE INTO subjects (id, board_id, name, code, description, ncert_url, class) VALUES (?, 'cbse', ?, ?, ?, ?, ?)",
+                    (new_subject_id, new_subject_name, code, new_desc, ncert_url, cls)
                 )
             except Exception:
                 conn.execute(
-                    "INSERT OR REPLACE INTO subjects (id, board_id, name, code, description, ncert_url) VALUES (?, ?, ?, ?, ?, ?)",
-                    (new_subject_id, sd["board_id"], new_subject_name, sd["code"], new_desc, sd["ncert_url"])
+                    "INSERT OR REPLACE INTO subjects (id, board_id, name, code, description, ncert_url) VALUES (?, 'cbse', ?, ?, ?, ?)",
+                    (new_subject_id, new_subject_name, code, new_desc, ncert_url)
                 )
                 
-            # Get all chapters for this subject
-            chapters = conn.execute("SELECT * FROM chapters WHERE subject_id = ?", (sd["id"],)).fetchall()
-            for ch in chapters:
-                chd = dict(ch)
-                new_chapter_id = f"{chd['id']}-{cls.lower()}"
-                new_book_id = f"{chd['book_id']}-{cls.lower()}" if chd['book_id'] else None
-                
-                # Check if book exists first (if there's a book_id)
-                if chd['book_id']:
-                    book_row = conn.execute("SELECT * FROM books WHERE id = ?", (chd['book_id'],)).fetchone()
-                    if book_row:
-                        bd = dict(book_row)
-                        conn.execute(
-                            "INSERT OR REPLACE INTO books (id, subject_id, name, code, ncert_url) VALUES (?, ?, ?, ?, ?)",
-                            (new_book_id, new_subject_id, f"{bd['name']} (Class {cls})", bd["code"], bd["ncert_url"])
-                        )
+            for ch in subject["chapters"]:
+                new_chapter_id = f"ch-{new_subject_id}-{ch['num']}"
                 
                 conn.execute(
-                    "INSERT OR REPLACE INTO chapters (id, book_id, subject_id, board_id, num, title) VALUES (?, ?, ?, ?, ?, ?)",
-                    (new_chapter_id, new_book_id, new_subject_id, chd["board_id"], chd["num"], chd["title"])
+                    "INSERT OR REPLACE INTO chapters (id, book_id, subject_id, board_id, num, title) VALUES (?, NULL, ?, 'cbse', ?, ?)",
+                    (new_chapter_id, new_subject_id, ch["num"], ch["title"])
                 )
                 
-                # Get all topics for this chapter
-                topics = conn.execute("SELECT * FROM topics WHERE chapter_id = ?", (chd["id"],)).fetchall()
-                for t in topics:
-                    td = dict(t)
-                    new_topic_id = f"{td['id']}-{cls.lower()}"
-                    conn.execute(
-                        "INSERT OR REPLACE INTO topics (id, chapter_id, num, title, content) VALUES (?, ?, ?, ?, ?)",
-                        (new_topic_id, new_chapter_id, td["num"], td["title"], td["content"])
-                    )
+                # Add revision summary chunk
+                rev_id = make_id(new_chapter_id, "revision-summary")
+                rev_content = f"Revision summary notes for Class {cls} {subject['name']}, Chapter {ch['num']}: {ch['title']}. Covers all core concepts, definitions, and formulas recommended in the NCERT 2026-27 syllabus."
+                insert_chunk(rev_id, None, new_chapter_id, None, 3, f"📝 Revision Summary — {ch['title']}", rev_content, "text", 0)
+                
+                for i, tname in enumerate(ch["topics"]):
+                    new_topic_id = make_id(new_chapter_id, tname)
+                    insert_topic(new_topic_id, new_chapter_id, i + 1, tname)
                     
-                    # Get all chunks for this topic
-                    chunks = conn.execute("SELECT * FROM chunks WHERE topic_id = ?", (td["id"],)).fetchall()
-                    for ck in chunks:
-                        ckd = dict(ck)
-                        new_chunk_id = f"{ckd['id']}-{cls.lower()}"
-                        new_parent_id = f"{ckd['parent_id']}-{cls.lower()}" if ckd['parent_id'] else None
+                    # Generate 5 chunks using _make_chunks
+                    stype = "social" if "social" in sub_id or "studies" in sub_id else (
+                        "math" if "math" in sub_id else (
+                            "science" if "science" in sub_id or "physics" in sub_id or "chemistry" in sub_id or "biology" in sub_id else "general"
+                        )
+                    )
+                    chunks_list = _make_chunks(tname, ch["title"], stype, ch["num"])
+                    for j, chunk in enumerate(chunks_list):
+                        ck_id = make_id(new_topic_id, str(j))
                         conn.execute(
-                            "INSERT OR REPLACE INTO chunks (id, topic_id, chapter_id, parent_id, level, title, content, content_type, seq) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            (new_chunk_id, new_topic_id, new_chapter_id, new_parent_id, ckd["level"], ckd["title"], ckd["content"], ckd["content_type"], ckd["seq"])
+                            "INSERT OR REPLACE INTO chunks (id, topic_id, chapter_id, parent_id, level, title, content, content_type, seq) VALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?)",
+                            (ck_id, new_topic_id, new_chapter_id, 4 if j == 0 else 5, chunk["title"], chunk["content"], chunk["type"], j)
                         )
                         
-                    # Get all problems for this topic
-                    problems = conn.execute("SELECT * FROM problems WHERE topic_id = ?", (td["id"],)).fetchall()
-                    for prob in problems:
-                        probd = dict(prob)
-                        new_prob_id = f"{probd['id']}-{cls.lower()}"
-                        conn.execute(
-                            "INSERT OR REPLACE INTO problems (id, topic_id, chapter_id, problem_text, solution_text, problem_type, seq) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                            (new_prob_id, new_topic_id, new_chapter_id, probd["problem_text"], probd["solution_text"], probd["problem_type"], probd["seq"])
-                        )
+                    # Add Glossary chunk
+                    gid = make_id(new_topic_id, "glossary")
+                    terms = _get_glossary_terms(tname, ch["title"])
+                    terms_md = "\n".join(f"- **{term}**: {definition}" for term, definition in terms)
+                    glossary_content = f"**Glossary — {tname}**\n\n**Key Terms and Definitions:**\n\n{terms_md}\n\n**Study Tip:** Review these terms for active recall preparation."
+                    insert_chunk(gid, new_topic_id, new_chapter_id, None, 5, f"📖 Glossary — {tname}", glossary_content, "text", 99)
+                    
+                    # Generate practice problems (MCQ, Fill, TF)
+                    for pi, ptype in enumerate(["mcq", "fill", "tf"]):
+                        p_text, s_text = _make_problem_extra(tname, ch["title"], stype, ptype, pi)
+                        pid = make_id(new_topic_id, "prob", ptype)
+                        insert_problem(pid, new_topic_id, new_chapter_id, p_text, s_text, ptype, 10 + pi)
+                        
+                    # For Math/Science/Physics/Chemistry/Biology, generate at least 3 solved exercise problems
+                    if stype in ("math", "science"):
+                        for idx in range(1, 4):
+                            pid = make_id(new_topic_id, "exercise", str(idx))
+                            prob_text = f"Explain the core concept, standard formulation, and analytical application of {tname} in the study of {ch['title']}." if idx == 1 else (
+                                f"Solve the typical NCERT textbook exercise problem demonstrating the principles of {tname}." if idx == 2 else
+                                f"Practice problem: Discuss key questions, common errors, and exam tips for the topic: {tname}."
+                            )
+                            sol_text = solve_problem_offline(prob_text, tname)
+                            insert_problem(pid, new_topic_id, new_chapter_id, prob_text, sol_text, "exercise", idx)
+                            
     conn.commit()
-    log.info("V-XII curriculum replication completed successfully!")
+    log.info("V-IX and XI-XII curricula seeded successfully!")
 
 if __name__ == "__main__":
     seed_database_full()

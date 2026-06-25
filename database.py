@@ -82,6 +82,25 @@ CREATE TABLE IF NOT EXISTS content_meta (
     value TEXT
 );
 
+CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(
+    title,
+    content,
+    content='chunks'
+);
+
+CREATE TRIGGER IF NOT EXISTS chunks_ai AFTER INSERT ON chunks BEGIN
+    INSERT INTO chunks_fts(rowid, title, content) VALUES (new.rowid, new.title, new.content);
+END;
+
+CREATE TRIGGER IF NOT EXISTS chunks_ad AFTER DELETE ON chunks BEGIN
+    INSERT INTO chunks_fts(chunks_fts, rowid, title, content) VALUES('delete', old.rowid, old.title, old.content);
+END;
+
+CREATE TRIGGER IF NOT EXISTS chunks_au AFTER UPDATE ON chunks BEGIN
+    INSERT INTO chunks_fts(chunks_fts, rowid, title, content) VALUES('delete', old.rowid, old.title, old.content);
+    INSERT INTO chunks_fts(rowid, title, content) VALUES (new.rowid, new.title, new.content);
+END;
+
 CREATE TABLE IF NOT EXISTS learner (
     id INTEGER PRIMARY KEY,
     name TEXT DEFAULT 'Learner',

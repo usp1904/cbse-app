@@ -23,12 +23,14 @@ case "$MODE" in
     app)
         echo "[2/3] Starting web server..."
         echo ""
-        python3 app.py
+        python3 server.py
         ;;
     mesh)
-        echo "[2/3] Starting mesh load balancer with workers..."
-        echo ""
-        python3 mesh_lb.py
+        if [ -f mesh_lb.py ]; then
+            python3 mesh_lb.py
+        else
+            python3 _archive/mesh_lb.py
+        fi
         ;;
     mcp)
         echo "[2/3] Starting MCP server (stdio)..."

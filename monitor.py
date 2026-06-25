@@ -15,7 +15,10 @@ from urllib.error import URLError, HTTPError
 
 BASE_URL = "http://localhost:9090"
 LOG_DIR = os.path.dirname(os.path.abspath(__file__))
-SERVER_LOG = "/tmp/server_stderr.log"
+SERVER_LOG = os.environ.get("SERVER_LOG") or (
+    "/tmp/server_stderr.log" if os.name != "nt" 
+    else os.path.join(LOG_DIR, "server_stderr.log")
+)
 REPORT_LOG = os.path.join(LOG_DIR, "monitor_report.log")
 ERROR_HISTORY = os.path.join(LOG_DIR, "monitor_errors.json")
 
@@ -167,7 +170,7 @@ def save_error_history(data):
         log(f"Cannot save error history: {e}", "WARN")
 
 
-def run_once(auto_fix=False):
+def run_once(auto_fix=False, mode="server"):
     log("=== MONITOR RUN START ===")
     errors = {"server": [], "pages": [], "api": [], "logs": []}
 
@@ -176,13 +179,28 @@ def run_once(auto_fix=False):
         log("Server is down — attempting restart...", "FAIL")
         if auto_fix:
             try:
+                # Platform-independent stdout path
+                stdout_path = (
+                    "/tmp/server_stdout.log" if os.name != "nt" 
+                    else os.path.join(LOG_DIR, "server_stdout.log")
+                )
+                
+                # Determine script and command args based on mode
+                if mode == "mesh":
+                    script_to_run = os.path.join(LOG_DIR, "mesh_lb.py")
+                    if not os.path.exists(script_to_run):
+                        script_to_run = os.path.join(LOG_DIR, "_archive", "mesh_lb.py")
+                    cmd = [sys.executable, script_to_run]
+                else:
+                    cmd = [sys.executable, os.path.join(LOG_DIR, "server.py")]
+                
+                log(f"Server restart initiated in {mode} mode: {' '.join(cmd)}", "FIX")
                 subprocess.Popen(
-                    ["python3", "server.py"],
+                    cmd,
                     cwd=LOG_DIR,
-                    stdout=open("/tmp/server_stdout.log", "a"),
+                    stdout=open(stdout_path, "a"),
                     stderr=open(SERVER_LOG, "a"),
                 )
-                log("Server restart initiated", "FIX")
                 time.sleep(5)
                 if check_server_alive():
                     log("Server restart successful", "FIX")
@@ -223,13 +241,13 @@ def run_once(auto_fix=False):
     return total
 
 
-def watch_mode(interval=60, auto_fix=False):
-    log(f"Starting 24/7 watch mode — interval={interval}s auto_fix={auto_fix}")
+def watch_mode(interval=60, auto_fix=False, mode="server"):
+    log(f"Starting 24/7 watch mode — interval={interval}s auto_fix={auto_fix} mode={mode}")
     log(f"Report log: {REPORT_LOG}")
     log(f"Error history: {ERROR_HISTORY}")
     while True:
         try:
-            run_once(auto_fix=auto_fix)
+            run_once(auto_fix=auto_fix, mode=mode)
         except Exception as e:
             log(f"Monitor crashed: {traceback.format_exc()}", "FAIL")
         time.sleep(interval)
@@ -240,12 +258,13 @@ def main():
     parser.add_argument("--watch", action="store_true", help="Continuous monitoring mode")
     parser.add_argument("--interval", type=int, default=60, help="Check interval in seconds (default: 60)")
     parser.add_argument("--auto-fix", action="store_true", help="Attempt auto-fix on failures")
+    parser.add_argument("--mode", choices=["server", "mesh"], default="server", help="Server mode to start on auto-fix")
     args = parser.parse_args()
 
     if args.watch:
-        watch_mode(interval=args.interval, auto_fix=args.auto_fix)
+        watch_mode(interval=args.interval, auto_fix=args.auto_fix, mode=args.mode)
     else:
-        sys.exit(run_once(auto_fix=args.auto_fix))
+        sys.exit(run_once(auto_fix=args.auto_fix, mode=args.mode))
 
 
 if __name__ == "__main__":
